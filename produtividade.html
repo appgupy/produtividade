@@ -3,93 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relatório de Produtividade - Gupy</title>
+    <title>Relatório Detalhado - Gupy</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        :root { --primary: #e11d48; --success: #059669; --danger: #dc2626; --bg: #f1f5f9; }
+        :root { --primary: #e11d48; --success: #059669; --bg: #f1f5f9; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #1e293b; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .btn { padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; }
-        .btn-import { background: var(--primary); color: white; }
-        .btn-nav { background: #64748b; color: white; text-decoration: none; font-size: 0.9rem; }
-        
-        /* Estilo do Relatório */
-        .report-controls { display: flex; gap: 15px; align-items: flex-end; margin-bottom: 20px; flex-wrap: wrap; }
-        .report-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
-        .report-table th { background: #f8fafc; padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0; font-size: 0.85rem; text-transform: uppercase; }
-        .report-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.95rem; }
-        
-        /* Badges de Status */
-        .badge { padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
-        .badge-success { background: #dcfce7; color: var(--success); }
-        .badge-danger { background: #fee2e2; color: var(--danger); }
-        
-        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .summary-item { background: white; padding: 15px; border-radius: 10px; border-left: 5px solid var(--primary); }
-        .summary-label { font-size: 0.8rem; color: #64748b; }
-        .summary-value { font-size: 1.4rem; font-weight: bold; }
-        
-        input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; }
+        .btn { padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; background: var(--primary); color: white; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .summary-item { background: white; padding: 15px; border-radius: 10px; border-bottom: 4px solid #cbd5e1; text-align: center; }
+        .summary-item.total { border-bottom-color: var(--primary); }
+        .summary-label { font-size: 0.7rem; color: #64748b; text-transform: uppercase; margin-bottom: 5px; }
+        .summary-value { font-size: 1.2rem; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { background: #f8fafc; padding: 10px; text-align: left; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 10px; border-bottom: 1px solid #f1f5f9; }
+        .badge { padding: 3px 7px; border-radius: 10px; font-size: 0.7rem; font-weight: bold; }
+        .bg-green { background: #dcfce7; color: #166534; }
+        .bg-red { background: #fee2e2; color: #991b1b; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div>
-        <h1 style="margin:0; font-size: 1.5rem;">📊 Relatório Diário de Validação</h1>
-        <p style="margin:5px 0 0; color: #64748b; font-size: 0.9rem;">Gestão de Produtividade Assistentes</p>
-    </div>
-    <button class="btn btn-nav" onclick="location.href='gestao.html'">Configurações de Gestão</button>
+    <h2>📊 Produção Detalhada</h2>
+    <button class="btn" onclick="location.href='gestao.html'" style="background:#64748b;">Voltar à Gestão</button>
 </div>
 
 <div class="card">
-    <h3 style="margin-top:0;">Nova Importação</h3>
-    <div class="report-controls">
-        <div>
-            <label style="display:block; font-size:0.8rem; margin-bottom:5px;">Arquivo Excel (DDMMAAAA.xlsx)</label>
-            <input type="file" id="excel-file" accept=".xlsx">
-        </div>
-        <button class="btn btn-import" onclick="processarExcel()">Carregar Dados</button>
-    </div>
+    <h3 style="margin-top:0;">Importar Planilha Diária</h3>
+    <input type="file" id="excel-file" accept=".xlsx">
+    <button class="btn" onclick="processarExcel()">Carregar Dados</button>
 </div>
 
 <div class="card">
-    <div class="report-controls">
-        <div>
-            <label style="display:block; font-size:0.8rem; margin-bottom:5px;">Filtrar por Data</label>
-            <input type="date" id="filtro-data" onchange="carregarRelatorio()">
-        </div>
-        <div id="info-arquivo" style="font-size: 0.85rem; color: #64748b; align-self: center; margin-top: 20px;"></div>
+    <div style="margin-bottom: 20px;">
+        <label>Ver Relatório de:</label>
+        <input type="date" id="filtro-data" onchange="carregarRelatorio()" style="padding:8px; border-radius:5px; border:1px solid #ddd;">
     </div>
 
-    <div class="summary-grid">
-        <div class="summary-item">
-            <div class="summary-label">Total Validado no Dia</div>
-            <div class="summary-value" id="total-dia">0</div>
-        </div>
-        <div class="summary-item" style="border-left-color: #3b82f6;">
-            <div class="summary-label">Média por Assistente</div>
-            <div class="summary-value" id="media-dia">0</div>
-        </div>
+    <div class="summary-grid" id="resumo-detalhado">
+        <div class="summary-item"><div class="summary-label">FIFO</div><div class="summary-value" id="tot-fifo">0</div></div>
+        <div class="summary-item"><div class="summary-label">Grad. Total</div><div class="summary-value" id="tot-gt">0</div></div>
+        <div class="summary-item"><div class="summary-label">Grad. Parcial</div><div class="summary-value" id="tot-gp">0</div></div>
+        <div class="summary-item"><div class="summary-label">Perfil FC</div><div class="summary-value" id="tot-fc">0</div></div>
+        <div class="summary-item total"><div class="summary-label">Soma Geral</div><div class="summary-value" id="tot-geral">0</div></div>
     </div>
 
-    <table class="report-table">
-        <thead>
-            <tr>
-                <th>Assistente</th>
-                <th>ID</th>
-                <th>Produção</th>
-                <th>Meta Atual</th>
-                <th>Atingimento</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody id="tabela-corpo">
-            <tr><td colspan="6" style="text-align:center; padding:40px;">Selecione uma data para visualizar o relatório.</td></tr>
-        </tbody>
-    </table>
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Assistente</th>
+                    <th>FIFO</th>
+                    <th>Grad. Total</th>
+                    <th>Grad. Parcial</th>
+                    <th>Perfil FC</th>
+                    <th>Total</th>
+                    <th>Meta</th>
+                    <th>Ating.</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-corpo"></tbody>
+        </table>
+    </div>
 </div>
 
 <script>
@@ -97,7 +76,6 @@
     const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdscXJwc3lqd296dmlzbHl4YXBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyNTQyOTgsImV4cCI6MjA4MTgzMDI5OH0.etzcmIHgPcGC12HwZPTU2u0DLtJdF3XTBSYW38O7S-w";
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
-    // Define a data de hoje no filtro ao carregar
     document.getElementById('filtro-data').valueAsDate = new Date();
 
     async function processarExcel() {
@@ -105,8 +83,6 @@
         if(!file) return alert("Selecione o arquivo!");
         
         const fileName = file.name.replace('.xlsx', '');
-        if(!/^\d{8}$/.test(fileName)) return alert("Nome inválido! Use DDMMAAAA.xlsx");
-        
         const dataRef = `${fileName.substring(4,8)}-${fileName.substring(2,4)}-${fileName.substring(0,2)}`;
 
         const reader = new FileReader();
@@ -117,77 +93,64 @@
 
             const inserts = json.map(r => ({
                 usuario_id: r.id_assistente,
-                quantidade: r.documentos_validados,
+                fifo: r.documentos_validados_fifo || 0,
+                gradual_total: r.documentos_validados_gradual_total || 0,
+                gradual_parcial: r.documentos_validados_gradual_parcial || 0,
+                perfil_fc: r.documentos_validados_perfil_fc || 0,
+                quantidade: r.documentos_validados || 0,
                 data_referencia: dataRef,
                 nome_arquivo: file.name
             })).filter(x => x.usuario_id);
 
             const { error } = await _supabase.from('producao').insert(inserts);
-            if(error) alert("Erro: Esta data já foi importada anteriormente.");
-            else {
-                alert("Sucesso! Relatório de " + dataRef + " carregado.");
-                document.getElementById('filtro-data').value = dataRef;
-                carregarRelatorio();
-            }
+            if(error) alert("Erro: Planilha já importada ou erro de IDs.");
+            else { alert("Sucesso!"); carregarRelatorio(); }
         };
         reader.readAsArrayBuffer(file);
     }
 
     async function carregarRelatorio() {
         const dataBusca = document.getElementById('filtro-data').value;
-        if(!dataBusca) return;
-
-        // Buscar Produção + Nome do Usuário
-        const { data: pData, error: pError } = await _supabase
-            .from('producao')
-            .select('*, usuarios(nome)')
-            .eq('data_referencia', dataBusca);
-
-        // Buscar Metas Atuais
+        const { data: pData } = await _supabase.from('producao').select('*, usuarios(nome)').eq('data_referencia', dataBusca);
         const { data: mData } = await _supabase.from('metas').select('*');
 
         const tbody = document.getElementById('tabela-corpo');
         tbody.innerHTML = '';
+        
+        let totais = { fifo:0, gt:0, gp:0, fc:0, geral:0 };
 
-        if(!pData || pData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">Sem dados para esta data.</td></tr>';
-            atualizarResumo(0, 0);
-            return;
+        if(pData) {
+            pData.forEach(p => {
+                const metaUser = mData.filter(m => m.usuario_id == p.usuario_id).sort((a,b) => b.id - a.id)[0];
+                const metaVal = metaUser ? metaUser.valor_meta : 0;
+                const perc = metaVal > 0 ? ((p.quantidade / metaVal) * 100).toFixed(0) : 0;
+
+                totais.fifo += p.fifo; totais.gt += p.gradual_total;
+                totais.gp += p.gradual_parcial; totais.fc += p.perfil_fc;
+                totais.geral += p.quantidade;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${p.usuarios?.nome || 'ID:'+p.usuario_id}</strong></td>
+                        <td>${p.fifo}</td>
+                        <td>${p.gradual_total}</td>
+                        <td>${p.gradual_parcial}</td>
+                        <td>${p.perfil_fc}</td>
+                        <td><strong>${p.quantidade}</strong></td>
+                        <td>${metaVal}</td>
+                        <td><span class="badge ${perc >= 100 ? 'bg-green' : 'bg-red'}">${perc}%</span></td>
+                    </tr>
+                `;
+            });
         }
 
-        let somaTotal = 0;
-
-        pData.forEach(p => {
-            // Encontrar a meta do usuário (pegando a mais recente)
-            const metaUser = mData.filter(m => m.usuario_id == p.usuario_id).sort((a,b) => b.id - a.id)[0];
-            const metaValor = metaUser ? metaUser.valor_meta : 0;
-            const atingimento = metaValor > 0 ? ((p.quantidade / metaValor) * 100).toFixed(1) : 0;
-            const statusLabel = atingimento >= 100 ? 'META ATINGIDA' : 'ABAIXO DA META';
-            const statusClass = atingimento >= 100 ? 'badge-success' : 'badge-danger';
-
-            somaTotal += p.quantidade;
-
-            tbody.innerHTML += `
-                <tr>
-                    <td><strong>${p.usuarios?.nome || 'Não cadastrado'}</strong></td>
-                    <td>${p.usuario_id}</td>
-                    <td>${p.quantidade}</td>
-                    <td>${metaValor}</td>
-                    <td>${atingimento}%</td>
-                    <td><span class="badge ${statusClass}">${statusLabel}</span></td>
-                </tr>
-            `;
-        });
-
-        atualizarResumo(somaTotal, pData.length);
+        document.getElementById('tot-fifo').innerText = totais.fifo;
+        document.getElementById('tot-gt').innerText = totais.gt;
+        document.getElementById('tot-gp').innerText = totais.gp;
+        document.getElementById('tot-fc').innerText = totais.fc;
+        document.getElementById('tot-geral').innerText = totais.geral;
     }
 
-    function atualizarResumo(total, qtdPessoas) {
-        document.getElementById('total-dia').innerText = total.toLocaleString();
-        document.getElementById('media-dia').innerText = qtdPessoas > 0 ? (total / qtdPessoas).toFixed(0) : 0;
-    }
-
-    // Inicializa o relatório
     carregarRelatorio();
 </script>
 </body>
