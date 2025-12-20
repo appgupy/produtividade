@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Produtividade - Gupy</title>
+    <title>Gestão de Produtividade - Gupy</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
@@ -11,40 +11,51 @@
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
         .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 2rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px; }
-        .stat-card { background: white; padding: 20px; border-radius: 10px; text-align: center; border-bottom: 4px solid var(--primary); }
-        .stat-val { font-size: 1.8rem; font-weight: bold; color: var(--primary); }
-        .hidden { display: none; }
         .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; background: var(--primary); color: white; }
+        .btn-secondary { background: #64748b; margin-left: 10px; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 0.9rem; }
+        select, input[type="file"] { padding: 8px; border-radius: 5px; border: 1px solid #cbd5e1; }
+        .status-ok { color: #059669; font-weight: bold; }
+        .status-low { color: #dc2626; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h2 id="view-title">Controle de Produção</h2>
-    <div><span id="user-nome">...</span> <button onclick="sair()" style="margin-left:10px; cursor:pointer;">Sair</button></div>
-</div>
-
-<div id="area-gestora" class="card hidden">
-    <h3>Importar Planilha Diária (.xlsx)</h3>
-    <p style="font-size: 0.8rem; color: #64748b;">Nome do arquivo deve ser exato: <strong>01102025.xlsx</strong></p>
-    <input type="file" id="excel-file" accept=".xlsx">
-    <button class="btn" onclick="processarExcel()">Subir Dados</button>
-</div>
-
-<div class="grid">
-    <div class="stat-card"><div>Produção do Dia</div><div class="stat-val" id="val-produzido">0</div></div>
-    <div class="stat-card"><div>Minha Meta</div><div class="stat-val" id="val-meta">0</div></div>
-    <div class="stat-card"><div>Atingimento</div><div class="stat-val" id="val-status">0%</div></div>
+    <h2>Centro de Produtividade (Gestora)</h2>
+    <div>
+        <button class="btn btn-secondary" onclick="location.href='gestao.html'">Voltar para Gestão</button>
+        <button class="btn btn-secondary" onclick="location.href='index.html'">Sair</button>
+    </div>
 </div>
 
 <div class="card">
-    <h3>Meu Histórico</h3>
+    <h3>1. Importar Novo Arquivo Diário</h3>
+    <p style="font-size: 0.8rem; color: #64748b;">Formato aceito: <strong>DDMMAAAA.xlsx</strong> (Ex: 01102025.xlsx)</p>
+    <input type="file" id="excel-file" accept=".xlsx">
+    <button class="btn" onclick="processarExcel()">Processar Excel</button>
+</div>
+
+<div class="card">
+    <h3>2. Analisar Desempenho por Colaborador</h3>
+    <div style="margin-bottom: 15px;">
+        <select id="filtro-user" onchange="carregarProducaoFiltrada()">
+            <option value="">Selecione um colaborador...</option>
+        </select>
+    </div>
     <table>
-        <thead><tr><th>Data</th><th>Quantidade</th><th>Meta</th><th>%</th></tr></thead>
-        <tbody id="lista-producao"></tbody>
+        <thead>
+            <tr>
+                <th>Data Ref.</th>
+                <th>Produção</th>
+                <th>Meta do Dia</th>
+                <th>Atingimento (%)</th>
+            </tr>
+        </thead>
+        <tbody id="tabela-analise">
+            <tr><td colspan="4" style="text-align:center;">Selecione um usuário para ver os dados</td></tr>
+        </tbody>
     </table>
 </div>
 
@@ -53,46 +64,30 @@
     const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdscXJwc3lqd296dmlzbHl4YXBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyNTQyOTgsImV4cCI6MjA4MTgzMDI5OH0.etzcmIHgPcGC12HwZPTU2u0DLtJdF3XTBSYW38O7S-w";
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
+    // Bloqueio de acesso: Somente Gestora (Patrícia) por enquanto
     const user = JSON.parse(localStorage.getItem('usuario'));
-    if(!user) window.location.href = 'index.html';
-
-    document.getElementById('user-nome').innerText = user.nome;
-    if(user.funcao === 'Gestora') document.getElementById('area-gestora').classList.remove('hidden');
-
-    async function carregarDados() {
-        // Buscar Meta
-        const { data: mData } = await _supabase.from('metas').select('valor_meta').eq('usuario_id', user.id).order('data_inicio', {ascending: false}).limit(1);
-        const meta = mData?.[0]?.valor_meta || 100;
-        document.getElementById('val-meta').innerText = meta;
-
-        // Buscar Produção
-        const { data: pData } = await _supabase.from('producao').select('*').eq('usuario_id', user.id).order('data_referencia', {ascending: false});
-        
-        const lista = document.getElementById('lista-producao');
-        lista.innerHTML = '';
-        
-        if(pData && pData.length > 0) {
-            document.getElementById('val-produzido').innerText = pData[0].quantidade;
-            document.getElementById('val-status').innerText = ((pData[0].quantidade/meta)*100).toFixed(0) + "%";
-            
-            pData.forEach(p => {
-                lista.innerHTML += `<tr>
-                    <td>${new Date(p.data_referencia).toLocaleDateString('pt-BR', {timeZone: 'UTC'})}</td>
-                    <td>${p.quantidade}</td>
-                    <td>${meta}</td>
-                    <td>${((p.quantidade/meta)*100).toFixed(1)}%</td>
-                </tr>`;
-            });
-        }
+    if(!user || user.funcao !== 'Gestora') {
+        alert("Acesso restrito à Gestora neste momento.");
+        window.location.href = 'index.html';
     }
 
-    function processarExcel() {
+    // Carrega a lista de usuários no select
+    async function carregarListaUsuarios() {
+        const { data } = await _supabase.from('usuarios').select('id, nome').eq('ativo', true).order('nome');
+        const select = document.getElementById('filtro-user');
+        data.forEach(u => {
+            select.innerHTML += `<option value="${u.id}">${u.nome}</option>`;
+        });
+    }
+
+    async function processarExcel() {
         const file = document.getElementById('excel-file').files[0];
-        if(!file) return alert("Selecione o arquivo .xlsx");
+        if(!file) return alert("Selecione o arquivo!");
 
         const fileName = file.name.replace('.xlsx', '');
-        if(!/^\d{8}$/.test(fileName)) return alert("Nome inválido! Use: DDMMAAAA.xlsx");
+        if(!/^\d{8}$/.test(fileName)) return alert("Nome do arquivo deve ser DDMMAAAA.xlsx");
 
+        // Converte 01102025 para 2025-10-01
         const dataRef = `${fileName.substring(4,8)}-${fileName.substring(2,4)}-${fileName.substring(0,2)}`;
 
         const reader = new FileReader();
@@ -110,14 +105,46 @@
             }));
 
             const { error } = await _supabase.from('producao').insert(inserts);
-            if(error) alert("Erro: Verifique se os dados já foram importados hoje.");
-            else { alert("Importação concluída!"); carregarDados(); }
+            if(error) {
+                alert("Erro: Este arquivo já foi importado ou os IDs não existem.");
+            } else {
+                alert("Importação da planilha " + file.name + " concluída com sucesso!");
+                carregarProducaoFiltrada();
+            }
         };
         reader.readAsArrayBuffer(file);
     }
 
-    function sair() { localStorage.removeItem('usuario'); window.location.href = 'index.html'; }
-    carregarDados();
+    async function carregarProducaoFiltrada() {
+        const userId = document.getElementById('filtro-user').value;
+        if(!userId) return;
+
+        // Buscar meta mais recente deste usuário
+        const { data: mData } = await _supabase.from('metas').select('valor_meta').eq('usuario_id', userId).order('data_inicio', {ascending: false}).limit(1);
+        const meta = mData?.[0]?.valor_meta || 0;
+
+        // Buscar histórico de produção
+        const { data: pData } = await _supabase.from('producao').select('*').eq('usuario_id', userId).order('data_referencia', {ascending: false});
+        
+        const tabela = document.getElementById('tabela-analise');
+        tabela.innerHTML = '';
+
+        pData.forEach(p => {
+            const perc = meta > 0 ? ((p.quantidade / meta) * 100).toFixed(1) : 0;
+            const statusClass = perc >= 100 ? 'status-ok' : 'status-low';
+
+            tabela.innerHTML += `
+                <tr>
+                    <td>${new Date(p.data_referencia).toLocaleDateString('pt-BR', {timeZone: 'UTC'})}</td>
+                    <td>${p.quantidade}</td>
+                    <td>${meta}</td>
+                    <td class="${statusClass}">${perc}%</td>
+                </tr>
+            `;
+        });
+    }
+
+    carregarListaUsuarios();
 </script>
 </body>
 </html>
