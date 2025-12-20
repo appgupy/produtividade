@@ -50,20 +50,9 @@
         // Guardar dados temporariamente no navegador para usar nas outras páginas
         localStorage.setItem('usuario', JSON.stringify(data));
 
-        // Redirecionamento lógico
-        if (data.primeiro_acesso && data.id != 432243) {
-            // Se não for a Patrícia e for 1º acesso, poderia ir para troca de senha
-            // Para simplificar agora, vamos direto para a página conforme a função
-            alert("Bem-vindo! Lembre-se de trocar sua senha.");
-        }
-
+// Redirecionamento correto conforme o nome dos arquivos no GitHub
         if (data.funcao === 'Gestora' || data.funcao === 'Auditora') {
             window.location.href = 'gestao.html';
         } else {
-            window.location.href = 'colaborador.html';
+            window.location.href = 'produtividade.html';
         }
-    }
-</script>
-
-</body>
-</html>
