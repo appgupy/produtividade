@@ -13,71 +13,87 @@
         .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; background: var(--primary); color: white; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 0.85rem; }
+        .loading { color: orange; font-weight: bold; display: none; }
     </style>
 </head>
 <body>
-
-<div class="header">
-    <h2>📊 Centro de Produtividade</h2>
-    <button class="btn" onclick="location.href='gestao.html'" style="background:#64748b;">Voltar à Gestão</button>
-</div>
-
-<div class="card">
-    <h3>Importar Planilha Excel</h3>
-    <p>Nome do arquivo deve ser <strong>DDMMAAAA.xlsx</strong></p>
-    <input type="file" id="excel-file" accept=".xlsx">
-    <button class="btn" onclick="processarExcel()">Subir Arquivo</button>
-</div>
-
-<div class="card">
-    <h3>Ver Produção por Usuário</h3>
-    <select id="user-select" onchange="verProducao()" style="padding:10px; border-radius:5px; width:100%; max-width:300px;"></select>
-    <table id="tabela-resultados">
-        <thead><tr><th>Data</th><th>Produção</th><th>Meta</th><th>Status</th></tr></thead>
-        <tbody></tbody>
-    </table>
-</div>
-
+    <div class="header">
+        <h2>📊 Centro de Produtividade</h2>
+        <button class="btn" onclick="location.href='gestao.html'" style="background:#64748b;">Voltar à Gestão</button>
+    </div>
+    <div class="card">
+        <h3>Importar Planilha Diária</h3>
+        <p>Selecione o arquivo no formato <strong>DDMMAAAA.xlsx</strong></p>
+        <input type="file" id="excel-file" accept=".xlsx">
+        <button class="btn" onclick="processarExcel()">Subir Dados</button>
+        <p id="status-load" class="loading">Processando dados, aguarde...</p>
+    </div>
+    <div class="card">
+        <h3>Histórico de Importações</h3>
+        <select id="user-view" onchange="verProd()" style="padding:10px; width:100%; max-width:300px; margin-bottom:15px;"></select>
+        <table>
+            <thead><tr><th>Data</th><th>Total Validado</th><th>Meta</th><th>Atingimento</th></tr></thead>
+            <tbody id="corpo-tabela"></tbody>
+        </table>
+    </div>
 <script>
     const SB_URL = "https://glqrpsyjwozvislyxapj.supabase.co";
     const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdscXJwc3lqd296dmlzbHl4YXBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyNTQyOTgsImV4cCI6MjA4MTgzMDI5OH0.etzcmIHgPcGC12HwZPTU2u0DLtJdF3XTBSYW38O7S-w";
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
-    async function carregarUsers() {
-        const { data } = await _supabase.from('usuarios').select('id, nome').eq('funcao','Assistente');
-        const select = document.getElementById('user-select');
-        select.innerHTML = '<option value="">Selecione...</option>';
-        data.forEach(u => select.innerHTML += `<option value="${u.id}">${u.nome}</option>`);
-    }
-
     async function processarExcel() {
         const file = document.getElementById('excel-file').files[0];
-        if(!file) return alert("Selecione!");
+        if(!file) return alert("Selecione um arquivo!");
+        
         const fileName = file.name.replace('.xlsx', '');
+        if(!/^\d{8}$/.test(fileName)) return alert("Nome do arquivo deve ser DDMMAAAA.xlsx");
         const dataRef = `${fileName.substring(4,8)}-${fileName.substring(2,4)}-${fileName.substring(0,2)}`;
 
+        document.getElementById('status-load').style.display = 'block';
         const reader = new FileReader();
         reader.onload = async (e) => {
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, {type: 'array'});
             const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-            const inserts = json.map(r => ({ usuario_id: r.ID, quantidade: r.Contagem, data_referencia: dataRef, nome_arquivo: file.name }));
+
+            // Mapeamento usando as colunas que você enviou
+            const inserts = json.map(r => ({
+                usuario_id: r.id_assistente, // Sua coluna: id_assistente
+                quantidade: r.documentos_validados, // Sua coluna: documentos_validados
+                data_referencia: dataRef,
+                nome_arquivo: file.name
+            })).filter(x => x.usuario_id); // Remove linhas vazias
+
             const { error } = await _supabase.from('producao').insert(inserts);
-            if(error) alert("Erro na importação!"); else alert("Sucesso!");
+            document.getElementById('status-load').style.display = 'none';
+            if(error) alert("Erro: Dados já existentes ou IDs inválidos.");
+            else { alert("Importação concluída!"); verProd(); }
         };
         reader.readAsArrayBuffer(file);
     }
 
-    async function verProducao() {
-        const userId = document.getElementById('user-select').value;
-        const { data: pData } = await _supabase.from('producao').select('*').eq('usuario_id', userId).order('data_referencia');
-        const tbody = document.querySelector('#tabela-resultados tbody');
-        tbody.innerHTML = '';
-        pData.forEach(p => tbody.innerHTML += `<tr><td>${p.data_referencia}</td><td>${p.quantidade}</td><td>-</td><td>OK</td></tr>`);
+    async function verProd() {
+        const uid = document.getElementById('user-view').value;
+        const { data: p } = await _supabase.from('producao').select('*').eq('usuario_id', uid).order('data_referencia', {ascending: false});
+        const { data: m } = await _supabase.from('metas').select('valor_meta').eq('usuario_id', uid).order('id', {ascending: false}).limit(1);
+        const meta = m?.[0]?.valor_meta || 0;
+        
+        document.getElementById('corpo-tabela').innerHTML = p.map(x => `
+            <tr>
+                <td>${new Date(x.data_referencia).toLocaleDateString('pt-BR', {timeZone:'UTC'})}</td>
+                <td>${x.quantidade}</td>
+                <td>${meta}</td>
+                <td>${meta > 0 ? ((x.quantidade/meta)*100).toFixed(1) : 0}%</td>
+            </tr>
+        `).join('');
     }
 
-    carregarUsers();
+    async function init(){
+        const {data} = await _supabase.from('usuarios').select('id, nome').eq('funcao','Assistente');
+        document.getElementById('user-view').innerHTML = data.map(x=>`<option value="${x.id}">${x.nome}</option>`).join('');
+    }
+    init();
 </script>
 </body>
 </html>
