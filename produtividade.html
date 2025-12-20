@@ -3,59 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Produtividade - Gupy</title>
+    <title>Produtividade Gupy</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        :root { --primary: #e11d48; --bg: #f8fafc; --text: #1e293b; }
+        :root { --primary: #e11d48; --bg: #f8fafc; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 2rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 2rem; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; background: var(--primary); color: white; }
-        .btn-secondary { background: #64748b; margin-left: 10px; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 0.9rem; }
-        select, input[type="file"] { padding: 8px; border-radius: 5px; border: 1px solid #cbd5e1; }
-        .status-ok { color: #059669; font-weight: bold; }
-        .status-low { color: #dc2626; font-weight: bold; }
+        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: left; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h2>Centro de Produtividade (Gestora)</h2>
-    <div>
-        <button class="btn btn-secondary" onclick="location.href='gestao.html'">Voltar para Gestão</button>
-        <button class="btn btn-secondary" onclick="location.href='index.html'">Sair</button>
-    </div>
+    <h2>📊 Centro de Produtividade</h2>
+    <button class="btn" onclick="location.href='gestao.html'" style="background:#64748b;">Voltar à Gestão</button>
 </div>
 
 <div class="card">
-    <h3>1. Importar Novo Arquivo Diário</h3>
-    <p style="font-size: 0.8rem; color: #64748b;">Formato aceito: <strong>DDMMAAAA.xlsx</strong> (Ex: 01102025.xlsx)</p>
+    <h3>Importar Planilha Excel</h3>
+    <p>Nome do arquivo deve ser <strong>DDMMAAAA.xlsx</strong></p>
     <input type="file" id="excel-file" accept=".xlsx">
-    <button class="btn" onclick="processarExcel()">Processar Excel</button>
+    <button class="btn" onclick="processarExcel()">Subir Arquivo</button>
 </div>
 
 <div class="card">
-    <h3>2. Analisar Desempenho por Colaborador</h3>
-    <div style="margin-bottom: 15px;">
-        <select id="filtro-user" onchange="carregarProducaoFiltrada()">
-            <option value="">Selecione um colaborador...</option>
-        </select>
-    </div>
-    <table>
-        <thead>
-            <tr>
-                <th>Data Ref.</th>
-                <th>Produção</th>
-                <th>Meta do Dia</th>
-                <th>Atingimento (%)</th>
-            </tr>
-        </thead>
-        <tbody id="tabela-analise">
-            <tr><td colspan="4" style="text-align:center;">Selecione um usuário para ver os dados</td></tr>
-        </tbody>
+    <h3>Ver Produção por Usuário</h3>
+    <select id="user-select" onchange="verProducao()" style="padding:10px; border-radius:5px; width:100%; max-width:300px;"></select>
+    <table id="tabela-resultados">
+        <thead><tr><th>Data</th><th>Produção</th><th>Meta</th><th>Status</th></tr></thead>
+        <tbody></tbody>
     </table>
 </div>
 
@@ -64,87 +44,40 @@
     const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdscXJwc3lqd296dmlzbHl4YXBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyNTQyOTgsImV4cCI6MjA4MTgzMDI5OH0.etzcmIHgPcGC12HwZPTU2u0DLtJdF3XTBSYW38O7S-w";
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
-    // Bloqueio de acesso: Somente Gestora (Patrícia) por enquanto
-    const user = JSON.parse(localStorage.getItem('usuario'));
-    if(!user || user.funcao !== 'Gestora') {
-        alert("Acesso restrito à Gestora neste momento.");
-        window.location.href = 'index.html';
-    }
-
-    // Carrega a lista de usuários no select
-    async function carregarListaUsuarios() {
-        const { data } = await _supabase.from('usuarios').select('id, nome').eq('ativo', true).order('nome');
-        const select = document.getElementById('filtro-user');
-        data.forEach(u => {
-            select.innerHTML += `<option value="${u.id}">${u.nome}</option>`;
-        });
+    async function carregarUsers() {
+        const { data } = await _supabase.from('usuarios').select('id, nome').eq('funcao','Assistente');
+        const select = document.getElementById('user-select');
+        select.innerHTML = '<option value="">Selecione...</option>';
+        data.forEach(u => select.innerHTML += `<option value="${u.id}">${u.nome}</option>`);
     }
 
     async function processarExcel() {
         const file = document.getElementById('excel-file').files[0];
-        if(!file) return alert("Selecione o arquivo!");
-
+        if(!file) return alert("Selecione!");
         const fileName = file.name.replace('.xlsx', '');
-        if(!/^\d{8}$/.test(fileName)) return alert("Nome do arquivo deve ser DDMMAAAA.xlsx");
-
-        // Converte 01102025 para 2025-10-01
         const dataRef = `${fileName.substring(4,8)}-${fileName.substring(2,4)}-${fileName.substring(0,2)}`;
 
         const reader = new FileReader();
         reader.onload = async (e) => {
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, {type: 'array'});
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const json = XLSX.utils.sheet_to_json(sheet);
-
-            const inserts = json.map(row => ({
-                usuario_id: row.ID,
-                quantidade: row.Contagem,
-                data_referencia: dataRef,
-                nome_arquivo: file.name
-            }));
-
+            const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+            const inserts = json.map(r => ({ usuario_id: r.ID, quantidade: r.Contagem, data_referencia: dataRef, nome_arquivo: file.name }));
             const { error } = await _supabase.from('producao').insert(inserts);
-            if(error) {
-                alert("Erro: Este arquivo já foi importado ou os IDs não existem.");
-            } else {
-                alert("Importação da planilha " + file.name + " concluída com sucesso!");
-                carregarProducaoFiltrada();
-            }
+            if(error) alert("Erro na importação!"); else alert("Sucesso!");
         };
         reader.readAsArrayBuffer(file);
     }
 
-    async function carregarProducaoFiltrada() {
-        const userId = document.getElementById('filtro-user').value;
-        if(!userId) return;
-
-        // Buscar meta mais recente deste usuário
-        const { data: mData } = await _supabase.from('metas').select('valor_meta').eq('usuario_id', userId).order('data_inicio', {ascending: false}).limit(1);
-        const meta = mData?.[0]?.valor_meta || 0;
-
-        // Buscar histórico de produção
-        const { data: pData } = await _supabase.from('producao').select('*').eq('usuario_id', userId).order('data_referencia', {ascending: false});
-        
-        const tabela = document.getElementById('tabela-analise');
-        tabela.innerHTML = '';
-
-        pData.forEach(p => {
-            const perc = meta > 0 ? ((p.quantidade / meta) * 100).toFixed(1) : 0;
-            const statusClass = perc >= 100 ? 'status-ok' : 'status-low';
-
-            tabela.innerHTML += `
-                <tr>
-                    <td>${new Date(p.data_referencia).toLocaleDateString('pt-BR', {timeZone: 'UTC'})}</td>
-                    <td>${p.quantidade}</td>
-                    <td>${meta}</td>
-                    <td class="${statusClass}">${perc}%</td>
-                </tr>
-            `;
-        });
+    async function verProducao() {
+        const userId = document.getElementById('user-select').value;
+        const { data: pData } = await _supabase.from('producao').select('*').eq('usuario_id', userId).order('data_referencia');
+        const tbody = document.querySelector('#tabela-resultados tbody');
+        tbody.innerHTML = '';
+        pData.forEach(p => tbody.innerHTML += `<tr><td>${p.data_referencia}</td><td>${p.quantidade}</td><td>-</td><td>OK</td></tr>`);
     }
 
-    carregarListaUsuarios();
+    carregarUsers();
 </script>
 </body>
 </html>
