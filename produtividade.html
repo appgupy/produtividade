@@ -8,7 +8,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #e11d48; --clt: #0ea5e9; --pj: #a855f7; --bg: #f8fafc; --nav: #1e293b; --border: #e2e8f0; --panel-inner: #334155; }
+        :root { 
+            --primary: #e11d48; 
+            --clt: #0ea5e9; 
+            --pj: #10b981; /* Verde para PJ conforme solicitado */
+            --cat1: #f59e0b; /* Amarelo/Laranja para FIFO/GT */
+            --cat2: #d946ef; /* Rosa/Roxo para GP/FC */
+            --bg: #f8fafc; 
+            --nav: #1e293b; 
+            --border: #e2e8f0; 
+            --panel-inner: #334155; 
+        }
         body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding-top: 85px; color: #1e293b; }
 
         /* NAVBAR */
@@ -31,7 +41,7 @@
 
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
 
-        /* MINI PAINEL ATUALIZADO */
+        /* MINI PAINEL COLORIDO */
         .dynamic-panel { background: #1e293b; color: white; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-left: 6px solid var(--primary); }
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 10px; }
         .panel-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; background: var(--panel-inner); padding: 15px; border-radius: 10px; }
@@ -40,15 +50,20 @@
         .stat-group { display: flex; justify-content: space-between; align-items: flex-end; }
         .label { font-size: 0.55rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-bottom: 2px; }
         .value { font-size: 1.05rem; font-weight: 800; }
-        .value.small-val { font-size: 0.9rem; color: #cbd5e1; }
+        .value.small-val { font-size: 0.85rem; opacity: 0.9; }
 
-        /* TABELA COM ZEBRADO MAIS ESCURO */
+        /* CORES DAS MÉTRICAS */
+        .color-clt { color: var(--clt); }
+        .color-pj { color: var(--pj); }
+        .color-cat1 { color: var(--cat1); }
+        .color-cat2 { color: var(--cat2); }
+
+        /* TABELA */
         .table-wrap { background: white; border-radius: 15px; border: 1px solid var(--border); overflow-x: auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 1100px; }
         th { background: #f1f5f9; padding: 12px; text-align: left; border-bottom: 2px solid var(--border); color: #475569; font-weight: 800; }
         td { padding: 10px 12px; border-bottom: 1px solid #e2e8f0; }
         
-        /* Zebra mais escura conforme solicitado */
         tbody tr:nth-child(even) { background-color: #f1f5f9; }
         tbody tr:hover { background-color: #e2e8f0; }
         
@@ -104,20 +119,41 @@
         </div>
         <div class="panel-grid">
             <div class="panel-column">
-                <div class="stat-group"><div style="display:flex;flex-direction:column"><span class="label">Total Geral</span><span class="value" id="p-total">0</span></div><div style="display:flex;flex-direction:column;text-align:right"><span class="label">Média Time</span><span class="value small-val" id="p-media">0</span></div></div>
+                <div class="stat-group">
+                    <div style="display:flex;flex-direction:column"><span class="label">Total Geral</span><span class="value" id="p-total">0</span></div>
+                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Média Time</span><span class="value small-val" id="p-media">0</span></div>
+                </div>
                 <div class="stat-group"><div style="display:flex;flex-direction:column"><span class="label">Assistentes Ativos</span><span class="value" id="p-headcount">0</span></div></div>
             </div>
             <div class="panel-column">
-                <div class="stat-group"><div style="display:flex;flex-direction:column"><span class="label">Total CLT</span><span class="value" style="color:var(--clt)" id="p-clt">0</span></div><div style="display:flex;flex-direction:column;text-align:right"><span class="label">Média CLT</span><span class="value small-val" id="p-clt-media">0</span></div></div>
-                <div class="stat-group"><div style="display:flex;flex-direction:column"><span class="label">Total PJ</span><span class="value" style="color:var(--pj)" id="p-pj">0</span></div><div style="display:flex;flex-direction:column;text-align:right"><span class="label">Média PJ</span><span class="value small-val" id="p-pj-media">0</span></div></div>
+                <div class="stat-group">
+                    <div style="display:flex;flex-direction:column"><span class="label">Total CLT</span><span class="value color-clt" id="p-clt">0</span></div>
+                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Média CLT</span><span class="value small-val color-clt" id="p-clt-media">0</span></div>
+                </div>
+                <div class="stat-group">
+                    <div style="display:flex;flex-direction:column"><span class="label">Total PJ</span><span class="value color-pj" id="p-pj">0</span></div>
+                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Média PJ</span><span class="value small-val color-pj" id="p-pj-media">0</span></div>
+                </div>
             </div>
             <div class="panel-column">
-                <div class="stat-group"><div style="display:flex;flex-direction:column"><span class="label">FIFO</span><span class="value" id="p-fifo">0</span></div><div style="display:flex;flex-direction:column;text-align:right"><span class="label">Méd. FIFO</span><span class="value small-val" id="p-fifo-media">0</span></div></div>
-                <div class="stat-group"><div style="display:flex;flex-direction:column"><span class="label">GT</span><span class="value" id="p-gt">0</span></div><div style="display:flex;flex-direction:column;text-align:right"><span class="label">Méd. GT</span><span class="value small-val" id="p-gt-media">0</span></div></div>
+                <div class="stat-group">
+                    <div style="display:flex;flex-direction:column"><span class="label">Total FIFO</span><span class="value color-cat1" id="p-fifo">0</span></div>
+                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Méd. FIFO</span><span class="value small-val color-cat1" id="p-fifo-media">0</span></div>
+                </div>
+                <div class="stat-group">
+                    <div style="display:flex;flex-direction:column"><span class="label">Total GT</span><span class="value color-cat1" id="p-gt">0</span></div>
+                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Méd. GT</span><span class="value small-val color-cat1" id="p-gt-media">0</span></div>
+                </div>
             </div>
             <div class="panel-column">
-                <div class="stat-group"><div style="display:flex;flex-direction:column"><span class="label">GP</span><span class="value" id="p-gp">0</span></div><div style="display:flex;flex-direction:column;text-align:right"><span class="label">Méd. GP</span><span class="value small-val" id="p-gp-media">0</span></div></div>
-                <div class="stat-group"><div style="display:flex;flex-direction:column"><span class="label">FC</span><span class="value" id="p-fc">0</span></div><div style="display:flex;flex-direction:column;text-align:right"><span class="label">Méd. FC</span><span class="value small-val" id="p-fc-media">0</span></div></div>
+                <div class="stat-group">
+                    <div style="display:flex;flex-direction:column"><span class="label">Total GP</span><span class="value color-cat2" id="p-gp">0</span></div>
+                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Méd. GP</span><span class="value small-val color-cat2" id="p-gp-media">0</span></div>
+                </div>
+                <div class="stat-group">
+                    <div style="display:flex;flex-direction:column"><span class="label">Total FC</span><span class="value color-cat2" id="p-fc">0</span></div>
+                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Méd. FC</span><span class="value small-val color-cat2" id="p-fc-media">0</span></div>
+                </div>
             </div>
         </div>
     </div>
@@ -139,7 +175,7 @@
 <div id="import-log">
     <h4 style="margin:0 0 10px 0; font-size:0.85rem;">📢 Resultado da Importação</h4>
     <div id="log-content" style="font-size:0.75rem; line-height:1.4"></div>
-    <button onclick="this.parentElement.style.display='none'" style="margin-top:10px; width:100%; padding:8px; border:none; background:var(--nav); color:white; cursor:pointer; border-radius:6px; font-weight:700;">Fechar</button>
+    <button onclick="this.parentElement.style.display='none'" style="margin-top:12px; width:100%; padding:8px; border:none; background:var(--nav); color:white; cursor:pointer; border-radius:6px; font-weight:700;">Fechar</button>
 </div>
 
 <script>
@@ -274,10 +310,7 @@
             const meta = metasGlobais.filter(m => m.usuario_id == p.usuario_id && m.data_inicio <= p.data_referencia).sort((a,b)=>b.id-a.id)[0];
             const metaValor = meta ? meta.valor_meta : 0;
             const ating = metaValor > 0 ? ((p.quantidade / metaValor)*100).toFixed(0) : 0;
-            
-            // Lógica de cores Azul para atingiu, Vermelho para não atingiu
             const corBadge = ating >= 100 ? '#0284c7' : '#e11d48';
-            
             html += `<tr><td><b>${p.usuarios?.nome || p.usuario_id}</b></td><td style="text-align:center; color:var(--primary); font-weight:800">${p.quantidade}</td><td>${p.fifo}</td><td>${p.gradual_total}</td><td>${p.gradual_parcial}</td><td>${p.perfil_fc}</td><td>${p.tS}</td><td>${p.tM}</td><td>${p.mS}</td><td>${p.mM}</td><td><span class="badge" style="background:${corBadge}">${ating}%</span></td></tr>`;
         });
         document.getElementById('tabela-corpo').innerHTML = html || '<tr><td colspan="11" style="text-align:center">Sem dados.</td></tr>';
