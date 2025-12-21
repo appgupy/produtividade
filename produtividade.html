@@ -50,9 +50,13 @@
         .panel-column { display: flex; flex-direction: column; gap: 12px; border-right: 1px solid #475569; padding-right: 10px; }
         .panel-column:last-child { border-right: none; }
         .stat-group { display: flex; justify-content: space-between; align-items: flex-end; }
-        .label { font-size: 0.55rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-bottom: 2px; }
+        
+        /* Labels: Cinza claro para os novos, mantendo o original no Headcount conforme solicitado */
+        .label { font-size: 0.55rem; color: #cbd5e1; text-transform: uppercase; font-weight: 700; margin-bottom: 2px; }
+        .label.original { color: #94a3b8; }
+        
         .value { font-size: 1.05rem; font-weight: 800; }
-        .value.small-val { font-size: 0.85rem; opacity: 0.9; }
+        .value.small-val { font-size: 0.85rem; }
 
         .color-clt { color: var(--clt); }
         .color-pj { color: var(--pj); }
@@ -126,7 +130,12 @@
                     <div style="display:flex;flex-direction:column"><span class="label">Total Geral</span><span class="value" id="p-total">0</span></div>
                     <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Média Time</span><span class="value small-val" id="p-media">0</span></div>
                 </div>
-                <div class="stat-group"><div style="display:flex;flex-direction:column"><span class="label">Assistentes (Headcount)</span><span class="value" id="p-headcount">0</span></div></div>
+                <div class="stat-group">
+                    <div style="display:flex;flex-direction:column">
+                        <span class="label original">Assistentes (Headcount)</span>
+                        <span class="value" id="p-headcount">0</span>
+                    </div>
+                </div>
             </div>
             <div class="panel-column">
                 <div class="stat-group">
@@ -265,17 +274,21 @@
             filtrados = dadosGlobais;
             titulo = `Consolidado Mensal`;
         }
+        
+        // ORDENAÇÃO A-Z: Por nome do usuário ou por ID se não tiver nome
+        filtrados.sort((a, b) => {
+            const nomeA = (a.usuarios?.nome || a.usuario_id || "").toString().toLowerCase();
+            const nomeB = (b.usuarios?.nome || b.usuario_id || "").toString().toLowerCase();
+            return nomeA.localeCompare(nomeB);
+        });
+
         atualizarPainel(filtrados, titulo);
         renderizarTabela(filtrados, visao === 'dia');
     }
 
     function atualizarPainel(dados, titulo) {
-        // CORREÇÃO: Todos entram na soma total
         const todosValidos = dados.filter(p => p.usuario_id != null);
-        
-        // Apenas Assistentes para o cálculo do Headcount (divisor da média)
         const apenasAssistentes = todosValidos.filter(p => p.usuarios?.funcao === 'Assistente');
-        
         const total = todosValidos.reduce((a,b) => a + b.quantidade, 0);
         const dias = new Set(todosValidos.map(p => p.data_referencia)).size || 1;
         const headAssistentes = new Set(apenasAssistentes.map(p => p.usuario_id)).size || 1;
@@ -285,7 +298,6 @@
         document.getElementById('p-media').innerText = (total / dias / headAssistentes).toFixed(0);
         document.getElementById('p-headcount').innerText = headAssistentes;
 
-        // CLT / PJ (Soma todos, média por Assistente do contrato)
         const cltTodos = todosValidos.filter(p => (p.usuarios?.contrato || '').includes('CLT'));
         const cltAssistentes = apenasAssistentes.filter(p => (p.usuarios?.contrato || '').includes('CLT'));
         const totalCLT = cltTodos.reduce((a,b) => a + b.quantidade, 0);
@@ -300,7 +312,6 @@
         document.getElementById('p-pj').innerText = totalPJ.toLocaleString();
         document.getElementById('p-pj-media').innerText = (totalPJ / dias / headPJ).toFixed(0);
 
-        // Categorias (Soma todos, média por Headcount de Assistentes)
         const f = todosValidos.reduce((a,b) => a + b.fifo, 0);
         const gt = todosValidos.reduce((a,b) => a + b.gradual_total, 0);
         const gp = todosValidos.reduce((a,b) => a + b.gradual_parcial, 0);
@@ -328,6 +339,7 @@
             p.tS = stats[uid].s[wk].t; p.mS = (p.tS / stats[uid].s[wk].d).toFixed(0);
             p.tM = stats[uid].m; p.mM = (p.tM / stats[uid].d).toFixed(0);
         });
+        
         let html = '', lastD = '';
         dados.filter(p => p.usuario_id != null).forEach(p => {
             const dt = p.data_referencia.split('-').reverse().join('/');
@@ -341,7 +353,7 @@
         document.getElementById('tabela-corpo').innerHTML = html || '<tr><td colspan="11" style="text-align:center">Sem dados.</td></tr>';
     }
 
-    ajustarSeletores();
+    carregarDados();
 </script>
 </body>
 </html>
