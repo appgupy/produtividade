@@ -13,47 +13,42 @@
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .header-top h1 { margin: 0; font-size: 1.2rem; font-weight: 800; }
 
-        /* KPIs Superiores */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 10px; }
+        /* KPIs Superiores (Mensais) */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px; }
         .stat-card { background: white; padding: 12px; border-radius: 10px; border-top: 3px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .stat-label { font-size: 0.6rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
         .stat-value { font-size: 1.1rem; font-weight: 800; }
 
-        /* Tabela Categorias do Time */
-        .cat-card { background: white; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 25px; overflow: hidden; }
-        .cat-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
-        .cat-table th { background: #f1f5f9; padding: 10px; text-align: left; border-bottom: 1px solid var(--border); color: #475569; }
-        .cat-table td { padding: 10px; border-bottom: 1px solid #f8fafc; font-weight: 600; }
+        /* PAINEL DE DESTAQUE DIÁRIO (NOVO) */
+        .dia-destaque-container { background: #fff; border-radius: 12px; border: 2px solid var(--dark); margin-bottom: 25px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .dia-destaque-header { background: var(--dark); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .dia-destaque-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1px; background: var(--border); }
+        .dia-destaque-item { background: white; padding: 15px 20px; }
+        .dia-label { font-size: 0.65rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .dia-value { font-size: 1.4rem; font-weight: 800; display: block; }
+        .val-clt { color: var(--clt); }
+        .val-pj { color: var(--pj); }
+        .val-total { color: var(--primary); }
 
-        /* Cards de Histórico */
-        .history-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .history-card { background: white; border: 1px solid var(--border); padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; transition: 0.2s; }
-        .history-card:hover { border-color: var(--primary); background: #fff1f2; }
-        .history-card span { display: block; font-size: 0.75rem; font-weight: 700; }
+        /* Grid Categorias do Dia */
+        .cat-dia-grid { display: grid; grid-template-columns: repeat(4, 1fr); background: #f8fafc; border-top: 1px solid var(--border); }
+        .cat-dia-item { padding: 10px 20px; border-right: 1px solid var(--border); }
+        .cat-dia-item:last-child { border-right: none; }
 
-        /* Estilo das Tabelas Principais */
+        /* Estilo das Tabelas */
         .section-title { font-size: 0.9rem; font-weight: 800; margin-bottom: 12px; color: var(--dark); }
         .table-container { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
         th { background: #f8fafc; padding: 10px 12px; text-align: left; border-bottom: 2px solid var(--border); color: #475569; }
         td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; }
-        
-        /* Headers Diários */
-        .dia-divider { background: var(--dark) !important; color: white; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; padding: 12px 15px; }
-        .resumo-cat-inline { font-weight: 400; color: #cbd5e1; margin-left: 15px; font-size: 0.7rem; }
+        .dia-divider { background: #64748b !important; color: white; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; padding: 10px 15px; }
         .sub-header-row { background: #f1f5f9; font-weight: bold; color: #475569; font-size: 0.7rem; }
         
         .badge { padding: 4px 8px; border-radius: 6px; font-weight: 800; font-size: 0.7rem; color: white; }
-        .txt-destaque { font-weight: 800; color: var(--primary); }
-
-        /* Modal */
+        .btn { padding: 10px 18px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; font-size: 0.85rem; background: var(--primary); color: white; }
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
         .modal-content { background: var(--bg); margin: 2% auto; padding: 20px; border-radius: 15px; width: 95%; max-height: 90vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; position: sticky; top: 0; z-index: 10; }
-        .close { font-size: 28px; cursor: pointer; }
-
-        .btn { padding: 10px 18px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
-        .btn-primary { background: var(--primary); color: white; }
+        .close { font-size: 28px; cursor: pointer; float: right; }
     </style>
 </head>
 <body>
@@ -62,59 +57,75 @@
     <h1>Dashboard Gupy Produtividade</h1>
     <div style="display:flex; gap:10px;">
         <input type="month" id="filtro-mes" onchange="carregarDados()">
-        <button class="btn" style="background:#64748b; color:white;" onclick="window.location.href='gestao.html'">⚙️ Gestão</button>
+        <button class="btn" style="background:#64748b;" onclick="window.location.href='gestao.html'">⚙️ Gestão</button>
     </div>
 </div>
 
 <div class="stats-grid">
-    <div class="stat-card" style="border-top-color:#f59e0b;"><div class="stat-label">Dias Trabalhados</div><div class="stat-value" id="kpi-dias">0</div></div>
-    <div class="stat-card" style="border-top-color:#0ea5e9;"><div class="stat-label">Assistente por dia</div><div class="stat-value" id="kpi-media-as-dia">0</div></div>
-    <div class="stat-card" style="border-top-color:var(--clt);"><div class="stat-label">Média CLT (Dia)</div><div class="stat-value" id="kpi-media-clt">0</div></div>
-    <div class="stat-card" style="border-top-color:var(--pj);"><div class="stat-label">Média PJ (Dia)</div><div class="stat-value" id="kpi-media-pj">0</div></div>
+    <div class="stat-card" style="border-top-color:#f59e0b;"><div class="stat-label">Dias Trabalhados (Mês)</div><div class="stat-value" id="kpi-dias">0</div></div>
+    <div class="stat-card" style="border-top-color:#0ea5e9;"><div class="stat-label">Média Assistente/Dia</div><div class="stat-value" id="kpi-media-as-dia">0</div></div>
+    <div class="stat-card" style="border-top-color:#10b981;"><div class="stat-label">Total Validado (Mês)</div><div class="stat-value" id="kpi-total-mes-time">0</div></div>
     <div class="stat-card" style="border-top-color:#10b981;"><div class="stat-label">Média Assistente (Mês)</div><div class="stat-value" id="kpi-media-as-mes">0</div></div>
 </div>
 
-<div class="section-title">📊 Performance por Categoria (Time Geral)</div>
-<div class="cat-card">
-    <table class="cat-table">
-        <thead>
-            <tr>
-                <th>CATEGORIA</th>
-                <th>DIÁRIA (MÉDIA)</th>
-                <th>SEMANAL (TOTAL)</th>
-                <th>SEMANAL (MÉDIA)</th>
-                <th>MENSAL (TOTAL)</th>
-                <th>MENSAL (MÉDIA ASSIST.)</th>
-            </tr>
-        </thead>
-        <tbody id="tabela-categorias"></tbody>
-    </table>
-</div>
-
-<div class="section-title">📂 Histórico Mensal</div>
-<div class="history-grid" id="history-container">
-    <div class="history-card" onclick="abrirModal('mes')"><span>📊 Mês Completo</span></div>
-</div>
-
-<div class="section-title">🕒 Último Dia Importado: <span id="data-label" style="color:var(--primary);">...</span></div>
 <div class="card" style="margin-bottom:15px; background:white; padding:15px; border-radius:10px; border:1px solid var(--border);">
+    <label style="font-size:0.75rem; font-weight:700;">Importar Planilhas:</label>
     <input type="file" id="excel-files" accept=".xlsx" multiple>
-    <button class="btn btn-primary" onclick="importarArquivos()">📥 Importar Dados</button>
+    <button class="btn" onclick="importarArquivos()">📥 Importar Dados</button>
 </div>
 
+<div class="dia-destaque-container" id="painel-dia" style="display:none;">
+    <div class="dia-destaque-header">
+        <span style="font-weight:800; letter-spacing:1px;">📌 PERFORMANCE DO TIME - DIA <span id="label-dia-foco">00/00/0000</span></span>
+        <span id="label-headcount" style="font-size:0.8rem; opacity:0.9;">Assistentes ativos: 0</span>
+    </div>
+    <div class="dia-destaque-grid">
+        <div class="dia-destaque-item">
+            <span class="dia-label">Total Validação (Time)</span>
+            <span class="dia-value val-total" id="d-total-time">0</span>
+        </div>
+        <div class="dia-destaque-item">
+            <span class="dia-label">Média do Dia (Time)</span>
+            <span class="dia-value" id="d-media-time">0</span>
+        </div>
+        <div class="dia-destaque-item">
+            <span class="dia-label">Total Validação (CLT)</span>
+            <span class="dia-value val-clt" id="d-total-clt">0</span>
+        </div>
+        <div class="dia-destaque-item">
+            <span class="dia-label">Média Validação (CLT)</span>
+            <span class="dia-value" id="d-media-clt">0</span>
+        </div>
+        <div class="dia-destaque-item">
+            <span class="dia-label">Total Validação (PJ)</span>
+            <span class="dia-value val-pj" id="d-total-pj">0</span>
+        </div>
+        <div class="dia-destaque-item">
+            <span class="dia-label">Média Validação (PJ)</span>
+            <span class="dia-value" id="d-media-pj">0</span>
+        </div>
+    </div>
+    <div class="cat-dia-grid">
+        <div class="cat-dia-item"><span class="dia-label">Total FIFO</span><span class="dia-value" style="font-size:1.1rem;" id="d-fifo">0</span></div>
+        <div class="cat-dia-item"><span class="dia-label">Gradual Total</span><span class="dia-value" style="font-size:1.1rem;" id="d-gt">0</span></div>
+        <div class="cat-dia-item"><span class="dia-label">Gradual Parcial</span><span class="dia-value" style="font-size:1.1rem;" id="d-gp">0</span></div>
+        <div class="cat-dia-item"><span class="dia-label">Perfil FC</span><span class="dia-value" style="font-size:1.1rem;" id="d-fc">0</span></div>
+    </div>
+</div>
+
+<div class="section-title">📂 Histórico e Semanas</div>
+<div class="history-grid" id="history-container"></div>
+
+<div class="section-title">👤 Detalhamento Individual</div>
 <div class="table-container">
     <table id="tabela-hoje"></table>
 </div>
 
 <div id="modalHist" class="modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <h2 id="modal-titulo" style="margin:0;">Relatório</h2>
-            <span class="close" onclick="fecharModal()">&times;</span>
-        </div>
-        <div class="table-container">
-            <table id="tabela-modal"></table>
-        </div>
+        <span class="close" onclick="fecharModal()">&times;</span>
+        <h2 id="modal-titulo">Relatório</h2>
+        <div class="table-container"><table id="tabela-modal"></table></div>
     </div>
 </div>
 
@@ -122,22 +133,19 @@
     const SB_URL = "https://glqrpsyjwozvislyxapj.supabase.co";
     const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdscXJwc3lqd296dmlzbHl4YXBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyNTQyOTgsImV4cCI6MjA4MTgzMDI5OH0.etzcmIHgPcGC12HwZPTU2u0DLtJdF3XTBSYW38O7S-w";
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
-    
-    let dadosGlobais = [];
-    let metasGlobais = [];
+    let dadosGlobais = [], metasGlobais = [];
 
     document.getElementById('filtro-mes').value = new Date().toISOString().substring(0,7);
 
     async function importarArquivos() {
         const files = document.getElementById('excel-files').files;
-        if(files.length === 0) return;
         for(let file of files) {
             const fn = file.name.replace('.xlsx', '');
             if(!/^\d{8}$/.test(fn)) continue;
             const dr = `${fn.substring(4,8)}-${fn.substring(2,4)}-${fn.substring(0,2)}`;
             const buffer = await file.arrayBuffer();
-            const wb = XLSX.read(buffer, {type: 'array'});
-            const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+            const workbook = XLSX.read(buffer, {type: 'array'});
+            const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
             const ins = json.map(r => ({
                 usuario_id: r.id_assistente,
                 fifo: Number(r.documentos_validados_fifo || 0), gradual_total: Number(r.documentos_validados_gradual_total || 0),
@@ -159,50 +167,52 @@
         const mesStr = document.getElementById('filtro-mes').value;
         const { data: pData } = await _supabase.from('producao').select('*, usuarios(*)').gte('data_referencia', `${mesStr}-01`).lte('data_referencia', `${mesStr}-31`).order('data_referencia', {ascending: false});
         const { data: mData } = await _supabase.from('metas').select('*');
-        dadosGlobais = pData || [];
-        metasGlobais = mData || [];
+        dadosGlobais = pData || []; metasGlobais = mData || [];
         
         if(dadosGlobais.length > 0) {
             renderizarKPIs();
-            renderizarCategoriasTime();
+            renderizarDestaqueDiario(dadosGlobais[0].data_referencia);
             renderizarCardsSemanais();
             renderizarTabela(document.getElementById('tabela-hoje'), [dadosGlobais[0].data_referencia]);
-            document.getElementById('data-label').innerText = new Date(dadosGlobais[0].data_referencia + 'T12:00:00').toLocaleDateString('pt-BR');
         }
     }
 
     function renderizarKPIs() {
-        let kpi = { tG:0, nU:new Set(), dU:new Set(), tC:0, dC:new Set(), tP:0, dP:new Set(), assDia: {} };
+        let k = { t:0, n:new Set(), d:new Set(), assD:{} };
         dadosGlobais.filter(p => p.usuarios?.funcao === 'Assistente').forEach(p => {
-            kpi.tG += p.quantidade; kpi.nU.add(p.usuarios.nome); kpi.dU.add(p.data_referencia);
-            if(!kpi.assDia[p.data_referencia]) kpi.assDia[p.data_referencia] = new Set();
-            kpi.assDia[p.data_referencia].add(p.usuarios.nome);
-            if((p.usuarios.contrato || '').includes('CLT')) { kpi.tC += p.quantidade; kpi.dC.add(p.data_referencia); } 
-            else { kpi.tP += p.quantidade; kpi.dP.add(p.data_referencia); }
+            k.t += p.quantidade; k.n.add(p.usuarios.nome); k.d.add(p.data_referencia);
+            if(!k.assD[p.data_referencia]) k.assD[p.data_referencia] = new Set();
+            k.assD[p.data_referencia].add(p.usuarios.nome);
         });
-        document.getElementById('kpi-dias').innerText = kpi.dU.size;
-        document.getElementById('kpi-media-as-dia').innerText = (Object.keys(kpi.assDia).reduce((a,b)=>a+kpi.assDia[b].size,0) / (kpi.dU.size || 1)).toFixed(1);
-        document.getElementById('kpi-media-clt').innerText = (kpi.tC / (kpi.dC.size || 1)).toFixed(0);
-        document.getElementById('kpi-media-pj').innerText = (kpi.tP / (kpi.dP.size || 1)).toFixed(0);
-        document.getElementById('kpi-media-as-mes').innerText = (kpi.tG / (kpi.nU.size || 1)).toFixed(0);
+        document.getElementById('kpi-dias').innerText = k.d.size;
+        document.getElementById('kpi-total-mes-time').innerText = k.t.toLocaleString();
+        document.getElementById('kpi-media-as-mes').innerText = (k.t / (k.n.size || 1)).toFixed(0);
+        document.getElementById('kpi-media-as-dia').innerText = (Object.keys(k.assD).reduce((a,b)=>a+k.assD[b].size,0) / (k.d.size || 1)).toFixed(1);
     }
 
-    function renderizarCategoriasTime() {
-        let cat = { fifo:{m:0,s:{}}, gt:{m:0,s:{}}, gp:{m:0,s:{}}, fc:{m:0,s:{}} };
-        const dias = new Set(dadosGlobais.map(p => p.data_referencia)).size || 1;
-        const nomesU = new Set(dadosGlobais.map(p => p.usuarios?.nome)).size || 1;
+    function renderizarDestaqueDiario(dataFoco) {
+        const dia = dadosGlobais.filter(p => p.data_referencia === dataFoco && p.usuarios?.funcao === 'Assistente');
+        const clt = dia.filter(p => (p.usuarios.contrato || '').includes('CLT'));
+        const pj = dia.filter(p => !(p.usuarios.contrato || '').includes('CLT'));
 
-        dadosGlobais.forEach(p => {
-            const wk = getWeek(p.data_referencia);
-            cat.fifo.m += p.fifo; cat.gt.m += p.gradual_total; cat.gp.m += p.gradual_parcial; cat.fc.m += p.perfil_fc;
-            cat.fifo.s[wk] = (cat.fifo.s[wk] || 0) + p.fifo; cat.gt.s[wk] = (cat.gt.s[wk] || 0) + p.gradual_total;
-            cat.gp.s[wk] = (cat.gp.s[wk] || 0) + p.gradual_parcial; cat.fc.s[wk] = (cat.fc.s[wk] || 0) + p.perfil_fc;
-        });
+        const somar = (arr) => arr.reduce((a, b) => a + b.quantidade, 0);
+        const media = (arr) => arr.length > 0 ? (somar(arr) / new Set(arr.map(x=>x.usuarios.nome)).size).toFixed(0) : 0;
 
-        const semTotal = Object.keys(cat.fifo.s).length || 1;
-        const row = (lab, k) => `<tr><td>${lab}</td><td>${(cat[k].m/dias).toFixed(0)}</td><td>${(cat[k].m/semTotal).toFixed(0)}</td><td>${(cat[k].m/semTotal/(dias/semTotal)).toFixed(0)}</td><td>${cat[k].m.toLocaleString()}</td><td>${(cat[k].m/nomesU).toFixed(0)}</td></tr>`;
+        document.getElementById('painel-dia').style.display = 'block';
+        document.getElementById('label-dia-foco').innerText = new Date(dataFoco + 'T12:00:00').toLocaleDateString('pt-BR');
+        document.getElementById('label-headcount').innerText = `Assistentes ativos: ${new Set(dia.map(x=>x.usuarios.nome)).size}`;
         
-        document.getElementById('tabela-categorias').innerHTML = row('FIFO','fifo') + row('GRADUAL TOTAL','gt') + row('GRADUAL PARCIAL','gp') + row('PERFIL FC','fc');
+        document.getElementById('d-total-time').innerText = somar(dia).toLocaleString();
+        document.getElementById('d-media-time').innerText = media(dia);
+        document.getElementById('d-total-clt').innerText = somar(clt).toLocaleString();
+        document.getElementById('d-media-clt').innerText = media(clt);
+        document.getElementById('d-total-pj').innerText = somar(pj).toLocaleString();
+        document.getElementById('d-media-pj').innerText = media(pj);
+        
+        document.getElementById('d-fifo').innerText = dia.reduce((a,b)=>a+b.fifo, 0).toLocaleString();
+        document.getElementById('d-gt').innerText = dia.reduce((a,b)=>a+b.gradual_total, 0).toLocaleString();
+        document.getElementById('d-gp').innerText = dia.reduce((a,b)=>a+b.gradual_parcial, 0).toLocaleString();
+        document.getElementById('d-fc').innerText = dia.reduce((a,b)=>a+b.perfil_fc, 0).toLocaleString();
     }
 
     function renderizarCardsSemanais() {
@@ -212,30 +222,24 @@
         semanas.forEach((s, i) => container.innerHTML += `<div class="history-card" onclick="abrirModal('semana', ${s})">📅<span>Semana ${i+1}</span></div>`);
     }
 
-    function renderizarTabela(target, datasFiltradas) {
-        let stats = {}; let resDia = {};
+    function renderizarTabela(target, datas) {
+        let stats = {};
         [...dadosGlobais].reverse().forEach(p => {
-            const uid = p.usuario_id; const wk = getWeek(p.data_referencia); const dr = p.data_referencia;
-            if(!stats[uid]) stats[uid] = { mes:0, dias:0, semanas:{} };
-            if(!stats[uid].semanas[wk]) stats[uid].semanas[wk] = { total:0, dias:0 };
-            if(!resDia[dr]) resDia[dr] = { f:0, gt:0, gp:0, fc:0, t:0 };
-            stats[uid].mes += p.quantidade; stats[uid].dias++;
-            stats[uid].semanas[wk].total += p.quantidade; stats[uid].semanas[wk].dias++;
-            resDia[dr].f += p.fifo; resDia[dr].gt += p.gradual_total; resDia[dr].gp += p.gradual_parcial; resDia[dr].fc += p.perfil_fc; resDia[dr].t += p.quantidade;
-            p.tS = stats[uid].semanas[wk].total; p.mS = (stats[uid].semanas[wk].total / stats[uid].semanas[wk].dias).toFixed(0);
-            p.tM = stats[uid].mes; p.mM = (stats[uid].mes / stats[uid].dias).toFixed(0);
+            const uid = p.usuario_id, wk = getWeek(p.data_referencia);
+            if(!stats[uid]) stats[uid] = { m:0, d:0, s:{} };
+            if(!stats[uid].s[wk]) stats[uid].s[wk] = { t:0, d:0 };
+            stats[uid].m += p.quantidade; stats[uid].d++;
+            stats[uid].s[wk].t += p.quantidade; stats[uid].s[wk].d++;
+            p.tS = stats[uid].s[wk].t; p.mS = (p.tS / stats[uid].s[wk].d).toFixed(0);
+            p.tM = stats[uid].m; p.mM = (p.tM / stats[uid].d).toFixed(0);
         });
 
         let html = ''; let lastD = '';
-        const cabecalho = `<tr class="sub-header-row"><th>Assistente</th><th>Total Dia</th><th>Total Semana</th><th>Total Mês</th><th>Média Semana</th><th>Média Mês</th><th>Status</th></tr>`;
-
-        dadosGlobais.filter(p => datasFiltradas.includes(p.data_referencia)).sort((a,b) => b.data_referencia.localeCompare(a.data_referencia) || a.usuarios.nome.localeCompare(b.usuarios.nome)).forEach(p => {
+        const cabecalho = `<tr class="sub-header-row"><th>Assistente</th><th>Total Dia</th><th>Acum. Semana</th><th>Acum. Mês</th><th>Média Semana</th><th>Média Mês</th><th>Status</th></tr>`;
+        
+        dadosGlobais.filter(p => datas.includes(p.data_referencia)).sort((a,b) => b.data_referencia.localeCompare(a.data_referencia) || a.usuarios.nome.localeCompare(b.usuarios.nome)).forEach(p => {
             const dt = new Date(p.data_referencia + 'T12:00:00').toLocaleDateString('pt-BR');
-            if(dt !== lastD) { 
-                const r = resDia[p.data_referencia];
-                html += `<tr class="dia-divider"><td colspan="7">📅 ${dt} <span class="resumo-cat-inline">TIME: F:${r.f} GT:${r.gt} GP:${r.gp} FC:${r.fc} Σ:${r.t}</span></td></tr>` + cabecalho; 
-                lastD = dt; 
-            }
+            if(dt !== lastD) { html += `<tr class="dia-divider" onclick="renderizarDestaqueDiario('${p.data_referencia}')" style="cursor:pointer;"><td colspan="7">📅 ${dt} (Clique para destacar este dia)</td></tr>` + cabecalho; lastD = dt; }
             const ating = metasGlobais.filter(m => m.usuario_id == p.usuario_id && m.data_inicio <= p.data_referencia).sort((a,b)=>b.id-a.id)[0];
             const perc = ating ? ((p.quantidade / ating.valor_meta)*100).toFixed(0) : 0;
             html += `<tr><td><strong>${p.usuarios?.nome}</strong></td><td class="txt-destaque">${p.quantidade}</td><td>${p.tS}</td><td>${p.tM}</td><td>${p.mS}</td><td>${p.mM}</td><td><span class="badge" style="background:${perc>=100?'#059669':'#dc2626'}">${perc}%</span></td></tr>`;
@@ -245,13 +249,12 @@
 
     function abrirModal(tipo, valor) {
         const datas = tipo === 'mes' ? [...new Set(dadosGlobais.map(p => p.data_referencia))] : [...new Set(dadosGlobais.filter(p => getWeek(p.data_referencia) === valor).map(p => p.data_referencia))];
-        document.getElementById('modal-titulo').innerText = tipo === 'mes' ? "Relatório Mensal Completo" : "Relatório da Semana " + (valor % 10);
+        document.getElementById('modal-titulo').innerText = tipo === 'mes' ? "Relatório Mensal" : "Relatório Semanal";
         renderizarTabela(document.getElementById('tabela-modal'), datas);
         document.getElementById('modalHist').style.display = "block";
     }
 
     function fecharModal() { document.getElementById('modalHist').style.display = "none"; }
-    window.onclick = (e) => { if(e.target.classList.contains('modal')) fecharModal(); }
     carregarDados();
 </script>
 </body>
