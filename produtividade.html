@@ -10,74 +10,82 @@
     <style>
         :root { 
             --primary: #e11d48; 
-            --clt: #0ea5e9; 
-            --pj: #10b981; 
-            --fifo: #f59e0b; 
-            --gt: #a67c52;   
-            --gp: #d946ef;   
-            --fc: #8b5cf6;   
-            --bg: #f8fafc; 
-            --nav: #1e293b; 
+            --clt: #0284c7; 
+            --pj: #059669; 
+            --fifo: #d97706; 
+            --gt: #78350f;   
+            --gp: #ca8a04;   
+            --fc: #7c3aed;   
+            --bg: #f1f5f9; 
+            --nav: #0f172a; 
+            --card: #ffffff;
             --border: #e2e8f0; 
-            --panel-gray: #334155;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
         }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding-top: 85px; color: #1e293b; }
+        
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding-top: 85px; color: var(--text-main); }
 
-        /* NAVBAR */
-        .navbar { position: fixed; top: 0; left: 0; right: 0; height: 75px; background: var(--nav); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+        /* NAVBAR CLEAN */
+        .navbar { position: fixed; top: 0; left: 0; right: 0; height: 75px; background: var(--nav); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .nav-left { display: flex; align-items: center; gap: 20px; }
-        .brand { line-height: 1; cursor: pointer; min-width: 150px; }
         .brand .small { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; display: block; }
         .brand .big { font-size: 1.1rem; font-weight: 700; color: white; }
         .brand .big span { color: var(--primary); }
         
-        .nav-tools { display: flex; align-items: center; gap: 10px; background: var(--panel-gray); padding: 6px 12px; border-radius: 10px; border: 1px solid #475569; }
+        /* FERRAMENTAS MAIS CLEAN */
+        .nav-tools { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
         .nav-tools select, .nav-tools input { background: transparent; border: none; color: white; font-size: 0.8rem; font-weight: 500; outline: none; cursor: pointer; }
+        .nav-tools option { background: #1e293b; color: white; }
         
         .nav-links { display: flex; gap: 20px; margin-left: 20px; }
         .nav-item { color: #94a3b8; text-decoration: none; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
-        .nav-item.active { color: white; }
+        .nav-item.active { color: white; border-bottom: 2px solid var(--primary); padding-bottom: 5px; }
 
-        .btn-import { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; font-size: 0.75rem; cursor: pointer; }
+        .btn-import { background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
 
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
 
-        /* MINI PAINEL - TÍTULOS MAIORES */
-        .dynamic-panel { background: #1e293b; color: white; border-radius: 15px; padding: 20px; margin-bottom: 25px; border-left: 6px solid var(--primary); }
-        .panel-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; background: var(--panel-gray); padding: 20px; border-radius: 10px; }
-        .panel-column { display: flex; flex-direction: column; gap: 15px; border-right: 1px solid #475569; padding-right: 10px; }
+        /* MINI PAINEL LIGHT */
+        .dynamic-panel { background: var(--card); border-radius: 16px; padding: 24px; margin-bottom: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+        .panel-header h2 { color: var(--nav); font-size: 1.1rem; margin: 0; }
+        
+        .panel-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .panel-column { display: flex; flex-direction: column; gap: 18px; border-right: 1px solid var(--border); padding-right: 15px; }
         .panel-column:last-child { border-right: none; }
-        .stat-group { display: flex; justify-content: space-between; align-items: flex-start; min-height: 40px; }
         
-        /* TÍTULOS DO PAINEL AUMENTADOS */
-        .label { font-size: 0.65rem; color: #000000; text-transform: uppercase; font-weight: 800; letter-spacing: 0.6px; }
-        .value { font-size: 1.1rem; font-weight: 600; }
-        .value.white-res { color: #ffffff; }
-        .value.small-val { font-size: 0.9rem; }
-
-        /* CORES DAS MÉTRICAS */
-        .color-clt { color: var(--clt) !important; }
-        .color-pj { color: var(--pj) !important; }
-        .color-fifo { color: var(--fifo) !important; }
-        .color-gt { color: var(--gt) !important; }
-        .color-gp { color: var(--gp) !important; }
-        .color-fc { color: var(--fc) !important; }
-
-        /* TABELA E AGRUPAMENTO POR DATA */
-        .table-wrap { background: white; border-radius: 15px; border: 1px solid var(--border); overflow-x: auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 1100px; }
-        th { background: #f1f5f9; padding: 12px; text-align: left; border-bottom: 2px solid var(--border); color: #475569; font-weight: 700; }
-        td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; }
+        .stat-group { display: flex; justify-content: space-between; align-items: flex-start; }
+        .stat-item { display: flex; flex-direction: column; }
         
-        /* SEPARADOR DE DATA VISÍVEL */
-        .divider-row { background: #1e293b !important; color: #ffffff !important; font-weight: 800; font-size: 0.75rem; letter-spacing: 1px; }
-        .divider-row td { padding: 8px 15px; border: none; }
+        /* Títulos em Cinza Médio para não pesar */
+        .label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; }
+        
+        /* Valores em destaque */
+        .value { font-size: 1.2rem; font-weight: 700; color: var(--text-main); }
+        .value.small-val { font-size: 0.95rem; }
 
-        tbody tr:nth-child(even) { background-color: #f9fafb; }
+        .color-clt { color: var(--clt); }
+        .color-pj { color: var(--pj); }
+        .color-fifo { color: var(--fifo); }
+        .color-gt { color: var(--gt); }
+        .color-gp { color: var(--gp); }
+        .color-fc { color: var(--fc); }
+
+        /* TABELA CLEAN */
+        .table-wrap { background: var(--card); border-radius: 16px; border: 1px solid var(--border); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 1100px; }
+        th { background: #f8fafc; padding: 14px 12px; text-align: left; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.7rem; border-bottom: 1px solid var(--border); }
+        td { padding: 12px; border-bottom: 1px solid #f1f5f9; color: var(--text-main); }
+        
+        tbody tr:nth-child(even) { background-color: #fcfdfe; }
         tbody tr:hover { background-color: #f1f5f9; }
-        .badge { padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 0.7rem; color: white; }
+        
+        .divider-row { background: #f8fafc !important; color: var(--nav) !important; font-weight: 800; font-size: 0.75rem; border-top: 2px solid var(--border); }
+        .badge { padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 0.7rem; color: white; display: inline-block; }
         
         .hidden { display: none !important; }
+        #import-log { position: fixed; bottom: 20px; right: 20px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 2000; border-left: 5px solid var(--primary); display: none; min-width: 300px; }
     </style>
 </head>
 <body>
@@ -94,8 +102,7 @@
                 <option value="semana">📅 Visão Semanal</option>
                 <option value="mes">📊 Consolidado Mensal</option>
             </select>
-            <div style="width:1px; height:20px; background:#475569;"></div>
-            
+            <div style="width:1px; height:20px; background:rgba(255,255,255,0.2);"></div>
             <input type="month" id="select-mes" onchange="sincronizarMes()">
             <input type="date" id="select-dia" onchange="carregarDados()">
             <select id="select-semana" class="hidden" onchange="alternarVisao()">
@@ -117,47 +124,47 @@
 <div class="container">
     <div id="panel-contexto" class="dynamic-panel">
         <div class="panel-header">
-            <h2 id="panel-titulo" style="margin:0; font-size:1rem; font-weight: 600;">Dashboard</h2>
-            <span id="panel-info-extra" style="font-size:0.7rem; font-weight:500; opacity:0.8;">-</span>
+            <h2 id="panel-titulo">Análise de Dados</h2>
+            <span id="panel-info-extra" style="font-size:0.75rem; color: var(--text-muted);">-</span>
         </div>
         <div class="panel-grid">
             <div class="panel-column">
                 <div class="stat-group">
-                    <div style="display:flex;flex-direction:column"><span class="label">Total Geral</span><span class="value white-res" id="p-total">0</span></div>
-                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Média Time</span><span class="value small-val white-res" id="p-media">0</span></div>
+                    <div class="stat-item"><span class="label">Total Geral</span><span class="value" id="p-total">0</span></div>
+                    <div class="stat-item" style="text-align:right"><span class="label">Média Time</span><span class="value small-val" id="p-media">0</span></div>
                 </div>
                 <div class="stat-group">
-                    <div style="display:flex;flex-direction:column"><span class="label">Total de Assistentes</span><span class="value white-res" id="p-headcount">0</span></div>
-                </div>
-            </div>
-            <div class="panel-column">
-                <div class="stat-group">
-                    <div style="display:flex;flex-direction:column"><span class="label">Total CLT</span><span class="value color-clt" id="p-clt">0</span></div>
-                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Média CLT</span><span class="value small-val color-clt" id="p-clt-media">0</span></div>
-                </div>
-                <div class="stat-group">
-                    <div style="display:flex;flex-direction:column"><span class="label">Total PJ</span><span class="value color-pj" id="p-pj">0</span></div>
-                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Média PJ</span><span class="value small-val color-pj" id="p-pj-media">0</span></div>
+                    <div class="stat-item"><span class="label">Total de Assistentes</span><span class="value" id="p-headcount">0</span></div>
                 </div>
             </div>
             <div class="panel-column">
                 <div class="stat-group">
-                    <div style="display:flex;flex-direction:column"><span class="label">Total FIFO</span><span class="value color-fifo" id="p-fifo">0</span></div>
-                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Méd. FIFO</span><span class="value small-val color-fifo" id="p-fifo-media">0</span></div>
+                    <div class="stat-item"><span class="label">Total CLT</span><span class="value color-clt" id="p-clt">0</span></div>
+                    <div class="stat-item" style="text-align:right"><span class="label">Média CLT</span><span class="value small-val color-clt" id="p-clt-media">0</span></div>
                 </div>
                 <div class="stat-group">
-                    <div style="display:flex;flex-direction:column"><span class="label">Total GT</span><span class="value color-gt" id="p-gt">0</span></div>
-                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Méd. GT</span><span class="value small-val color-gt" id="p-gt-media">0</span></div>
+                    <div class="stat-item"><span class="label">Total PJ</span><span class="value color-pj" id="p-pj">0</span></div>
+                    <div class="stat-item" style="text-align:right"><span class="label">Média PJ</span><span class="value small-val color-pj" id="p-pj-media">0</span></div>
                 </div>
             </div>
             <div class="panel-column">
                 <div class="stat-group">
-                    <div style="display:flex;flex-direction:column"><span class="label">Total GP</span><span class="value color-gp" id="p-gp">0</span></div>
-                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Méd. GP</span><span class="value small-val color-gp" id="p-gp-media">0</span></div>
+                    <div class="stat-item"><span class="label">Total FIFO</span><span class="value color-fifo" id="p-fifo">0</span></div>
+                    <div class="stat-item" style="text-align:right"><span class="label">Méd. FIFO</span><span class="value small-val color-fifo" id="p-fifo-media">0</span></div>
                 </div>
                 <div class="stat-group">
-                    <div style="display:flex;flex-direction:column"><span class="label">Total FC</span><span class="value color-fc" id="p-fc">0</span></div>
-                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Méd. FC</span><span class="value small-val color-fc" id="p-fc-media">0</span></div>
+                    <div class="stat-item"><span class="label">Total GT</span><span class="value color-gt" id="p-gt">0</span></div>
+                    <div class="stat-item" style="text-align:right"><span class="label">Méd. GT</span><span class="value small-val color-gt" id="p-gt-media">0</span></div>
+                </div>
+            </div>
+            <div class="panel-column">
+                <div class="stat-group">
+                    <div class="stat-item"><span class="label">Total GP</span><span class="value color-gp" id="p-gp">0</span></div>
+                    <div class="stat-item" style="text-align:right"><span class="label">Méd. GP</span><span class="value small-val color-gp" id="p-gp-media">0</span></div>
+                </div>
+                <div class="stat-group">
+                    <div class="stat-item"><span class="label">Total FC</span><span class="value color-fc" id="p-fc">0</span></div>
+                    <div class="stat-item" style="text-align:right"><span class="label">Méd. FC</span><span class="value small-val color-fc" id="p-fc-media">0</span></div>
                 </div>
             </div>
         </div>
@@ -169,7 +176,7 @@
                 <tr>
                     <th>Assistente</th><th style="text-align:center; color:var(--primary)">Produção</th>
                     <th>FIFO</th><th>G.T.</th><th>G.P.</th><th>P.FC</th>
-                    <th>Acum. Semana</th><th>Acum. Mês</th><th>Média Semana</th><th>Média Mês</th><th>Status</th>
+                    <th>Acum. Sem.</th><th>Acum. Mês</th><th>Média Sem.</th><th>Média Mês</th><th>Status</th>
                 </tr>
             </thead>
             <tbody id="tabela-corpo"></tbody>
@@ -177,17 +184,23 @@
     </div>
 </div>
 
+<div id="import-log">
+    <h4 style="margin:0 0 10px 0; font-size:0.9rem;">📢 Relatório de Importação</h4>
+    <div id="log-content" style="font-size:0.8rem; line-height:1.5; color: var(--text-muted);"></div>
+    <button onclick="this.parentElement.style.display='none'" style="margin-top:15px; width:100%; padding:10px; border:none; background:var(--nav); color:white; cursor:pointer; border-radius:6px; font-weight:600;">Fechar</button>
+</div>
+
 <script>
-    // Configurações Supabase (Substitua se necessário)
     const SB_URL = "https://glqrpsyjwozvislyxapj.supabase.co";
     const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdscXJwc3lqd296dmlzbHl4YXBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyNTQyOTgsImV4cCI6MjA4MTgzMDI5OH0.etzcmIHgPcGC12HwZPTU2u0DLtJdF3XTBSYW38O7S-w";
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
     let dadosGlobais = [], metasGlobais = [];
 
-    // Inicialização
     const hoje = new Date();
     document.getElementById('select-dia').value = hoje.toISOString().substring(0,10);
     document.getElementById('select-mes').value = hoje.toISOString().substring(0,7);
+
+    function logout() { localStorage.removeItem('usuario'); window.location.href = 'index.html'; }
 
     function sincronizarMes() {
         const mesSelected = document.getElementById('select-mes').value;
@@ -197,9 +210,8 @@
 
     function ajustarSeletores() {
         const v = document.getElementById('view-selector').value;
-        // TRAVA VISUAL: Esconde mes-ano na analise detalhada (DIA)
-        document.getElementById('select-mes').classList.toggle('hidden', v === 'dia');
         document.getElementById('select-dia').classList.toggle('hidden', v !== 'dia');
+        document.getElementById('select-mes').classList.toggle('hidden', v === 'dia');
         document.getElementById('select-semana').classList.toggle('hidden', v !== 'semana');
         carregarDados();
     }
@@ -207,11 +219,34 @@
     async function carregarDados() {
         const v = document.getElementById('view-selector').value;
         let mesStr = v === 'dia' ? document.getElementById('select-dia').value.substring(0,7) : document.getElementById('select-mes').value;
-        
         const { data: pData } = await _supabase.from('producao').select('*, usuarios(*)').gte('data_referencia', `${mesStr}-01`).lte('data_referencia', `${mesStr}-31`).order('data_referencia', {ascending: false});
         const { data: mData } = await _supabase.from('metas').select('*');
         dadosGlobais = pData || []; metasGlobais = mData || [];
         alternarVisao();
+    }
+
+    async function importarArquivos() {
+        const files = document.getElementById('excel-files').files;
+        let logs = { sucesso: 0, duplicados: 0, total_linhas: 0, ignorados_sem_id: 0 };
+        for(let file of files) {
+            const fn = file.name.replace('.xlsx', '');
+            if(!/^\d{8}$/.test(fn)) continue;
+            const dr = `${fn.substring(4,8)}-${fn.substring(2,4)}-${fn.substring(0,2)}`;
+            const buffer = await file.arrayBuffer();
+            const wb = XLSX.read(buffer, {type: 'array'});
+            const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+            for(let r of json) {
+                logs.total_linhas++;
+                if (!r.id_assistente || isNaN(r.id_assistente)) { logs.ignorados_sem_id++; continue; }
+                const { data: ex } = await _supabase.from('producao').select('id').eq('usuario_id', r.id_assistente).eq('data_referencia', dr).maybeSingle();
+                if(ex) { logs.duplicados++; continue; }
+                await _supabase.from('producao').insert({ usuario_id: r.id_assistente, fifo: Number(r.documentos_validados_fifo || 0), gradual_total: Number(r.documentos_validados_gradual_total || 0), gradual_parcial: Number(r.documentos_validados_gradual_parcial || 0), perfil_fc: Number(r.documentos_validados_perfil_fc || 0), quantidade: Number(r.documentos_validados || 0), data_referencia: dr });
+                logs.sucesso++;
+            }
+        }
+        document.getElementById('log-content').innerHTML = `Processados: ${logs.total_linhas}<br>✅ Sucesso: ${logs.sucesso}<br>🔁 Duplicados: ${logs.duplicados}`;
+        document.getElementById('import-log').style.display = 'block';
+        carregarDados();
     }
 
     function getWeekOfMonth(dateStr) {
@@ -223,48 +258,85 @@
     function alternarVisao() {
         const visao = document.getElementById('view-selector').value;
         let filtrados = [], titulo = "";
-        
         if(visao === 'dia') {
             const d = document.getElementById('select-dia').value;
             filtrados = dadosGlobais.filter(p => p.data_referencia === d);
-            titulo = `Análise Diária: ${d.split('-').reverse().join('/')}`;
+            titulo = `Dia: ${d.split('-').reverse().join('/')}`;
         } else if(visao === 'semana') {
             const sem = parseInt(document.getElementById('select-semana').value);
             filtrados = dadosGlobais.filter(p => getWeekOfMonth(p.data_referencia) === sem);
-            titulo = `Resumo da Semana ${sem}`;
+            titulo = `Semana ${sem}`;
         } else {
             filtrados = dadosGlobais;
-            titulo = `Consolidado Mensal`;
+            titulo = `Relatório Mensal`;
         }
         
         filtrados.sort((a, b) => b.data_referencia.localeCompare(a.data_referencia) || (a.usuarios?.nome || "").localeCompare(b.usuarios?.nome || ""));
-        
         atualizarPainel(filtrados, titulo);
         renderizarTabela(filtrados, visao === 'dia');
     }
 
-    function renderizarTabela(dados, isDia) {
-        let html = '', lastD = '';
-        dados.filter(p => p.usuario_id != null).forEach(p => {
-            const dt = p.data_referencia.split('-').reverse().join('/');
-            
-            // AGRUPADOR DE DATAS (Linha Azul Escura)
-            if(!isDia && dt !== lastD) { 
-                html += `<tr class="divider-row"><td colspan="11">📅 DATA: ${dt}</td></tr>`; 
-                lastD = dt; 
-            }
+    function atualizarPainel(dados, titulo) {
+        const todosValidos = dados.filter(p => p.usuario_id != null);
+        const apenasAs = todosValidos.filter(p => p.usuarios?.funcao === 'Assistente');
+        const total = todosValidos.reduce((a,b) => a + b.quantidade, 0);
+        const dias = new Set(todosValidos.map(p => p.data_referencia)).size || 1;
+        const head = new Set(apenasAs.map(p => p.usuario_id)).size || 1;
 
-            const meta = metasGlobais.filter(m => m.usuario_id == p.usuario_id && m.data_inicio <= p.data_referencia).sort((a,b)=>b.id-a.id)[0];
-            const metaValor = meta ? meta.valor_meta : 0;
-            const ating = metaValor > 0 ? ((p.quantidade / metaValor)*100).toFixed(0) : 0;
-            const corBadge = ating >= 100 ? '#0284c7' : '#e11d48';
-            
-            html += `<tr><td><b>${p.usuarios?.nome || p.usuario_id}</b></td><td style="text-align:center; color:var(--primary); font-weight:700">${p.quantidade}</td><td>${p.fifo}</td><td>${p.gradual_total}</td><td>${p.gradual_parcial}</td><td>${p.perfil_fc}</td><td>-</td><td>-</td><td>-</td><td>-</td><td><span class="badge" style="background:${corBadge}">${ating}%</span></td></tr>`;
-        });
-        document.getElementById('tabela-corpo').innerHTML = html || '<tr><td colspan="11" style="text-align:center">Sem dados para exibir.</td></tr>';
+        document.getElementById('panel-titulo').innerText = titulo;
+        document.getElementById('panel-info-extra').innerText = `${head} Assistentes Ativos`;
+        document.getElementById('p-total').innerText = total.toLocaleString();
+        document.getElementById('p-media').innerText = (total / dias / head || 0).toFixed(0);
+        document.getElementById('p-headcount').innerText = head;
+
+        const clt = todosValidos.filter(p => (p.usuarios?.contrato || '').includes('CLT'));
+        const headClt = new Set(apenasAs.filter(p => (p.usuarios?.contrato || '').includes('CLT')).map(x => x.usuario_id)).size || 1;
+        const tClt = clt.reduce((a,b) => a + b.quantidade, 0);
+        document.getElementById('p-clt').innerText = tClt.toLocaleString();
+        document.getElementById('p-clt-media').innerText = (tClt / dias / headClt || 0).toFixed(0);
+
+        const pj = todosValidos.filter(p => !(p.usuarios?.contrato || '').includes('CLT') && p.usuarios);
+        const headPj = new Set(apenasAs.filter(p => !(p.usuarios?.contrato || '').includes('CLT')).map(x => x.usuario_id)).size || 1;
+        const tPj = pj.reduce((a,b) => a + b.quantidade, 0);
+        document.getElementById('p-pj').innerText = tPj.toLocaleString();
+        document.getElementById('p-pj-media').innerText = (tPj / dias / headPj || 0).toFixed(0);
+
+        document.getElementById('p-fifo').innerText = todosValidos.reduce((a,b) => a + b.fifo, 0).toLocaleString();
+        document.getElementById('p-fifo-media').innerText = (todosValidos.reduce((a,b) => a + b.fifo, 0) / dias / head || 0).toFixed(0);
+        document.getElementById('p-gt').innerText = todosValidos.reduce((a,b) => a + b.gradual_total, 0).toLocaleString();
+        document.getElementById('p-gt-media').innerText = (todosValidos.reduce((a,b) => a + b.gradual_total, 0) / dias / head || 0).toFixed(0);
+        document.getElementById('p-gp').innerText = todosValidos.reduce((a,b) => a + b.gradual_parcial, 0).toLocaleString();
+        document.getElementById('p-gp-media').innerText = (todosValidos.reduce((a,b) => a + b.gradual_parcial, 0) / dias / head || 0).toFixed(0);
+        document.getElementById('p-fc').innerText = todosValidos.reduce((a,b) => a + b.perfil_fc, 0).toLocaleString();
+        document.getElementById('p-fc-media').innerText = (todosValidos.reduce((a,b) => a + b.perfil_fc, 0) / dias / head || 0).toFixed(0);
     }
 
-    // Funções de apoio (importarArquivos, atualizarPainel omitidas para brevidade, mas devem ser mantidas do código anterior)
+    function renderizarTabela(dados, isDia) {
+        let stats = {};
+        [...dadosGlobais].reverse().forEach(p => {
+            if(!p.usuario_id) return;
+            const uid = p.usuario_id, wk = getWeekOfMonth(p.data_referencia);
+            if(!stats[uid]) stats[uid] = { m:0, d:0, s:{} };
+            if(!stats[uid].s[wk]) stats[uid].s[wk] = { t:0, d:0 };
+            stats[uid].m += p.quantidade; stats[uid].d++;
+            stats[uid].s[wk].t += p.quantidade; stats[uid].s[wk].d++;
+            p.tS = stats[uid].s[wk].t; p.mS = (p.tS / stats[uid].s[wk].d).toFixed(0);
+            p.tM = stats[uid].m; p.mM = (p.tM / stats[uid].d).toFixed(0);
+        });
+        
+        let html = '', lastD = '';
+        dados.forEach(p => {
+            const dt = p.data_referencia.split('-').reverse().join('/');
+            if(!isDia && dt !== lastD) { html += `<tr class="divider-row"><td colspan="11">📅 DATA: ${dt}</td></tr>`; lastD = dt; }
+            const meta = metasGlobais.filter(m => m.usuario_id == p.usuario_id && m.data_inicio <= p.data_referencia).sort((a,b)=>b.id-a.id)[0];
+            const metaV = meta ? meta.valor_meta : 0;
+            const ating = metaV > 0 ? ((p.quantidade / metaV)*100).toFixed(0) : 0;
+            const corB = ating >= 100 ? '#0284c7' : '#e11d48';
+            html += `<tr><td><b>${p.usuarios?.nome || p.usuario_id}</b></td><td style="text-align:center; color:var(--primary); font-weight:700">${p.quantidade}</td><td>${p.fifo}</td><td>${p.gradual_total}</td><td>${p.gradual_parcial}</td><td>${p.perfil_fc}</td><td>${p.tS}</td><td>${p.tM}</td><td>${p.mS}</td><td>${p.mM}</td><td><span class="badge" style="background:${corB}">${ating}%</span></td></tr>`;
+        });
+        document.getElementById('tabela-corpo').innerHTML = html || '<tr><td colspan="11" style="text-align:center">Sem dados.</td></tr>';
+    }
+
     ajustarSeletores();
 </script>
 </body>
