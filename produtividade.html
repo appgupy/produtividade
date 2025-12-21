@@ -11,9 +11,11 @@
         :root { 
             --primary: #e11d48; 
             --clt: #0ea5e9; 
-            --pj: #10b981; /* Verde para PJ conforme solicitado */
-            --cat1: #f59e0b; /* Amarelo/Laranja para FIFO/GT */
-            --cat2: #d946ef; /* Rosa/Roxo para GP/FC */
+            --pj: #10b981; 
+            --fifo: #f59e0b; /* Amarelo */
+            --gt: #a67c52;   /* Marrom Claro */
+            --gp: #d946ef;   /* Rosa */
+            --fc: #8b5cf6;   /* Roxo */
             --bg: #f8fafc; 
             --nav: #1e293b; 
             --border: #e2e8f0; 
@@ -52,11 +54,13 @@
         .value { font-size: 1.05rem; font-weight: 800; }
         .value.small-val { font-size: 0.85rem; opacity: 0.9; }
 
-        /* CORES DAS MÉTRICAS */
+        /* CLASSES DE CORES */
         .color-clt { color: var(--clt); }
         .color-pj { color: var(--pj); }
-        .color-cat1 { color: var(--cat1); }
-        .color-cat2 { color: var(--cat2); }
+        .color-fifo { color: var(--fifo); }
+        .color-gt { color: var(--gt); }
+        .color-gp { color: var(--gp); }
+        .color-fc { color: var(--fc); }
 
         /* TABELA */
         .table-wrap { background: white; border-radius: 15px; border: 1px solid var(--border); overflow-x: auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
@@ -114,7 +118,7 @@
 <div class="container">
     <div id="panel-contexto" class="dynamic-panel">
         <div class="panel-header">
-            <h2 id="panel-titulo" style="margin:0; font-size:1rem;">Carregando...</h2>
+            <h2 id="panel-titulo" style="margin:0; font-size:1rem;">Dashboard</h2>
             <span id="panel-info-extra" style="font-size:0.7rem; font-weight:600; opacity:0.8;">-</span>
         </div>
         <div class="panel-grid">
@@ -137,22 +141,22 @@
             </div>
             <div class="panel-column">
                 <div class="stat-group">
-                    <div style="display:flex;flex-direction:column"><span class="label">Total FIFO</span><span class="value color-cat1" id="p-fifo">0</span></div>
-                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Méd. FIFO</span><span class="value small-val color-cat1" id="p-fifo-media">0</span></div>
+                    <div style="display:flex;flex-direction:column"><span class="label">Total FIFO</span><span class="value color-fifo" id="p-fifo">0</span></div>
+                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Méd. FIFO</span><span class="value small-val color-fifo" id="p-fifo-media">0</span></div>
                 </div>
                 <div class="stat-group">
-                    <div style="display:flex;flex-direction:column"><span class="label">Total GT</span><span class="value color-cat1" id="p-gt">0</span></div>
-                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Méd. GT</span><span class="value small-val color-cat1" id="p-gt-media">0</span></div>
+                    <div style="display:flex;flex-direction:column"><span class="label">Total GT</span><span class="value color-gt" id="p-gt">0</span></div>
+                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Méd. GT</span><span class="value small-val color-gt" id="p-gt-media">0</span></div>
                 </div>
             </div>
             <div class="panel-column">
                 <div class="stat-group">
-                    <div style="display:flex;flex-direction:column"><span class="label">Total GP</span><span class="value color-cat2" id="p-gp">0</span></div>
-                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Méd. GP</span><span class="value small-val color-cat2" id="p-gp-media">0</span></div>
+                    <div style="display:flex;flex-direction:column"><span class="label">Total GP</span><span class="value color-gp" id="p-gp">0</span></div>
+                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Méd. GP</span><span class="value small-val color-gp" id="p-gp-media">0</span></div>
                 </div>
                 <div class="stat-group">
-                    <div style="display:flex;flex-direction:column"><span class="label">Total FC</span><span class="value color-cat2" id="p-fc">0</span></div>
-                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Méd. FC</span><span class="value small-val color-cat2" id="p-fc-media">0</span></div>
+                    <div style="display:flex;flex-direction:column"><span class="label">Total FC</span><span class="value color-fc" id="p-fc">0</span></div>
+                    <div style="display:flex;flex-direction:column;text-align:right"><span class="label">Méd. FC</span><span class="value small-val color-fc" id="p-fc-media">0</span></div>
                 </div>
             </div>
         </div>
@@ -211,7 +215,6 @@
     async function carregarDados() {
         const v = document.getElementById('view-selector').value;
         let mesStr = v === 'dia' ? document.getElementById('select-dia').value.substring(0,7) : document.getElementById('select-mes').value;
-        
         const { data: pData } = await _supabase.from('producao').select('*, usuarios(*)').gte('data_referencia', `${mesStr}-01`).lte('data_referencia', `${mesStr}-31`).order('data_referencia', {ascending: false});
         const { data: mData } = await _supabase.from('metas').select('*');
         dadosGlobais = pData || []; metasGlobais = mData || [];
@@ -237,7 +240,7 @@
                 logs.sucesso++;
             }
         }
-        document.getElementById('log-content').innerHTML = `Linhas: ${logs.total_linhas}<br>✅ Importadas: ${logs.sucesso}<br>🔁 Duplicados: ${logs.duplicados}`;
+        document.getElementById('log-content').innerHTML = `Linhas: ${logs.total_linhas}<br>✅ Importadas: ${logs.sucesso}<br>⚠️ Sem ID: ${logs.ignorados_sem_id}<br>🔁 Duplicados: ${logs.duplicados}`;
         document.getElementById('import-log').style.display = 'block';
         carregarDados();
     }
