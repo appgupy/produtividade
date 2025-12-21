@@ -7,40 +7,34 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #e11d48; --clt: #0284c7; --pj: #7c3aed; --bg: #f8fafc; --nav: #1e293b; --border: #e2e8f0; }
+        :root { --primary: #e11d48; --bg: #f8fafc; --nav: #1e293b; --border: #e2e8f0; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding-top: 85px; color: #1e293b; }
 
-        /* NAVBAR PADRONIZADA */
         .navbar { position: fixed; top: 0; left: 0; right: 0; height: 75px; background: var(--nav); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
-        .nav-left { display: flex; align-items: center; gap: 30px; }
+        .nav-left { display: flex; align-items: center; gap: 20px; }
         .brand { line-height: 1; cursor: pointer; }
-        .brand .small { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; display: block; margin-bottom: 2px; }
-        .brand .big { font-size: 1.2rem; font-weight: 800; letter-spacing: -1px; color: white; }
-        .brand .big span { color: var(--primary); }
-        .nav-links { display: flex; gap: 20px; margin-left: 20px; }
-        .nav-item { color: #94a3b8; text-decoration: none; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
-        .nav-item:hover, .nav-item.active { color: white; }
-
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .brand .small { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; display: block; }
+        .brand .big { font-size: 1.1rem; font-weight: 800; color: white; }
         
-        /* CARD ESTILIZADO */
-        .card { background: white; border-radius: 15px; padding: 25px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .card-title { font-size: 1rem; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: var(--nav); border-bottom: 2px solid var(--bg); padding-bottom: 10px; }
-        
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.9rem; box-sizing: border-box; }
-        
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; margin-top: 10px; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-danger { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
-        .btn-danger:hover { background: #dc2626; color: white; }
+        .nav-tools { display: flex; align-items: center; gap: 10px; background: #334155; padding: 6px 12px; border-radius: 10px; border: 1px solid #475569; }
+        .nav-tools select { background: transparent; border: none; color: white; font-size: 0.85rem; font-weight: 600; outline: none; cursor: pointer; }
+        .nav-tools option { background: var(--nav); }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.85rem; }
-        th { text-align: left; padding: 12px; border-bottom: 2px solid var(--bg); color: #64748b; }
-        td { padding: 12px; border-bottom: 1px solid var(--bg); }
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .admin-card { background: white; border-radius: 15px; padding: 30px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 8px; }
+        input, select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; }
+        
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
+        .btn-primary { background: var(--primary); color: white; margin-top: 10px; }
+        .btn-danger { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; margin-top: 30px; }
 
-        .full-width { grid-column: span 2; }
+        table { width: 100%; border-collapse: collapse; margin-top: 25px; }
+        th { text-align: left; padding: 12px; border-bottom: 2px solid var(--bg); color: #64748b; font-size: 0.75rem; text-transform: uppercase; }
+        td { padding: 12px; border-bottom: 1px solid var(--bg); font-size: 0.85rem; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -51,83 +45,55 @@
             <span class="small">controle de</span>
             <div class="big">PRODUTIVIDADE<span>.</span></div>
         </div>
-        <div class="nav-links">
-            <a href="produtividade.html" class="nav-item">Dashboard</a>
-            <a href="gestao.html" class="nav-item active">Gestão</a>
+        <div class="nav-tools">
+            <select id="gestao-selector" onchange="alternarModulo()">
+                <option value="equipe">👥 Cadastro de Equipe</option>
+                <option value="metas">🎯 Configurar Metas</option>
+                <option value="lista">📋 Listagem Geral</option>
+                <option value="limpar">⚠️ Reiniciar Sistema</option>
+            </select>
         </div>
-    </div>
-    <div style="text-align: right; color: white; font-size: 0.85rem; font-weight: 700;">
-        Configurações do Sistema
+        <div style="display:flex; gap:20px; margin-left:20px;">
+            <a href="produtividade.html" style="color:#94a3b8; text-decoration:none; font-weight:700; font-size:0.85rem;">Dashboard</a>
+            <a href="#" style="color:white; text-decoration:none; font-weight:700; font-size:0.85rem;">Gestão</a>
+        </div>
     </div>
 </nav>
 
 <div class="container">
-    <div class="card">
-        <div class="card-title">👥 Cadastro de Equipe</div>
-        <div class="form-group">
-            <label>ID da Assistente (Conforme Planilha)</label>
-            <input type="number" id="u-id" placeholder="Ex: 123">
-        </div>
-        <div class="form-group">
-            <label>Nome Completo</label>
-            <input type="text" id="u-nome" placeholder="Nome da Assistente">
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="form-group">
-                <label>Função</label>
-                <select id="u-fun">
-                    <option value="Assistente">Assistente</option>
-                    <option value="Auditora">Auditora</option>
-                    <option value="Gestora">Gestora</option>
-                </select>
+    <div class="admin-card">
+        <div id="mod-equipe">
+            <h2 style="margin-top:0; font-size:1.2rem;">Cadastrar Novo Colaborador</h2>
+            <div class="form-group"><label>ID (Planilha)</label><input type="number" id="u-id"></div>
+            <div class="form-group"><label>Nome Completo</label><input type="text" id="u-nome"></div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                <div class="form-group"><label>Função</label><select id="u-fun"><option>Assistente</option><option>Auditora</option><option>Gestora</option></select></div>
+                <div class="form-group"><label>Contrato</label><select id="u-con"><option>CLT</option><option>PJ</option></select></div>
             </div>
-            <div class="form-group">
-                <label>Tipo Contrato</label>
-                <select id="u-con">
-                    <option value="CLT">CLT</option>
-                    <option value="PJ">PJ</option>
-                </select>
-            </div>
+            <button class="btn btn-primary" onclick="salvarUsuario()">Salvar Cadastro</button>
         </div>
-        <button class="btn btn-primary" onclick="salvarUsuario()">Cadastrar / Atualizar</button>
-    </div>
 
-    <div class="card">
-        <div class="card-title">🎯 Definição de Metas</div>
-        <div class="form-group">
-            <label>Selecionar Colaborador</label>
-            <select id="m-user"></select>
+        <div id="mod-metas" class="hidden">
+            <h2 style="margin-top:0; font-size:1.2rem;">Definir Meta Diária</h2>
+            <div class="form-group"><label>Colaborador</label><select id="m-user"></select></div>
+            <div class="form-group"><label>Valor da Meta</label><input type="number" id="m-val"></div>
+            <div class="form-group"><label>Início da Vigência</label><input type="date" id="m-data"></div>
+            <button class="btn btn-primary" onclick="salvarMeta()">Aplicar Meta</button>
         </div>
-        <div class="form-group">
-            <label>Valor da Meta Diária</label>
-            <input type="number" id="m-val" placeholder="Ex: 600">
-        </div>
-        <div class="form-group">
-            <label>Vigência a partir de:</label>
-            <input type="date" id="m-data">
-        </div>
-        <button class="btn btn-primary" onclick="salvarMeta()">Aplicar Nova Meta</button>
-    </div>
 
-    <div class="card full-width">
-        <div class="card-title">📋 Colaboradores Ativos</div>
-        <table id="lista-u">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>Contrato</th>
-                    <th>Função</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
+        <div id="mod-lista" class="hidden">
+            <h2 style="margin-top:0; font-size:1.2rem;">Equipe Cadastrada</h2>
+            <table id="tabela-equipe">
+                <thead><tr><th>ID</th><th>Nome</th><th>Contrato</th><th>Função</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
 
-    <div class="card full-width" style="border: 1px solid #fecaca; background: #fffafb;">
-        <div class="card-title" style="color: #dc2626;">⚠️ Zona de Perigo</div>
-        <p style="font-size: 0.85rem; color: #7f1d1d; margin-top: 0;">Use esta opção apenas se desejar reiniciar o sistema. Isso apagará todas as produções importadas (planilhas), mas manterá os nomes e metas dos funcionários.</p>
-        <button class="btn btn-danger" onclick="limparDadosProducao()">Limpar Todas as Importações</button>
+        <div id="mod-limpar" class="hidden" style="text-align:center;">
+            <h2 style="margin-top:0; font-size:1.2rem; color:#dc2626;">Apagar Dados de Importação</h2>
+            <p>Esta ação removerá permanentemente todas as produções enviadas via Excel.</p>
+            <button class="btn btn-danger" onclick="limparBanco()">Limpar Banco de Produção</button>
+        </div>
     </div>
 </div>
 
@@ -136,67 +102,42 @@
     const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdscXJwc3lqd296dmlzbHl4YXBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyNTQyOTgsImV4cCI6MjA4MTgzMDI5OH0.etzcmIHgPcGC12HwZPTU2u0DLtJdF3XTBSYW38O7S-w";
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
+    function alternarModulo() {
+        const m = document.getElementById('gestao-selector').value;
+        document.getElementById('mod-equipe').classList.toggle('hidden', m !== 'equipe');
+        document.getElementById('mod-metas').classList.toggle('hidden', m !== 'metas');
+        document.getElementById('mod-lista').classList.toggle('hidden', m !== 'lista');
+        document.getElementById('mod-limpar').classList.toggle('hidden', m !== 'limpar');
+        if(m === 'lista' || m === 'metas') carregarListas();
+    }
+
     async function salvarUsuario() {
         const id = document.getElementById('u-id').value;
         const nome = document.getElementById('u-nome').value;
-        const funcao = document.getElementById('u-fun').value;
-        const contrato = document.getElementById('u-con').value;
-
-        if(!id || !nome) return alert("Preencha ID e Nome!");
-
-        const { error } = await _supabase.from('usuarios').upsert([{ 
-            id: id, nome: nome, funcao: funcao, contrato: contrato, senha: '123' 
-        }]);
-
-        if(!error) { alert("Cadastro atualizado!"); carregarListas(); }
+        if(!id || !nome) return alert("Preencha ID e Nome");
+        await _supabase.from('usuarios').upsert([{ id, nome, funcao: document.getElementById('u-fun').value, contrato: document.getElementById('u-con').value, senha: '123' }]);
+        alert("Salvo!");
     }
 
     async function salvarMeta() {
-        const uid = document.getElementById('m-user').value;
-        const val = document.getElementById('m-val').value;
-        const data = document.getElementById('m-data').value;
-
-        if(!uid || !val || !data) return alert("Preencha todos os campos da meta!");
-
-        const { error } = await _supabase.from('metas').insert([{
-            usuario_id: uid, valor_meta: val, data_inicio: data
-        }]);
-
-        if(!error) { alert("Meta cadastrada!"); }
+        await _supabase.from('metas').insert([{ usuario_id: document.getElementById('m-user').value, valor_meta: document.getElementById('m-val').value, data_inicio: document.getElementById('m-data').value }]);
+        alert("Meta definida!");
     }
 
-    async function limparDadosProducao() {
-        const confirmar = confirm("ATENÇÃO: Isso apagará permanentemente todos os dados de planilhas importadas. Deseja continuar?");
-        if(confirmar) {
-            const senha = prompt("Digite a palavra 'LIMPAR' para confirmar:");
-            if(senha === 'LIMPAR') {
-                const { error } = await _supabase.from('producao').delete().neq('id', 0); // Deleta tudo
-                if(!error) alert("Banco de dados de produção reiniciado com sucesso!");
-                else alert("Erro ao limpar dados.");
+    async function limparBanco() {
+        if(confirm("Deseja realmente apagar todas as produções?")) {
+            if(prompt("Digite LIMPAR para confirmar") === "LIMPAR") {
+                await _supabase.from('producao').delete().neq('id', 0);
+                alert("Dados apagados!");
             }
         }
     }
 
     async function carregarListas() {
         const { data: u } = await _supabase.from('usuarios').select('*').order('nome');
-        
-        // Popular Tabela
-        const tbody = document.querySelector('#lista-u tbody');
-        tbody.innerHTML = u.map(x => `
-            <tr>
-                <td>${x.id}</td>
-                <td><b>${x.nome}</b></td>
-                <td>${x.contrato}</td>
-                <td>${x.funcao}</td>
-            </tr>
-        `).join('');
-
-        // Popular Select de Metas
-        const mSelect = document.getElementById('m-user');
-        mSelect.innerHTML = u.filter(x => x.funcao === 'Assistente').map(x => `<option value="${x.id}">${x.nome}</option>`).join('');
+        document.getElementById('m-user').innerHTML = u.map(x => `<option value="${x.id}">${x.nome}</option>`).join('');
+        document.querySelector('#tabela-equipe tbody').innerHTML = u.map(x => `<tr><td>${x.id}</td><td>${x.nome}</td><td>${x.contrato}</td><td>${x.funcao}</td></tr>`).join('');
     }
-
-    carregarListas();
 </script>
 </body>
 </html>
