@@ -13,7 +13,7 @@
 
         .navbar { position: fixed; top: 0; left: 0; right: 0; height: 75px; background: var(--nav); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
         .nav-left { display: flex; align-items: center; gap: 20px; }
-        .brand { line-height: 1; cursor: pointer; min-width: 150px; }
+        .brand { line-height: 1; cursor: pointer; }
         .brand .small { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; display: block; }
         .brand .big { font-size: 1.1rem; font-weight: 800; color: white; }
         
@@ -22,25 +22,31 @@
         .nav-tools option { background: var(--nav); }
 
         .btn-import { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 700; font-size: 0.75rem; cursor: pointer; }
-        
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
 
-        .dynamic-panel { background: #1e293b; color: white; border-radius: 15px; padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-left: 6px solid var(--primary); }
-        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #334155; padding-bottom: 15px; }
-        .panel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; }
-        .stat-box { padding: 5px; }
-        .stat-box .label { font-size: 0.55rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; display: block; }
-        .stat-box .value { font-size: 1.1rem; font-weight: 800; display: block; margin-top: 2px; }
+        /* NOVO MINI PAINEL ORGANIZADO */
+        .dynamic-panel { background: #1e293b; color: white; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-left: 6px solid var(--primary); }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        
+        .panel-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .panel-column { display: flex; flex-direction: column; gap: 12px; border-right: 1px solid #334155; padding-right: 15px; }
+        .panel-column:last-child { border-right: none; }
+        
+        .stat-group { display: flex; justify-content: space-between; align-items: flex-end; }
+        .stat-item { display: flex; flex-direction: column; }
+        .label { font-size: 0.55rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-bottom: 2px; }
+        .value { font-size: 1.05rem; font-weight: 800; }
+        .value.small-val { font-size: 0.9rem; color: #cbd5e1; }
 
+        /* TABELA */
         .table-wrap { background: white; border-radius: 15px; border: 1px solid var(--border); overflow-x: auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 1100px; }
         th { background: #f8fafc; padding: 12px; text-align: left; border-bottom: 2px solid var(--border); color: #64748b; }
         td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; }
         .divider-row { background: #f1f5f9 !important; font-weight: 800; font-size: 0.7rem; color: #475569; }
-        
         .hidden { display: none !important; }
         
-        #import-log { position: fixed; bottom: 20px; right: 20px; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 2000; border-top: 4px solid var(--primary); display: none; min-width: 280px; }
+        #import-log { position: fixed; bottom: 20px; right: 20px; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 2000; border-top: 4px solid var(--primary); display: none; }
     </style>
 </head>
 <body>
@@ -60,15 +66,18 @@
             <div style="width:1px; height:20px; background:#475569;"></div>
             
             <input type="date" id="select-dia" onchange="carregarDados()">
-            <select id="select-semana" class="hidden" onchange="alternarVisao()"></select>
             <input type="month" id="select-mes" class="hidden" onchange="carregarDados()">
+            <select id="select-semana" class="hidden" onchange="alternarVisao()">
+                <option value="1">Semana 1</option><option value="2">Semana 2</option>
+                <option value="3">Semana 3</option><option value="4">Semana 4</option><option value="5">Semana 5</option>
+            </select>
         </div>
     </div>
     <div class="nav-right" style="display: flex; align-items: center; gap: 20px;">
-        <button class="btn-import" onclick="document.getElementById('excel-files').click()">📥 Importar Planilhas</button>
+        <button class="btn-import" onclick="document.getElementById('excel-files').click()">📥 Importar</button>
         <input type="file" id="excel-files" accept=".xlsx" multiple class="hidden" onchange="importarArquivos()">
         <div style="text-align: right; border-left: 1px solid #334155; padding-left: 20px;">
-            <span id="user-display" style="font-weight:700; font-size:0.85rem; color:white; display:block;"></span>
+            <span id="user-display" style="font-weight:700; font-size:0.85rem; color:white; display:block;">Patrícia</span>
             <span style="color: #f87171; font-size: 0.7rem; cursor: pointer; font-weight: 700;" onclick="logout()">Sair</span>
         </div>
     </div>
@@ -77,24 +86,48 @@
 <div class="container">
     <div id="panel-contexto" class="dynamic-panel">
         <div class="panel-header">
-            <h2 id="panel-titulo" style="margin:0; font-size:1.1rem;">Iniciando sistema...</h2>
-            <span id="panel-info-extra" style="font-size:0.75rem; font-weight:600; background:rgba(255,255,255,0.1); padding:5px 12px; border-radius:20px;">-</span>
+            <h2 id="panel-titulo" style="margin:0; font-size:1rem;">Dashboard</h2>
+            <span id="panel-info-extra" style="font-size:0.7rem; font-weight:600; opacity:0.8;">-</span>
         </div>
-        <div class="panel-grid" id="panel-stats">
-            <div class="stat-box"><span class="label">Total Produção</span><span class="value" id="p-total">0</span></div>
-            <div class="stat-box"><span class="label">Média Time</span><span class="value" id="p-media">0</span></div>
-            <div class="stat-box"><span class="label">Total CLT</span><span class="value" style="color:var(--clt)" id="p-clt">0</span></div>
-            <div class="stat-box"><span class="label">Média CLT</span><span class="value" style="color:var(--clt)" id="p-clt-media">0</span></div>
-            <div class="stat-box"><span class="label">Total PJ</span><span class="value" style="color:var(--pj)" id="p-pj">0</span></div>
-            <div class="stat-box"><span class="label">Média PJ</span><span class="value" style="color:var(--pj)" id="p-pj-media">0</span></div>
-            <div class="stat-box"><span class="label">Total FIFO</span><span class="value" id="p-fifo">0</span></div>
-            <div class="stat-box"><span class="label">Média FIFO</span><span class="value" id="p-fifo-media">0</span></div>
-            <div class="stat-box"><span class="label">Total GT</span><span class="value" id="p-gt">0</span></div>
-            <div class="stat-box"><span class="label">Média GT</span><span class="value" id="p-gt-media">0</span></div>
-            <div class="stat-box"><span class="label">Total GP</span><span class="value" id="p-gp">0</span></div>
-            <div class="stat-box"><span class="label">Média GP</span><span class="value" id="p-gp-media">0</span></div>
-            <div class="stat-box"><span class="label">Total FC</span><span class="value" id="p-fc">0</span></div>
-            <div class="stat-box"><span class="label">Média FC</span><span class="value" id="p-fc-media">0</span></div>
+        
+        <div class="panel-grid">
+            <div class="panel-column">
+                <div class="stat-group">
+                    <div class="stat-item"><span class="label">Total Geral</span><span class="value" id="p-total">0</span></div>
+                    <div class="stat-item"><span class="label">Média Time</span><span class="value small-val" id="p-media">0</span></div>
+                </div>
+                <div class="stat-group"><div class="stat-item"><span class="label">Assistentes Ativos</span><span class="value" id="p-headcount">0</span></div></div>
+            </div>
+            <div class="panel-column">
+                <div class="stat-group">
+                    <div class="stat-item"><span class="label">Total CLT</span><span class="value" style="color:var(--clt)" id="p-clt">0</span></div>
+                    <div class="stat-item"><span class="label">Média CLT</span><span class="value small-val" id="p-clt-media">0</span></div>
+                </div>
+                <div class="stat-group">
+                    <div class="stat-item"><span class="label">Total PJ</span><span class="value" style="color:var(--pj)" id="p-pj">0</span></div>
+                    <div class="stat-item"><span class="label">Média PJ</span><span class="value small-val" id="p-pj-media">0</span></div>
+                </div>
+            </div>
+            <div class="panel-column">
+                <div class="stat-group">
+                    <div class="stat-item"><span class="label">Total FIFO</span><span class="value" id="p-fifo">0</span></div>
+                    <div class="stat-item"><span class="label">Média FIFO</span><span class="value small-val" id="p-fifo-media">0</span></div>
+                </div>
+                <div class="stat-group">
+                    <div class="stat-item"><span class="label">Total GT</span><span class="value" id="p-gt">0</span></div>
+                    <div class="stat-item"><span class="label">Média GT</span><span class="value small-val" id="p-gt-media">0</span></div>
+                </div>
+            </div>
+            <div class="panel-column">
+                <div class="stat-group">
+                    <div class="stat-item"><span class="label">Total GP</span><span class="value" id="p-gp">0</span></div>
+                    <div class="stat-item"><span class="label">Média GP</span><span class="value small-val" id="p-gp-media">0</span></div>
+                </div>
+                <div class="stat-group">
+                    <div class="stat-item"><span class="label">Total FC</span><span class="value" id="p-fc">0</span></div>
+                    <div class="stat-item"><span class="label">Média FC</span><span class="value small-val" id="p-fc-media">0</span></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -105,7 +138,7 @@
                     <th>Assistente</th>
                     <th style="text-align:center; color:var(--primary)">Produção</th>
                     <th>FIFO</th><th>G.T.</th><th>G.P.</th><th>P.FC</th>
-                    <th>Semana</th><th>Mês</th><th>Méd. Sem</th><th>Méd. Mês</th><th>Ating.</th>
+                    <th>Acum. Semana</th><th>Acum. Mês</th><th>Média Semana</th><th>Média Mês</th><th>Ating.</th>
                 </tr>
             </thead>
             <tbody id="tabela-corpo"></tbody>
@@ -114,9 +147,9 @@
 </div>
 
 <div id="import-log">
-    <h4 style="margin:0 0 10px 0; font-size:0.9rem;">📢 Relatório de Importação</h4>
-    <div id="log-content" style="font-size:0.75rem; color:#475569; line-height:1.4"></div>
-    <button onclick="this.parentElement.style.display='none'" style="margin-top:12px; width:100%; padding:8px; border:none; background:var(--nav); color:white; cursor:pointer; border-radius:6px; font-weight:700;">Fechar</button>
+    <h4 style="margin:0 0 10px 0; font-size:0.85rem;">📢 Relatório de Importação</h4>
+    <div id="log-content" style="font-size:0.75rem; line-height:1.4"></div>
+    <button onclick="this.parentElement.style.display='none'" style="margin-top:10px; width:100%; padding:5px; border:none; background:#eee; cursor:pointer; border-radius:5px;">Fechar</button>
 </div>
 
 <script>
@@ -125,40 +158,22 @@
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
     let dadosGlobais = [], metasGlobais = [];
 
-    const sessao = JSON.parse(localStorage.getItem('usuario'));
-    if(!sessao) window.location.href = 'index.html';
-    document.getElementById('user-display').innerText = sessao.nome;
-    
-    // Datas Iniciais
-    const hoje = new Date();
-    document.getElementById('select-dia').value = hoje.toISOString().substring(0,10);
-    document.getElementById('select-mes').value = hoje.toISOString().substring(0,7);
+    document.getElementById('select-dia').value = new Date().toISOString().substring(0,10);
+    document.getElementById('select-mes').value = new Date().toISOString().substring(0,7);
 
     function logout() { localStorage.removeItem('usuario'); window.location.href = 'index.html'; }
 
     function ajustarSeletores() {
         const v = document.getElementById('view-selector').value;
         document.getElementById('select-dia').classList.toggle('hidden', v !== 'dia');
+        // Mês agora aparece para SEMANA e MES
+        document.getElementById('select-mes').classList.toggle('hidden', v === 'dia');
         document.getElementById('select-semana').classList.toggle('hidden', v !== 'semana');
-        document.getElementById('select-mes').classList.toggle('hidden', v !== 'mes');
-        
-        if(v === 'semana') gerarOpcoesSemana();
         carregarDados();
-    }
-
-    function gerarOpcoesSemana() {
-        const sel = document.getElementById('select-semana');
-        sel.innerHTML = '';
-        for(let i=1; i<=5; i++) {
-            const opt = document.createElement('option');
-            opt.value = i; opt.text = `Semana ${i}`;
-            sel.appendChild(opt);
-        }
     }
 
     async function carregarDados() {
         const v = document.getElementById('view-selector').value;
-        // Sempre carrega o mês da data selecionada para ter os acumulados
         let dataRef = v === 'dia' ? document.getElementById('select-dia').value : document.getElementById('select-mes').value + "-01";
         const mesStr = dataRef.substring(0,7);
         
@@ -183,15 +198,15 @@
                 logs.total++;
                 const { data: ex } = await _supabase.from('producao').select('id').eq('usuario_id', r.id_assistente).eq('data_referencia', dr).maybeSingle();
                 if(ex) { logs.duplicados++; continue; }
-                const { error } = await _supabase.from('producao').insert({
+                await _supabase.from('producao').insert({
                     usuario_id: r.id_assistente, fifo: Number(r.documentos_validados_fifo || 0), gradual_total: Number(r.documentos_validados_gradual_total || 0),
                     gradual_parcial: Number(r.documentos_validados_gradual_parcial || 0), perfil_fc: Number(r.documentos_validados_perfil_fc || 0),
                     quantidade: Number(r.documentos_validados || 0), data_referencia: dr
                 });
-                if(!error) logs.sucesso++;
+                logs.sucesso++;
             }
         }
-        document.getElementById('log-content').innerHTML = `Processados: ${logs.total}<br>✅ Importados: ${logs.sucesso}<br>⚠️ Duplicados: ${logs.duplicados}`;
+        document.getElementById('log-content').innerHTML = `Lidas: ${logs.total}<br>✅ Novas: ${logs.sucesso}<br>⚠️ Duplicadas: ${logs.duplicados}`;
         document.getElementById('import-log').style.display = 'block';
         carregarDados();
     }
@@ -213,10 +228,10 @@
         } else if(visao === 'semana') {
             const sem = parseInt(document.getElementById('select-semana').value);
             filtrados = dadosGlobais.filter(p => getWeekOfMonth(p.data_referencia) === sem);
-            titulo = `Análise Semana ${sem}`;
+            titulo = `Análise Semana ${sem} (${document.getElementById('select-mes').options[document.getElementById('select-mes').selectedIndex].text})`;
         } else {
             filtrados = dadosGlobais;
-            titulo = `Consolidado Mensal`;
+            titulo = `Consolidado ${document.getElementById('select-mes').options[document.getElementById('select-mes').selectedIndex].text}`;
         }
         atualizarPainel(filtrados, titulo);
         renderizarTabela(filtrados, visao === 'dia');
@@ -227,32 +242,31 @@
         const total = as.reduce((a,b)=>a+b.quantidade,0);
         const dias = new Set(as.map(p => p.data_referencia)).size || 1;
         const head = new Set(as.map(p => p.usuarios?.nome)).size || 1;
-
         const clt = as.filter(p=>(p.usuarios?.contrato||'').includes('CLT'));
         const pj = as.filter(p=>!(p.usuarios?.contrato||'').includes('CLT'));
 
         document.getElementById('panel-titulo').innerText = titulo;
-        document.getElementById('panel-info-extra').innerText = `${head} Assistentes ativos`;
         document.getElementById('p-total').innerText = total.toLocaleString();
         document.getElementById('p-media').innerText = (total/dias/head || 0).toFixed(0);
+        document.getElementById('p-headcount').innerText = head;
         
         const cTot = clt.reduce((a,b)=>a+b.quantidade,0);
         document.getElementById('p-clt').innerText = cTot.toLocaleString();
-        document.getElementById('p-clt-media').innerText = (cTot / dias / (new Set(clt.map(x=>x.usuarios?.nome)).size || 1)).toFixed(0);
+        document.getElementById('p-clt-media').innerText = (cTot/dias/(new Set(clt.map(x=>x.usuarios?.nome)).size||1)).toFixed(0);
         
         const pTot = pj.reduce((a,b)=>a+b.quantidade,0);
         document.getElementById('p-pj').innerText = pTot.toLocaleString();
-        document.getElementById('p-pj-media').innerText = (pTot / dias / (new Set(pj.map(x=>x.usuarios?.nome)).size || 1)).toFixed(0);
+        document.getElementById('p-pj-media').innerText = (pTot/dias/(new Set(pj.map(x=>x.usuarios?.nome)).size||1)).toFixed(0);
 
-        const f = as.reduce((a,b)=>a+b.fifo,0), gt = as.reduce((a,b)=>a+b.gradual_total,0), gp = as.reduce((a,b)=>a+b.gradual_parcial,0), fc = as.reduce((a,b)=>a+b.perfil_fc,0);
+        const f=as.reduce((a,b)=>a+b.fifo,0), gt=as.reduce((a,b)=>a+b.gradual_total,0), gp=as.reduce((a,b)=>a+b.gradual_parcial,0), fc=as.reduce((a,b)=>a+b.perfil_fc,0);
         document.getElementById('p-fifo').innerText = f.toLocaleString();
-        document.getElementById('p-fifo-media').innerText = (f/dias/head || 0).toFixed(0);
+        document.getElementById('p-fifo-media').innerText = (f/dias/head||0).toFixed(0);
         document.getElementById('p-gt').innerText = gt.toLocaleString();
-        document.getElementById('p-gt-media').innerText = (gt/dias/head || 0).toFixed(0);
+        document.getElementById('p-gt-media').innerText = (gt/dias/head||0).toFixed(0);
         document.getElementById('p-gp').innerText = gp.toLocaleString();
-        document.getElementById('p-gp-media').innerText = (gp/dias/head || 0).toFixed(0);
+        document.getElementById('p-gp-media').innerText = (gp/dias/head||0).toFixed(0);
         document.getElementById('p-fc').innerText = fc.toLocaleString();
-        document.getElementById('p-fc-media').innerText = (fc/dias/head || 0).toFixed(0);
+        document.getElementById('p-fc-media').innerText = (fc/dias/head||0).toFixed(0);
     }
 
     function renderizarTabela(dados, isDia) {
@@ -275,7 +289,7 @@
             const ating = meta ? ((p.quantidade / meta.valor_meta)*100).toFixed(0) : 0;
             html += `<tr><td><b>${p.usuarios?.nome || 'N/A'}</b></td><td style="text-align:center; color:var(--primary); font-weight:800">${p.quantidade}</td><td>${p.fifo}</td><td>${p.gradual_total}</td><td>${p.gradual_parcial}</td><td>${p.perfil_fc}</td><td>${p.tS}</td><td>${p.tM}</td><td>${p.mS}</td><td>${p.mM}</td><td><span style="font-weight:800; color:${ating>=100?'#059669':'#dc2626'}">${ating}%</span></td></tr>`;
         });
-        document.getElementById('tabela-corpo').innerHTML = html || '<tr><td colspan="11" style="text-align:center">Sem dados.</td></tr>';
+        document.getElementById('tabela-corpo').innerHTML = html || '<tr><td colspan="11" style="text-align:center">Nenhum dado.</td></tr>';
     }
 
     ajustarSeletores();
