@@ -13,13 +13,13 @@
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .header-top h1 { margin: 0; font-size: 1.2rem; font-weight: 800; }
 
-        /* KPIs Superiores (Mensais) */
+        /* KPIs Mensais */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px; }
         .stat-card { background: white; padding: 12px; border-radius: 10px; border-top: 3px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .stat-label { font-size: 0.6rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
         .stat-value { font-size: 1.1rem; font-weight: 800; }
 
-        /* PAINEL DE DESTAQUE DIÁRIO (NOVO) */
+        /* PAINEL DE DESTAQUE DIÁRIO */
         .dia-destaque-container { background: #fff; border-radius: 12px; border: 2px solid var(--dark); margin-bottom: 25px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .dia-destaque-header { background: var(--dark); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
         .dia-destaque-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1px; background: var(--border); }
@@ -30,7 +30,6 @@
         .val-pj { color: var(--pj); }
         .val-total { color: var(--primary); }
 
-        /* Grid Categorias do Dia */
         .cat-dia-grid { display: grid; grid-template-columns: repeat(4, 1fr); background: #f8fafc; border-top: 1px solid var(--border); }
         .cat-dia-item { padding: 10px 20px; border-right: 1px solid var(--border); }
         .cat-dia-item:last-child { border-right: none; }
@@ -41,8 +40,18 @@
         table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
         th { background: #f8fafc; padding: 10px 12px; text-align: left; border-bottom: 2px solid var(--border); color: #475569; }
         td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; }
-        .dia-divider { background: #64748b !important; color: white; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; padding: 10px 15px; }
+
+        /* DIVIDER COM RESUMO EMBUTIDO */
+        .dia-divider { background: #475569 !important; color: white; cursor: pointer; transition: 0.2s; }
+        .dia-divider:hover { background: var(--dark) !important; }
+        .dia-divider-content { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; }
+        .resumo-compacto { font-size: 0.68rem; font-weight: 400; color: #e2e8f0; display: flex; gap: 12px; }
+        .resumo-compacto b { color: #fff; }
+
         .sub-header-row { background: #f1f5f9; font-weight: bold; color: #475569; font-size: 0.7rem; }
+        .history-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .history-card { background: white; border: 1px solid var(--border); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .history-card:hover { border-color: var(--primary); transform: translateY(-3px); }
         
         .badge { padding: 4px 8px; border-radius: 6px; font-weight: 800; font-size: 0.7rem; color: white; }
         .btn { padding: 10px 18px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; font-size: 0.85rem; background: var(--primary); color: white; }
@@ -63,13 +72,12 @@
 
 <div class="stats-grid">
     <div class="stat-card" style="border-top-color:#f59e0b;"><div class="stat-label">Dias Trabalhados (Mês)</div><div class="stat-value" id="kpi-dias">0</div></div>
-    <div class="stat-card" style="border-top-color:#0ea5e9;"><div class="stat-label">Média Assistente/Dia</div><div class="stat-value" id="kpi-media-as-dia">0</div></div>
+    <div class="stat-card" style="border-top-color:#0ea5e9;"><div class="stat-label">Assistente por dia</div><div class="stat-value" id="kpi-media-as-dia">0</div></div>
     <div class="stat-card" style="border-top-color:#10b981;"><div class="stat-label">Total Validado (Mês)</div><div class="stat-value" id="kpi-total-mes-time">0</div></div>
     <div class="stat-card" style="border-top-color:#10b981;"><div class="stat-label">Média Assistente (Mês)</div><div class="stat-value" id="kpi-media-as-mes">0</div></div>
 </div>
 
 <div class="card" style="margin-bottom:15px; background:white; padding:15px; border-radius:10px; border:1px solid var(--border);">
-    <label style="font-size:0.75rem; font-weight:700;">Importar Planilhas:</label>
     <input type="file" id="excel-files" accept=".xlsx" multiple>
     <button class="btn" onclick="importarArquivos()">📥 Importar Dados</button>
 </div>
@@ -168,26 +176,18 @@
         const { data: pData } = await _supabase.from('producao').select('*, usuarios(*)').gte('data_referencia', `${mesStr}-01`).lte('data_referencia', `${mesStr}-31`).order('data_referencia', {ascending: false});
         const { data: mData } = await _supabase.from('metas').select('*');
         dadosGlobais = pData || []; metasGlobais = mData || [];
-        
         if(dadosGlobais.length > 0) {
             renderizarKPIs();
-            renderizarDestaqueDiario(dadosGlobais[0].data_referencia);
+            selecionarDia(dadosGlobais[0].data_referencia);
             renderizarCardsSemanais();
             renderizarTabela(document.getElementById('tabela-hoje'), [dadosGlobais[0].data_referencia]);
         }
     }
 
-    function renderizarKPIs() {
-        let k = { t:0, n:new Set(), d:new Set(), assD:{} };
-        dadosGlobais.filter(p => p.usuarios?.funcao === 'Assistente').forEach(p => {
-            k.t += p.quantidade; k.n.add(p.usuarios.nome); k.d.add(p.data_referencia);
-            if(!k.assD[p.data_referencia]) k.assD[p.data_referencia] = new Set();
-            k.assD[p.data_referencia].add(p.usuarios.nome);
-        });
-        document.getElementById('kpi-dias').innerText = k.d.size;
-        document.getElementById('kpi-total-mes-time').innerText = k.t.toLocaleString();
-        document.getElementById('kpi-media-as-mes').innerText = (k.t / (k.n.size || 1)).toFixed(0);
-        document.getElementById('kpi-media-as-dia').innerText = (Object.keys(k.assD).reduce((a,b)=>a+k.assD[b].size,0) / (k.d.size || 1)).toFixed(1);
+    function selecionarDia(data) {
+        renderizarDestaqueDiario(data);
+        fecharModal();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function renderizarDestaqueDiario(dataFoco) {
@@ -215,21 +215,23 @@
         document.getElementById('d-fc').innerText = dia.reduce((a,b)=>a+b.perfil_fc, 0).toLocaleString();
     }
 
-    function renderizarCardsSemanais() {
-        const container = document.getElementById('history-container');
-        container.innerHTML = `<div class="history-card" onclick="abrirModal('mes')">📊<span>Mês Completo</span></div>`;
-        const semanas = [...new Set(dadosGlobais.map(p => getWeek(p.data_referencia)))].sort((a,b) => a-b);
-        semanas.forEach((s, i) => container.innerHTML += `<div class="history-card" onclick="abrirModal('semana', ${s})">📅<span>Semana ${i+1}</span></div>`);
-    }
-
     function renderizarTabela(target, datas) {
-        let stats = {};
+        let stats = {}; let resumoDia = {};
         [...dadosGlobais].reverse().forEach(p => {
-            const uid = p.usuario_id, wk = getWeek(p.data_referencia);
+            const uid = p.usuario_id, wk = getWeek(p.data_referencia), dr = p.data_referencia;
             if(!stats[uid]) stats[uid] = { m:0, d:0, s:{} };
             if(!stats[uid].s[wk]) stats[uid].s[wk] = { t:0, d:0 };
+            if(!resumoDia[dr]) resumoDia[dr] = { f:0, gt:0, gp:0, fc:0, t:0, clt:0, pj:0, cC:0, cP:0 };
+            
             stats[uid].m += p.quantidade; stats[uid].d++;
             stats[uid].s[wk].t += p.quantidade; stats[uid].s[wk].d++;
+            
+            if(p.usuarios?.funcao === 'Assistente') {
+                resumoDia[dr].f += p.fifo; resumoDia[dr].gt += p.gradual_total; resumoDia[dr].gp += p.gradual_parcial; resumoDia[dr].fc += p.perfil_fc; resumoDia[dr].t += p.quantidade;
+                if((p.usuarios.contrato || '').includes('CLT')) { resumoDia[dr].clt += p.quantidade; resumoDia[dr].cC++; }
+                else { resumoDia[dr].pj += p.quantidade; resumoDia[dr].cP++; }
+            }
+
             p.tS = stats[uid].s[wk].t; p.mS = (p.tS / stats[uid].s[wk].d).toFixed(0);
             p.tM = stats[uid].m; p.mM = (p.tM / stats[uid].d).toFixed(0);
         });
@@ -239,18 +241,55 @@
         
         dadosGlobais.filter(p => datas.includes(p.data_referencia)).sort((a,b) => b.data_referencia.localeCompare(a.data_referencia) || a.usuarios.nome.localeCompare(b.usuarios.nome)).forEach(p => {
             const dt = new Date(p.data_referencia + 'T12:00:00').toLocaleDateString('pt-BR');
-            if(dt !== lastD) { html += `<tr class="dia-divider" onclick="renderizarDestaqueDiario('${p.data_referencia}')" style="cursor:pointer;"><td colspan="7">📅 ${dt} (Clique para destacar este dia)</td></tr>` + cabecalho; lastD = dt; }
+            if(dt !== lastD) { 
+                const r = resumoDia[p.data_referencia];
+                html += `<tr class="dia-divider" onclick="selecionarDia('${p.data_referencia}')">
+                    <td colspan="7">
+                        <div class="dia-divider-content">
+                            <span>📅 ${dt}</span>
+                            <div class="resumo-compacto">
+                                <span>TOTAL: <b>${r.t}</b></span>
+                                <span>CLT: <b>${r.clt}</b> (M: ${(r.clt/(r.cC||1)).toFixed(0)})</span>
+                                <span>PJ: <b>${r.pj}</b> (M: ${(r.pj/(r.cP||1)).toFixed(0)})</span>
+                                <span>FIFO: <b>${r.f}</b> | GT: <b>${r.gt}</b></span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>` + cabecalho; 
+                lastD = dt; 
+            }
             const ating = metasGlobais.filter(m => m.usuario_id == p.usuario_id && m.data_inicio <= p.data_referencia).sort((a,b)=>b.id-a.id)[0];
-            const perc = ating ? ((p.quantidade / ating.valor_meta)*100).toFixed(0) : 0;
-            html += `<tr><td><strong>${p.usuarios?.nome}</strong></td><td class="txt-destaque">${p.quantidade}</td><td>${p.tS}</td><td>${p.tM}</td><td>${p.mS}</td><td>${p.mM}</td><td><span class="badge" style="background:${perc>=100?'#059669':'#dc2626'}">${perc}%</span></td></tr>`;
+            const atingVal = ating ? ating.valor_meta : 0;
+            const perc = atingVal > 0 ? ((p.quantidade / atingVal)*100).toFixed(0) : 0;
+            html += `<tr><td><strong>${p.usuarios?.nome}</strong></td><td style="font-weight:800; color:var(--primary)">${p.quantidade}</td><td>${p.tS}</td><td>${p.tM}</td><td>${p.mS}</td><td>${p.mM}</td><td><span class="badge" style="background:${perc>=100?'#059669':'#dc2626'}">${perc}%</span></td></tr>`;
         });
         target.innerHTML = html;
+    }
+
+    function renderizarKPIs() {
+        let k = { t:0, n:new Set(), d:new Set(), assD:{} };
+        dadosGlobais.filter(p => p.usuarios?.funcao === 'Assistente').forEach(p => {
+            k.t += p.quantidade; k.n.add(p.usuarios.nome); k.d.add(p.data_referencia);
+            if(!k.assD[p.data_referencia]) k.assD[p.data_referencia] = new Set();
+            k.assD[p.data_referencia].add(p.usuarios.nome);
+        });
+        document.getElementById('kpi-dias').innerText = k.d.size;
+        document.getElementById('kpi-total-mes-time').innerText = k.t.toLocaleString();
+        document.getElementById('kpi-media-as-mes').innerText = (k.t / (k.n.size || 1)).toFixed(0);
+        document.getElementById('kpi-media-as-dia').innerText = (Object.keys(k.assD).reduce((a,b)=>a+k.assD[b].size,0) / (k.d.size || 1)).toFixed(1);
+    }
+
+    function renderizarCardsSemanais() {
+        const container = document.getElementById('history-container');
+        container.innerHTML = `<div class="history-card" onclick="abrirModal('mes')">📊<span>Mês Completo</span></div>`;
+        const semanas = [...new Set(dadosGlobais.map(p => getWeek(p.data_referencia)))].sort((a,b) => a-b);
+        semanas.forEach((s, i) => container.innerHTML += `<div class="history-card" onclick="abrirModal('semana', ${s})">📅<span>Semana ${i+1}</span></div>`);
     }
 
     function abrirModal(tipo, valor) {
         const datas = tipo === 'mes' ? [...new Set(dadosGlobais.map(p => p.data_referencia))] : [...new Set(dadosGlobais.filter(p => getWeek(p.data_referencia) === valor).map(p => p.data_referencia))];
         document.getElementById('modal-titulo').innerText = tipo === 'mes' ? "Relatório Mensal" : "Relatório Semanal";
-        renderizarTabela(document.getElementById('tabela-modal'), datas);
+        renderizarTabela(document.getElementById('corpo-modal'), datas);
         document.getElementById('modalHist').style.display = "block";
     }
 
