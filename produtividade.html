@@ -3,90 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Gerencial - Gupy</title>
+    <title>Dashboard Produtividade - Gupy</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        :root { --primary: #e11d48; --clt: #3b82f6; --pj: #8b5cf6; --bg: #f8fafc; --dark: #334155; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 15px; color: #1e293b; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 0.8rem 1.2rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        :root { --primary: #e11d48; --clt: #0284c7; --pj: #7c3aed; --bg: #f8fafc; --text: #1e293b; --border: #e2e8f0; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 20px; color: var(--text); }
         
-        /* KPIs Compactos */
-        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px; }
-        .summary-item { background: white; padding: 10px; border-radius: 8px; border-top: 3px solid #cbd5e1; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .kpi-label { font-size: 0.6rem; color: #64748b; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; }
-        .kpi-value { font-size: 1.1rem; font-weight: 800; }
-        .kpi-sub { font-size: 0.55rem; color: #94a3b8; }
+        /* Layout de Topo Minimalista */
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .top-nav h1 { margin: 0; font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px; }
 
-        .btn { padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; color: white; background: var(--primary); font-weight: bold; font-size: 0.85rem; }
-        
-        /* Tabela Otimizada */
-        .table-container { overflow-x: auto; background: white; border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 900px; }
-        th { background: #f1f5f9; padding: 10px; text-align: left; border-bottom: 2px solid #e2e8f0; color: #475569; }
-        td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; }
-        
-        /* Cores alternadas (Zebra) */
-        tbody tr:nth-child(even) { background-color: #f8fafc; }
-        tbody tr:hover { background-color: #f1f5f9; }
+        /* Nova Estrutura de Stats Bar */
+        .stats-container { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden; }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); border-bottom: 1px solid var(--border); }
+        .stats-row:last-child { border-bottom: none; }
+        .stat-box { padding: 15px 20px; border-right: 1px solid var(--border); }
+        .stat-box:last-child { border-right: none; }
+        .stat-label { font-size: 0.65rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .stat-value { font-size: 1.25rem; font-weight: 800; color: var(--text); }
+        .stat-accent { color: var(--primary); }
+        .stat-clt { color: var(--clt); }
+        .stat-pj { color: var(--pj); }
 
-        .dia-header { background: var(--dark) !important; color: white; font-weight: bold; }
-        .dia-resumo { font-size: 0.65rem; font-weight: normal; color: #cbd5e1; margin-left: 10px; }
-        .badge { padding: 3px 7px; border-radius: 10px; font-size: 0.65rem; font-weight: bold; color: white; }
+        /* Controles */
+        .controls-bar { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-secondary { background: white; border: 1px solid var(--border); color: #64748b; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* Tabela Reformulada */
+        .table-card { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { background: #f8fafc; padding: 12px 15px; text-align: left; font-weight: 700; color: #475569; border-bottom: 2px solid var(--border); }
+        td { padding: 10px 15px; border-bottom: 1px solid #f1f5f9; }
+        
+        /* Zebra e Estilo de Linha */
+        tbody tr:nth-child(even) { background: #fbfcfe; }
+        tbody tr:hover { background: #f1f5f9; }
+        .dia-divider { background: #334155 !important; color: white; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+        .dia-summary { font-weight: 400; opacity: 0.8; margin-left: 15px; font-size: 0.7rem; }
+        
+        .badge { padding: 4px 8px; border-radius: 6px; font-weight: 800; font-size: 0.7rem; color: white; }
+        input[type="month"], input[type="file"] { padding: 8px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.85rem; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1 style="margin:0; font-size: 1.1rem;">📊 Dashboard de Fechamento Mensal</h1>
-    <button class="btn" onclick="window.location.href='gestao.html'" style="background:#64748b;">⚙️ Gestão</button>
+<div class="top-nav">
+    <h1>Produtividade Mensal</h1>
+    <button class="btn btn-secondary" onclick="window.location.href='gestao.html'">⚙️ Gestão de Equipe</button>
 </div>
 
-<div class="summary-grid">
-    <div class="summary-item" style="border-top-color:#f59e0b;"><div class="kpi-label">Dias</div><div class="kpi-value" id="kpi-dias">0</div></div>
-    <div class="summary-item" style="border-top-color:#0ea5e9;"><div class="kpi-label">Assistentes/Dia</div><div class="kpi-value" id="kpi-media-as-dia">0</div></div>
-    <div class="summary-item" style="border-top-color:#10b981;"><div class="kpi-label">Total Mês</div><div class="kpi-value" id="kpi-total-mes">0</div></div>
-    <div class="summary-item" style="border-top-color:#10b981;"><div class="kpi-label">Média Pessoa (Mês)</div><div class="kpi-value" id="kpi-media-as-mes">0</div></div>
-</div>
-
-<div class="summary-grid">
-    <div class="summary-item" style="border-top-color:var(--primary);"><div class="kpi-label">Média Diária Time</div><div class="kpi-value" id="kpi-media-geral">0</div></div>
-    <div class="summary-item" style="border-top-color:var(--clt);"><div class="kpi-label">Média Diária CLT</div><div class="kpi-value" id="kpi-media-clt">0</div></div>
-    <div class="summary-item" style="border-top-color:var(--pj);"><div class="kpi-label">Média Diária PJ</div><div class="kpi-value" id="kpi-media-pj">0</div></div>
-</div>
-
-<div class="summary-grid">
-    <div class="summary-item"><div class="kpi-label">FIFO</div><div class="kpi-value" id="kpi-fifo">0</div></div>
-    <div class="summary-item"><div class="kpi-label">Gradual Total</div><div class="kpi-value" id="kpi-gt">0</div></div>
-    <div class="summary-item"><div class="kpi-label">Gradual Parcial</div><div class="kpi-value" id="kpi-gp">0</div></div>
-    <div class="summary-item"><div class="kpi-label">Perfil FC</div><div class="kpi-value" id="kpi-fc">0</div></div>
-</div>
-
-<div class="card" style="padding: 10px 15px; margin-bottom: 10px;">
-    <div style="display:flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <div style="display:flex; align-items:center; gap:8px;">
-            <input type="file" id="excel-files" accept=".xlsx" multiple style="font-size: 0.75rem;">
-            <button class="btn" onclick="importarTudo()">Subir</button>
+<div class="stats-container">
+    <div class="stats-row">
+        <div class="stat-box">
+            <div class="stat-label">Total Mês</div>
+            <div class="stat-value stat-accent" id="kpi-total-mes">0</div>
         </div>
-        <input type="month" id="filtro-mes" onchange="carregarDados()" style="padding:5px; border-radius:5px; border:1px solid #ddd;">
+        <div class="stat-box">
+            <div class="stat-label">Dias Ativos</div>
+            <div class="stat-value" id="kpi-dias">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Média Pessoa/Mês</div>
+            <div class="stat-value" id="kpi-media-as-mes">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Headcount Médio</div>
+            <div class="stat-value" id="kpi-media-as-dia">0</div>
+        </div>
+    </div>
+    <div class="stats-row" style="background: #fafafa;">
+        <div class="stat-box">
+            <div class="stat-label">Média Diária Time</div>
+            <div class="stat-value" id="kpi-media-geral">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Média Diária CLT</div>
+            <div class="stat-value stat-clt" id="kpi-media-clt">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Média Diária PJ</div>
+            <div class="stat-value stat-pj" id="kpi-media-pj">0</div>
+        </div>
+    </div>
+    <div class="stats-row">
+        <div class="stat-box"><div class="stat-label">FIFO</div><div class="stat-value" style="font-size:1rem;" id="kpi-fifo">0</div></div>
+        <div class="stat-box"><div class="stat-label">Gradual Total</div><div class="stat-value" style="font-size:1rem;" id="kpi-gt">0</div></div>
+        <div class="stat-box"><div class="stat-label">Gradual Parcial</div><div class="stat-value" style="font-size:1rem;" id="kpi-gp">0</div></div>
+        <div class="stat-box"><div class="stat-label">Perfil FC</div><div class="stat-value" style="font-size:1rem;" id="kpi-fc">0</div></div>
     </div>
 </div>
 
-<div class="card table-container">
-    <table>
+<div class="controls-bar">
+    <div style="display:flex; align-items:center; gap:10px;">
+        <input type="file" id="excel-files" accept=".xlsx" multiple>
+        <button class="btn btn-primary" onclick="importarArquivos()">📥 Importar Planilhas</button>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:0.8rem; font-weight:700; color:#64748b">FILTRAR MÊS:</span>
+        <input type="month" id="filtro-mes" onchange="carregarDados()">
+    </div>
+</div>
+
+<div class="table-card">
+    <table id="main-table">
         <thead>
             <tr>
                 <th>Assistente</th>
-                <th style="background:#fff1f2">Dia</th>
-                <th>Semana</th>
-                <th>Mês</th>
+                <th style="color:var(--primary)">Total Dia</th>
+                <th>Total Semana</th>
+                <th>Total Mês</th>
                 <th>Média Semanal</th>
                 <th>Média Mensal</th>
-                <th>Ating.</th>
+                <th>Status</th>
             </tr>
         </thead>
-        <tbody id="tabela-corpo"></tbody>
+        <tbody id="tabela-corpo">
+            <tr><td colspan="7" style="text-align:center; padding:40px; color:#94a3b8;">Nenhum dado carregado para este período.</td></tr>
+        </tbody>
     </table>
 </div>
 
@@ -97,16 +134,19 @@
 
     document.getElementById('filtro-mes').value = new Date().toISOString().substring(0,7);
 
-    async function importarTudo() {
+    async function importarArquivos() {
         const files = document.getElementById('excel-files').files;
-        if(files.length === 0) return alert("Selecione arquivos!");
+        if(files.length === 0) return alert("Selecione os arquivos .xlsx");
+        
         for(let file of files) {
             const fn = file.name.replace('.xlsx', '');
             if(!/^\d{8}$/.test(fn)) continue;
             const dr = `${fn.substring(4,8)}-${fn.substring(2,4)}-${fn.substring(0,2)}`;
+            
             const buffer = await file.arrayBuffer();
             const wb = XLSX.read(buffer, {type: 'array'});
             const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+            
             const ins = json.map(r => ({
                 usuario_id: r.id_assistente,
                 fifo: Number(r.documentos_validados_fifo || 0),
@@ -116,9 +156,10 @@
                 quantidade: Number(r.documentos_validados || 0),
                 data_referencia: dr, nome_arquivo: file.name
             })).filter(x => x.usuario_id);
+            
             await _supabase.from('producao').insert(ins);
         }
-        alert("Importação concluída!"); carregarDados();
+        alert("Processamento concluído!"); carregarDados();
     }
 
     function getWeek(d) {
@@ -132,91 +173,86 @@
         const { data: pData } = await _supabase.from('producao').select('*, usuarios(*)').gte('data_referencia', `${mesStr}-01`).lte('data_referencia', `${mesStr}-31`);
         const { data: mData } = await _supabase.from('metas').select('*');
 
+        const tbody = document.getElementById('tabela-corpo');
         if(!pData || pData.length === 0) {
-            document.getElementById('tabela-corpo').innerHTML = '<tr><td colspan="7" style="text-align:center;">Sem dados.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px;">Sem registros.</td></tr>';
             return;
         }
 
-        // ORDENAÇÃO: Primeiro por data (recente) e depois por NOME da assistente (A-Z)
+        // Ordenação: Data Recente -> Nome A-Z
         pData.sort((a, b) => {
             if (a.data_referencia > b.data_referencia) return -1;
             if (a.data_referencia < b.data_referencia) return 1;
-            const nomeA = (a.usuarios?.nome || '').toLowerCase();
-            const nomeB = (b.usuarios?.nome || '').toLowerCase();
-            if (nomeA < nomeB) return -1;
-            if (nomeA > nomeB) return 1;
-            return 0;
+            return (a.usuarios?.nome || '').localeCompare(b.usuarios?.nome || '');
         });
 
-        let ind = {}; 
-        let kpi = { totalG:0, fifo:0, gt:0, gp:0, fc:0, nomesU:new Set(), diasU:new Set(), totalC:0, diasC:new Set(), totalP:0, diasP:new Set(), assistPorDia: {} };
-        let resumoDia = {};
+        let ind = {}; let kpi = { totalG:0, f:0, gt:0, gp:0, fc:0, nomesU:new Set(), diasU:new Set(), totalC:0, dC:new Set(), totalP:0, dP:new Set(), assDia: {} };
+        let resDia = {};
 
-        pData.filter(p => p.usuarios?.funcao === 'Assistente').forEach(p => {
+        pData.forEach(p => {
+            const dr = p.data_referencia;
             const uid = p.usuario_id;
             const qtd = Number(p.quantidade);
-            const dr = p.data_referencia;
             const wk = getWeek(new Date(dr + 'T12:00:00'));
-            const isCLT = (p.usuarios.contrato || '').includes('CLT');
 
-            kpi.totalG += qtd; kpi.fifo += p.fifo; kpi.gt += p.gradual_total; kpi.gp += p.gradual_parcial; kpi.fc += p.perfil_fc;
-            kpi.nomesU.add(p.usuarios.nome); kpi.diasU.add(dr);
-            if(!kpi.assistPorDia[dr]) kpi.assistPorDia[dr] = new Set();
-            kpi.assistPorDia[dr].add(p.usuarios.nome);
-            if(isCLT) { kpi.totalC += qtd; kpi.diasC.add(dr); } else { kpi.totalP += qtd; kpi.diasP.add(dr); }
+            if(p.usuarios?.funcao === 'Assistente') {
+                kpi.totalG += qtd; kpi.f += p.fifo; kpi.gt += p.gradual_total; kpi.gp += p.gradual_parcial; kpi.fc += p.perfil_fc;
+                kpi.nomesU.add(p.usuarios.nome); kpi.diasU.add(dr);
+                if(!kpi.assDia[dr]) kpi.assDia[dr] = new Set();
+                kpi.assDia[dr].add(p.usuarios.nome);
+                if((p.usuarios.contrato || '').includes('CLT')) { kpi.totalC += qtd; kpi.dC.add(dr); } else { kpi.totalP += qtd; kpi.dP.add(dr); }
 
-            if(!resumoDia[dr]) resumoDia[dr] = { fifo:0, gt:0, gp:0, fc:0, total:0 };
-            resumoDia[dr].fifo += p.fifo; resumoDia[dr].gt += p.gradual_total; resumoDia[dr].gp += p.gradual_parcial; resumoDia[dr].fc += p.perfil_fc; resumoDia[dr].total += qtd;
+                if(!ind[uid]) ind[uid] = { total:0, dias:0, semanas:{} };
+                ind[uid].total += qtd; ind[uid].dias++;
+                if(!ind[uid].semanas[wk]) ind[uid].semanas[wk] = { total:0, dias:0 };
+                ind[uid].semanas[wk].total += qtd; ind[uid].semanas[wk].dias++;
+            }
 
-            if(!ind[uid]) ind[uid] = { mes:0, dias:0, semanas:{} };
-            ind[uid].mes += qtd; ind[uid].dias++;
-            if(!ind[uid].semanas[wk]) ind[uid].semanas[wk] = { total:0, dias:0 };
-            ind[uid].semanas[wk].total += qtd; ind[uid].semanas[wk].dias++;
+            if(!resDia[dr]) resDia[dr] = { f:0, gt:0, gp:0, fc:0, t:0 };
+            resDia[dr].f += p.fifo; resDia[dr].gt += p.gradual_total; resDia[dr].gp += p.gradual_parcial; resDia[dr].fc += p.perfil_fc; resDia[dr].t += qtd;
         });
 
-        let html = ''; let ultimaData = '';
+        let html = ''; let lastD = '';
         pData.forEach(p => {
-            const dtRaw = new Date(p.data_referencia + 'T12:00:00');
-            const dt = dtRaw.toLocaleDateString('pt-BR');
-            
-            if (dt !== ultimaData) { 
-                const r = resumoDia[p.data_referencia];
-                html += `<tr class="dia-header"><td colspan="7">📅 ${dt} <span class="dia-resumo">Time: F:${r.fifo} | GT:${r.gt} | GP:${r.gp} | FC:${r.fc} | Σ:${r.total}</span></td></tr>`; 
-                ultimaData = dt; 
+            const dt = new Date(p.data_referencia + 'T12:00:00').toLocaleDateString('pt-BR');
+            if (dt !== lastD) { 
+                const r = resDia[p.data_referencia];
+                html += `<tr class="dia-divider"><td colspan="7">📅 ${dt} <span class="dia-summary">| Time: FIFO:${r.f} GT:${r.gt} GP:${r.gp} FC:${r.fc} Σ:${r.t}</span></td></tr>`; 
+                lastD = dt; 
             }
             const uid = p.usuario_id;
-            const wk = getWeek(dtRaw);
-            const stats = ind[uid] || {mes:0, dias:1, semanas:{}};
-            const m = mData.filter(m => m.usuario_id == uid && m.data_inicio <= p.data_referencia).sort((a,b)=>b.id-a.id)[0];
+            const wk = getWeek(new Date(p.data_referencia + 'T12:00:00'));
+            const s = ind[uid] || {total:0, dias:1, semanas:{}};
+            const m = mData.filter(x => x.usuario_id == uid && x.data_inicio <= p.data_referencia).sort((a,b)=>b.id-a.id)[0];
             const mv = m ? m.valor_meta : 0;
             const at = mv > 0 ? ((p.quantidade / mv) * 100).toFixed(0) : 0;
 
             html += `<tr>
                 <td><strong>${p.usuarios?.nome || uid}</strong></td>
-                <td style="font-weight:bold; color:var(--primary)">${p.quantidade}</td>
-                <td>${stats.semanas[wk]?.total || 0}</td>
-                <td>${stats.mes}</td>
-                <td>${(stats.semanas[wk]?.total / stats.semanas[wk]?.dias).toFixed(0)}</td>
-                <td>${(stats.mes / stats.dias).toFixed(0)}</td>
+                <td style="font-weight:800; color:var(--primary)">${p.quantidade}</td>
+                <td>${s.semanas[wk]?.total || 0}</td>
+                <td>${s.total}</td>
+                <td>${(s.semanas[wk]?.total / s.semanas[wk]?.dias).toFixed(0)}</td>
+                <td>${(s.total / s.dias).toFixed(0)}</td>
                 <td><span class="badge" style="background:${at>=100?'#059669':'#dc2626'}">${at}%</span></td>
             </tr>`;
         });
 
-        document.getElementById('tabela-corpo').innerHTML = html;
+        tbody.innerHTML = html;
 
-        // Atualização dos Cards
-        const headcount = kpi.nomesU.size || 1;
-        const diasAtivos = kpi.diasU.size || 1;
-        let somaAssDia = 0; Object.keys(kpi.assistPorDia).forEach(d => somaAssDia += kpi.assistPorDia[d].size);
+        // Atualização dos Indicadores
+        const head = kpi.nomesU.size || 1;
+        const dias = kpi.diasU.size || 1;
+        let sumAss = 0; Object.keys(kpi.assDia).forEach(d => sumAss += kpi.assDia[d].size);
 
-        document.getElementById('kpi-dias').innerText = diasAtivos;
-        document.getElementById('kpi-media-as-dia').innerText = (somaAssDia / diasAtivos).toFixed(1);
         document.getElementById('kpi-total-mes').innerText = kpi.totalG.toLocaleString();
-        document.getElementById('kpi-media-as-mes').innerText = (kpi.totalG / headcount).toFixed(0);
-        document.getElementById('kpi-media-geral').innerText = (kpi.totalG / headcount / diasAtivos).toFixed(0);
-        document.getElementById('kpi-media-clt').innerText = (kpi.totalC / (kpi.diasC.size || 1)).toFixed(0);
-        document.getElementById('kpi-media-pj').innerText = (kpi.totalP / (kpi.diasP.size || 1)).toFixed(0);
-        document.getElementById('kpi-fifo').innerText = kpi.fifo.toLocaleString();
+        document.getElementById('kpi-dias').innerText = dias;
+        document.getElementById('kpi-media-as-mes').innerText = (kpi.totalG / head).toFixed(0);
+        document.getElementById('kpi-media-as-dia').innerText = (sumAss / dias).toFixed(1);
+        document.getElementById('kpi-media-geral').innerText = (kpi.totalG / head / dias).toFixed(0);
+        document.getElementById('kpi-media-clt').innerText = (kpi.totalC / (kpi.dC.size || 1)).toFixed(0);
+        document.getElementById('kpi-media-pj').innerText = (kpi.totalP / (kpi.dP.size || 1)).toFixed(0);
+        document.getElementById('kpi-fifo').innerText = kpi.f.toLocaleString();
         document.getElementById('kpi-gt').innerText = kpi.gt.toLocaleString();
         document.getElementById('kpi-gp').innerText = kpi.gp.toLocaleString();
         document.getElementById('kpi-fc').innerText = kpi.fc.toLocaleString();
