@@ -53,17 +53,16 @@
         .table-wrap { background: var(--card); border-radius: 8px; border: 1px solid var(--border); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 1100px; }
         
-        th { background: var(--header-blue); padding: 15px 20px; text-align: center; color: white; font-weight: 700; text-transform: uppercase; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.1); }
-        th:first-child { text-align: left; width: 300px; } 
+        th { background: var(--header-blue); padding: 15px 20px; text-align: center; color: white; font-weight: 700; text-transform: uppercase; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.1); white-space: nowrap; }
+        th:first-child { text-align: left; width: 250px; position: sticky; left: 0; background: var(--header-blue); z-index: 10; } 
         
-        td { padding: 12px 20px; border: 1px solid var(--border); color: var(--text-main); text-align: center; }
-        td:first-child { text-align: left; font-weight: 600; color: var(--nav); background: #f8fafc; }
+        td { padding: 12px 20px; border: 1px solid var(--border); color: var(--text-main); text-align: center; white-space: nowrap; }
+        td:first-child { text-align: left; font-weight: 600; color: var(--nav); background: #f8fafc; position: sticky; left: 0; z-index: 5; border-right: 2px solid var(--border); }
         
-        .row-highlight { background-color: var(--row-highlight) !important; }
-        .row-highlight td { font-weight: 700; color: #166534; }
+        .row-highlight td { font-weight: 700; color: #166534; background-color: var(--row-highlight) !important; }
         .row-total-main td { font-weight: 800; color: var(--primary); font-size: 0.95rem; border-top: 2px solid var(--border); }
-        .row-sub-header td { background-color: #eff6ff; font-weight: 700; color: var(--primary); text-align: left; padding-left: 10px; }
-        tbody tr:hover { background-color: var(--row-hover); }
+        .row-sub-header td { background-color: #eff6ff !important; font-weight: 700; color: var(--primary); text-align: left; padding-left: 10px; }
+        tbody tr:hover td { background-color: var(--row-hover); }
         
         .hidden { display: none; }
     </style>
@@ -98,7 +97,8 @@
                 <option value="mes" selected>📊 Mensal (por Semana)</option>
                 <option value="trimestre">📈 Trimestral (por Mês)</option>
                 <option value="semestre">📆 Semestral (por Mês)</option>
-                <option value="ano">📅 Anual (por Trimestre)</option>
+                <option value="ano_mes">📅 Anual (Visão Mensal)</option>
+                <option value="ano_tri">📈 Anual (Visão Trimestral)</option>
             </select>
         </div>
 
@@ -198,9 +198,12 @@
         } else if(type === 'semestre') {
             label.innerText = 'Selecione o Semestre';
             valSel.innerHTML = `<option value="1">1º Sem (Jan-Jun)</option><option value="2">2º Sem (Jul-Dez)</option>`;
+        } else if(type === 'ano_mes') {
+            label.innerText = 'Visualização';
+            valSel.innerHTML = `<option value="1">Ano Completo (Por Mês)</option>`;
         } else {
             label.innerText = 'Visualização';
-            valSel.innerHTML = `<option value="1">Ano Completo</option>`;
+            valSel.innerHTML = `<option value="1">Ano Completo (Por Trimestre)</option>`;
         }
         carregarRelatorio();
     }
@@ -227,6 +230,7 @@
             start = s===1 ? `${year}-01-01` : `${year}-07-01`;
             end = s===1 ? `${year}-06-30` : `${year}-12-31`;
         } else {
+            // Anual
             start = `${year}-01-01`; end = `${year}-12-31`;
         }
         return { start, end, type };
@@ -248,7 +252,9 @@
             .lte('data_referencia', end);
 
         if(!dados || dados.length === 0) {
-            alert("Sem dados no período.");
+            // REMOVIDO ALERT - MOSTRA MENSAGEM NA TABELA
+            document.getElementById('table-body').innerHTML = '<tr><td colspan="100%" style="text-align:center; padding:30px; color:#64748b;">Nenhum dado encontrado para o período selecionado.</td></tr>';
+            zerarPainel();
             return;
         }
 
@@ -264,26 +270,32 @@
         }
         if(type === 'trimestre') return (date.getMonth() % 3) + 1; 
         if(type === 'semestre') return (date.getMonth() % 6) + 1; 
-        if(type === 'ano') return Math.floor(date.getMonth() / 3) + 1; 
+        
+        // NOVAS OPÇÕES ANUAIS
+        if(type === 'ano_tri') return Math.floor(date.getMonth() / 3) + 1; // 1-4
+        if(type === 'ano_mes') return date.getMonth() + 1; // 1-12
+        
         return 1;
     }
 
     function getColumnNames(type) {
         if(type === 'dia') return ['Dia Selecionado'];
         if(type === 'mes') return ['Semana 1','Semana 2','Semana 3','Semana 4','Semana 5'];
+        
+        const mNames = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+        
         if(type === 'trimestre') {
             const t = parseInt(document.getElementById('period-value').value);
-            const m = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
             const start = (t-1)*3;
-            return [m[start], m[start+1], m[start+2]];
+            return [mNames[start], mNames[start+1], mNames[start+2]];
         }
         if(type === 'semestre') {
             const s = parseInt(document.getElementById('period-value').value);
-            const m = ['Jan','Fev','Mar','Abr','Mai','Jun'];
-            const m2 = ['Jul','Ago','Set','Out','Nov','Dez'];
-            return s===1 ? m : m2;
+            return s===1 ? mNames.slice(0,6) : mNames.slice(6,12);
         }
-        if(type === 'ano') return ['1º Trim','2º Trim','3º Trim','4º Trim'];
+        if(type === 'ano_tri') return ['1º Tri','2º Tri','3º Tri','4º Tri'];
+        if(type === 'ano_mes') return mNames;
+        
         return [];
     }
 
@@ -349,11 +361,12 @@
                     else if(key === 'media_assistente') val = (s.total / FIXED_HEADCOUNT); // REGRA DO 17
                     else if(key === 'media_validacao_assistente') val = (s.total / dias / FIXED_HEADCOUNT); // REGRA DO 17
                     
-                    // CLT (Aqui mantemos a lógica específica do grupo)
+                    // CLT
                     else if(key === 'clt_media') {
                         const hC = s.assistentesCLT.size || 1;
                         val = (s.totalCLT / dias / hC);
                     }
+                    // PJ
                     else if(key === 'pj_media') {
                         const hP = s.assistentesPJ.size || 1;
                         val = (s.totalPJ / dias / hP);
@@ -399,6 +412,13 @@
 
     function createEmptyStat() {
         return { assistentes: new Set(), assistentesCLT: new Set(), assistentesPJ: new Set(), dias: new Set(), fifo:0, gt:0, gp:0, fc:0, total:0, totalCLT:0, totalPJ:0 };
+    }
+
+    function zerarPainel() {
+        document.getElementById('p-total').innerText = '0';
+        document.getElementById('p-media-time').innerText = '0';
+        document.getElementById('p-media-ind').innerText = '0';
+        document.getElementById('p-headcount').innerText = '0';
     }
 
     init();
