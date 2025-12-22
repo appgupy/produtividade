@@ -62,18 +62,19 @@
         .log-header h3 { margin: 0; color: var(--nav); font-size: 0.95rem; }
         
         table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-        
-        th { padding: 8px 10px; text-align: left; color: var(--text-muted); font-weight: 700; border-bottom: 1px solid var(--border); background: #fff; text-transform: uppercase; font-size: 0.7rem; }
+        th { padding: 8px 10px; text-align: left; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border); background: #fff; text-transform: uppercase; font-size: 0.7rem; }
         td { padding: 4px 10px; border-bottom: 1px solid var(--border); color: var(--text-main); height: 35px; vertical-align: middle; }
         
-        /* Inputs Compactos */
+        /* Inputs */
         .input-qty { width: 60px; padding: 4px; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center; font-weight: 600; color: var(--nav); font-family: 'Inter'; font-size: 0.85rem; transition: 0.2s; }
         .input-qty:focus { border-color: var(--accent); outline: none; background: #eff6ff; }
+        .input-qty:disabled { background: #f1f5f9; color: #94a3b8; border-color: #e2e8f0; cursor: not-allowed; }
         
         .input-divergent { border-color: var(--danger); color: var(--danger); background-color: #fee2e2; }
 
         .input-obs { width: 100%; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 4px; font-family: 'Inter'; font-size: 0.8rem; color: var(--text-main); transition: 0.2s; box-sizing: border-box; }
         .input-obs:focus { border-color: var(--accent); outline: none; background: #fff; }
+        .input-obs:disabled { background: #f1f5f9; color: #94a3b8; border-color: #e2e8f0; cursor: not-allowed; }
 
         .col-date { font-weight: 600; color: var(--nav); width: 90px; }
         .col-sys { width: 80px; text-align: center; font-weight: 700; color: var(--text-muted); background-color: #f8fafc; }
@@ -86,6 +87,8 @@
         .bg-sim { background: var(--success); }
         .bg-nao { background: var(--danger); }
         .bg-none { background: #e2e8f0; color: #94a3b8; }
+        
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -119,6 +122,11 @@
     </div>
 
     <div class="top-controls">
+        <div class="control-group hidden" id="manager-controls" style="flex: 2; border-right: 1px solid var(--border); padding-right: 15px;">
+            <label style="color:var(--primary);">👁️ Visualizar Colaborador (Modo Leitura)</label>
+            <select id="user-selector" onchange="carregarMeusDados()"></select>
+        </div>
+
         <div class="control-group">
             <label>Tipo de Período</label>
             <select id="period-type" onchange="atualizarOpcoesPeriodo()">
@@ -145,7 +153,7 @@
             <div class="stat-sub">Validado (Excel)</div>
         </div>
         <div class="stat-card" style="border-top: 4px solid var(--accent);">
-            <div class="stat-label">Sua Contagem</div>
+            <div class="stat-label">Contagem Manual</div>
             <div class="stat-value" id="kpi-manual">0</div>
             <div class="stat-sub">Soma do Diário</div>
         </div>
@@ -202,15 +210,44 @@
     document.getElementById('welcome-msg').innerText = `Olá, ${sessao.nome.split(' ')[0]}`;
     
     let myChart = null;
+    let targetUserId = sessao.id; // Por padrão, vê o próprio ID
+    const isGestora = sessao.funcao === 'Gestora';
 
     function logout() { localStorage.removeItem('usuario'); window.location.href = 'index.html'; }
 
-    // --- DATAS E FILTROS ---
-    function init() {
+    // --- INIT ---
+    async function init() {
+        // Seletor de Ano
         const yearSel = document.getElementById('year-selector');
         const currentYear = new Date().getFullYear();
         for(let y = currentYear; y >= 2024; y--) yearSel.innerHTML += `<option value="${y}">${y}</option>`;
-        atualizarOpcoesPeriodo();
+
+        // Lógica de Gestora
+        if (isGestora) {
+            document.getElementById('manager-controls').classList.remove('hidden');
+            document.getElementById('welcome-msg').innerText = `Painel da Gestora`;
+            await loadUsers(); // Carrega lista de assistentes
+        } else {
+            atualizarOpcoesPeriodo(); // Inicia direto
+        }
+    }
+
+    async function loadUsers() {
+        const { data: users } = await _supabase.from('usuarios').select('*').order('nome');
+        const sel = document.getElementById('user-selector');
+        
+        // Filtra para não mostrar outras gestoras, se desejar
+        const assistentes = users.filter(u => u.funcao !== 'Gestora' && u.funcao !== 'Auditora');
+        
+        assistentes.forEach(u => {
+            sel.innerHTML += `<option value="${u.id}">${u.nome}</option>`;
+        });
+        
+        // Seleciona o primeiro da lista e carrega
+        if(assistentes.length > 0) {
+            targetUserId = assistentes[0].id;
+            atualizarOpcoesPeriodo();
+        }
     }
 
     function atualizarOpcoesPeriodo() {
@@ -222,9 +259,9 @@
         if(type === 'mes') {
             meses.forEach((m, i) => valSel.innerHTML += `<option value="${i+1}" ${i === new Date().getMonth() ? 'selected' : ''}>${m}</option>`);
         } else if(type === 'trimestre') {
-            valSel.innerHTML = `<option value="1">1º Trimestre (Jan-Mar)</option><option value="2">2º Trimestre (Abr-Jun)</option><option value="3">3º Trimestre (Jul-Set)</option><option value="4">4º Trimestre (Out-Dez)</option>`;
+            valSel.innerHTML = `<option value="1">1º Trimestre</option><option value="2">2º Trimestre</option><option value="3">3º Trimestre</option><option value="4">4º Trimestre</option>`;
         } else if(type === 'semestre') {
-            valSel.innerHTML = `<option value="1">1º Semestre (Jan-Jun)</option><option value="2">2º Semestre (Jul-Dez)</option>`;
+            valSel.innerHTML = `<option value="1">1º Semestre</option><option value="2">2º Semestre</option>`;
         } else {
             valSel.innerHTML = `<option value="1">Ano Completo</option>`;
         }
@@ -264,20 +301,25 @@
 
     // --- CARREGAMENTO ---
     async function carregarMeusDados() {
+        // Se for gestora, pega o ID do select. Se não, usa o da sessão.
+        if (isGestora) {
+            targetUserId = document.getElementById('user-selector').value;
+        }
+
         const { start, end } = getRangeDates();
         
-        // Busca Produção do Usuário
+        // Busca Produção do ID ALVO
         const { data: producao } = await _supabase.from('producao')
             .select('*')
-            .eq('usuario_id', sessao.id)
+            .eq('usuario_id', targetUserId)
             .gte('data_referencia', start)
             .lte('data_referencia', end)
             .order('data_referencia');
 
-        // Busca Meta
+        // Busca Meta do ID ALVO
         const { data: metas } = await _supabase.from('metas')
             .select('*')
-            .eq('usuario_id', sessao.id)
+            .eq('usuario_id', targetUserId)
             .order('data_inicio', { ascending: false });
         
         const metaAtual = metas.find(m => m.data_inicio <= end)?.valor_meta || 650;
@@ -289,14 +331,16 @@
 
     // --- SALVAMENTO (AUTO-SAVE) ---
     async function atualizarDiario(input, dataRef, campo) {
+        // Se for Gestora, aborta (segurança extra, embora o input esteja disabled)
+        if (isGestora) return;
+
         let valor = input.value;
         
-        // Se for quantidade manual e estiver vazio, assume 0 para o banco
         if(campo === 'quantidade_manual' && valor === '') valor = 0;
         
         input.style.borderColor = '#fbbf24'; // Processando
 
-        const { data: existente } = await _supabase.from('producao').select('id').eq('usuario_id', sessao.id).eq('data_referencia', dataRef).maybeSingle();
+        const { data: existente } = await _supabase.from('producao').select('id').eq('usuario_id', targetUserId).eq('data_referencia', dataRef).maybeSingle();
 
         let erro = null;
 
@@ -305,7 +349,7 @@
             erro = error;
         } else {
             const novoDado = {
-                usuario_id: sessao.id,
+                usuario_id: targetUserId,
                 data_referencia: dataRef,
                 [campo]: valor,
                 quantidade: 0,
@@ -370,9 +414,11 @@
 
         const start = new Date(startDateStr);
         const end = new Date(endDateStr);
-        // Ajuste fuso horário simples
         start.setHours(12,0,0,0);
         end.setHours(12,0,0,0);
+
+        // Se for gestora, inputs ficam readonly
+        const disabledAttr = isGestora ? 'disabled' : '';
 
         for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
             const dateStr = d.toISOString().split('T')[0];
@@ -385,24 +431,20 @@
             const qtdMan = registro.quantidade_manual;
             const obs = registro.observacao || '';
 
-            // Dados Gráfico
             if(!isWeekend || qtdSys > 0) {
-                chartLabels.push(diaFormatado.substring(0,5)); // DD/MM
+                chartLabels.push(diaFormatado.substring(0,5)); 
                 chartData.push(qtdSys);
                 chartMeta.push(meta);
             }
 
-            // Visual
             let statusBadge = '<span class="badge bg-none">-</span>';
             let ausenciaText = '-';
             let rowClass = isWeekend ? 'row-weekend' : '';
             let manualStyle = '';
             
-            // Valor no input (Vazio se 0) - REGRA PEDIDA
             const displayManual = (qtdMan !== null && qtdMan !== undefined && qtdMan !== 0) ? qtdMan : '';
 
-            // Divergencia visual
-            if(qtdMan !== null && qtdMan !== undefined && qtdMan !== 0 && qtdMan !== qtdSys) {
+            if(displayManual !== '' && parseInt(displayManual) !== qtdSys) {
                 manualStyle = 'input-divergent';
             }
 
@@ -420,14 +462,14 @@
                     <td class="col-sys">${qtdSys > 0 ? qtdSys.toLocaleString() : '-'}</td>
                     <td class="col-manual">
                         <input type="number" class="input-qty ${manualStyle}" value="${displayManual}" 
-                            placeholder=""
+                            placeholder="" ${disabledAttr}
                             onchange="atualizarDiario(this, '${dateStr}', 'quantidade_manual')">
                     </td>
                     <td class="col-meta">${statusBadge}</td>
                     <td class="col-ausencia">${ausenciaText}</td>
                     <td class="col-obs">
                         <input type="text" class="input-obs" value="${obs}" 
-                            placeholder="..."
+                            placeholder="..." ${disabledAttr}
                             onchange="atualizarDiario(this, '${dateStr}', 'observacao')">
                     </td>
                 </tr>
