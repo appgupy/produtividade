@@ -195,9 +195,14 @@
     if(!sessao) window.location.href = 'index.html';
     document.getElementById('user-display').innerText = sessao.nome;
 
+    // --- INICIALIZAÇÃO COM DATA DE ONTEM ---
     const hoje = new Date();
-    document.getElementById('select-dia').value = hoje.toISOString().substring(0,10);
-    document.getElementById('select-mes').value = hoje.toISOString().substring(0,7);
+    const ontem = new Date(hoje);
+    ontem.setDate(ontem.getDate() - 1); // Subtrai 1 dia
+
+    // Ajusta formato para o input (YYYY-MM-DD)
+    document.getElementById('select-dia').value = ontem.toISOString().substring(0,10);
+    document.getElementById('select-mes').value = ontem.toISOString().substring(0,7);
 
     function logout() { localStorage.removeItem('usuario'); window.location.href = 'index.html'; }
 
@@ -231,7 +236,6 @@
         const v = document.getElementById('view-selector').value;
         let mesStr = v === 'dia' ? document.getElementById('select-dia').value.substring(0,7) : document.getElementById('select-mes').value;
         
-        // CORREÇÃO: NENHUM ALERT AQUI. Se não vier dados, dadosGlobais fica vazio.
         const { data: pData } = await _supabase.from('producao')
             .select('*, usuarios(*)')
             .gte('data_referencia', `${mesStr}-01`)
@@ -293,13 +297,11 @@
         
         filtrados.sort((a, b) => b.data_referencia.localeCompare(a.data_referencia) || (a.usuarios?.nome || "").localeCompare(b.usuarios?.nome || ""));
         
-        // Aqui chamamos as funções de renderização. Se "filtrados" estiver vazio, elas cuidam disso.
         atualizarPainel(filtrados, titulo);
         renderizarTabela(filtrados, visao === 'dia');
     }
 
     function zerarPainel() {
-        // Função para garantir que o painel mostre zeros e não dados antigos ou NaN
         document.getElementById('p-total').innerText = '0';
         document.getElementById('p-media').innerText = '0';
         document.getElementById('p-headcount').innerText = '0';
@@ -319,7 +321,6 @@
     }
 
     function atualizarPainel(dados, titulo) {
-        // Se não houver dados, limpa o painel e sai silenciosamente
         if(!dados || dados.length === 0) {
             zerarPainel();
             document.getElementById('panel-titulo').innerText = titulo;
@@ -374,7 +375,6 @@
 
         let html = '', lastD = '';
         
-        // CORREÇÃO: Mensagem na tabela em vez de alert
         if(!dados || dados.length === 0) {
             document.getElementById('tabela-corpo').innerHTML = '<tr><td colspan="11" style="text-align:center; padding:30px; color:#64748b;">Nenhum dado encontrado para o período selecionado.</td></tr>';
             return;
