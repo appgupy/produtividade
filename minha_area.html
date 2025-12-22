@@ -15,9 +15,7 @@
             --bg: #f3f5f8; --card: #ffffff; --border: #e2e8f0;
             --text-main: #1f2937; --text-muted: #64748b;
             --row-weekend: #fefce8; 
-            --divergent-bg: #fff7ed;
-            --divergent-border: #f97316;
-            --divergent-text: #c2410c;
+            --divergent-bg: #fff7ed; --divergent-border: #f97316; --divergent-text: #c2410c;
         }
         
         body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding-top: 80px; color: var(--text-main); }
@@ -37,49 +35,54 @@
         .container { max-width: 1400px; margin: 0 auto; padding: 30px; }
 
         /* HEADER */
-        .welcome-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; }
-        .welcome-title h1 { font-size: 1.8rem; color: var(--nav); margin: 0; letter-spacing: -0.5px; }
-        .welcome-title p { color: var(--text-muted); margin: 5px 0 0 0; font-size: 0.95rem; }
-        .date-control input { padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-family: 'Inter'; font-size: 0.9rem; outline: none; }
+        .welcome-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
+        .welcome-title h1 { font-size: 1.5rem; color: var(--nav); margin: 0; letter-spacing: -0.5px; }
+        .welcome-title p { color: var(--text-muted); margin: 5px 0 0 0; font-size: 0.9rem; }
+
+        /* CONTROLES */
+        .top-controls { display: flex; gap: 15px; margin-bottom: 20px; background: var(--card); padding: 15px 20px; border-radius: 8px; border: 1px solid var(--border); align-items: flex-end; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .control-group { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+        .control-group label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        select, input { padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-family: 'Inter'; font-size: 0.85rem; color: var(--text-main); outline: none; background: #fff; width: 100%; box-sizing: border-box; }
 
         /* KPI GRID */
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: var(--card); padding: 25px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; flex-direction: column; }
-        .stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
-        .stat-value { font-size: 2rem; font-weight: 700; color: var(--nav); }
-        .stat-sub { font-size: 0.85rem; margin-top: 5px; color: var(--text-muted); }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: var(--card); padding: 20px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; flex-direction: column; }
+        .stat-label { font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
+        .stat-value { font-size: 1.6rem; font-weight: 700; color: var(--nav); }
+        .stat-sub { font-size: 0.75rem; margin-top: 5px; color: var(--text-muted); }
 
         /* AREA GRAFICO */
-        .chart-section { background: var(--card); padding: 25px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 30px; height: 300px; }
-        .chart-title { font-weight: 700; color: var(--nav); margin-bottom: 15px; }
+        .chart-section { background: var(--card); padding: 20px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px; height: 300px; }
+        .chart-title { font-weight: 700; color: var(--nav); margin-bottom: 10px; font-size: 0.9rem; }
 
-        /* TABELA DIÁRIO DE BORDO */
+        /* TABELA COMPACTA */
         .log-section { background: var(--card); border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
-        .log-header { padding: 20px; border-bottom: 1px solid var(--border); background: #f8fafc; display: flex; justify-content: space-between; align-items: center; }
-        .log-header h3 { margin: 0; color: var(--nav); font-size: 1.1rem; }
+        .log-header { padding: 12px 20px; border-bottom: 1px solid var(--border); background: #f8fafc; display: flex; justify-content: space-between; align-items: center; }
+        .log-header h3 { margin: 0; color: var(--nav); font-size: 0.95rem; }
         
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        th { padding: 15px; text-align: left; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border); background: #fff; }
-        td { padding: 8px 15px; border-bottom: 1px solid var(--border); color: var(--text-main); height: 50px; vertical-align: middle; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
         
-        /* Inputs e Colunas Especiais */
-        .input-qty { width: 70px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; text-align: center; font-weight: 600; color: var(--nav); font-family: 'Inter'; transition: 0.2s; }
+        th { padding: 8px 10px; text-align: left; color: var(--text-muted); font-weight: 700; border-bottom: 1px solid var(--border); background: #fff; text-transform: uppercase; font-size: 0.7rem; }
+        td { padding: 4px 10px; border-bottom: 1px solid var(--border); color: var(--text-main); height: 35px; vertical-align: middle; }
+        
+        /* Inputs Compactos */
+        .input-qty { width: 60px; padding: 4px; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center; font-weight: 600; color: var(--nav); font-family: 'Inter'; font-size: 0.85rem; transition: 0.2s; }
         .input-qty:focus { border-color: var(--accent); outline: none; background: #eff6ff; }
         
-        /* Estilo para divergência */
         .input-divergent { border-color: var(--danger); color: var(--danger); background-color: #fee2e2; }
 
-        .input-obs { width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; font-family: 'Inter'; font-size: 0.85rem; color: var(--text-main); transition: 0.2s; }
+        .input-obs { width: 100%; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 4px; font-family: 'Inter'; font-size: 0.8rem; color: var(--text-main); transition: 0.2s; box-sizing: border-box; }
         .input-obs:focus { border-color: var(--accent); outline: none; background: #fff; }
 
-        .col-date { font-weight: 600; color: var(--nav); width: 110px; }
-        .col-sys { width: 100px; text-align: center; font-weight: 700; color: var(--text-muted); background-color: #f8fafc; } /* Coluna Sistema Bloqueada */
-        .col-manual { width: 110px; text-align: center; }
-        .col-meta { width: 100px; text-align: center; }
-        .col-ausencia { color: var(--warning); font-weight: 500; width: 140px; text-align: center; }
+        .col-date { font-weight: 600; color: var(--nav); width: 90px; }
+        .col-sys { width: 80px; text-align: center; font-weight: 700; color: var(--text-muted); background-color: #f8fafc; }
+        .col-manual { width: 90px; text-align: center; }
+        .col-meta { width: 80px; text-align: center; }
+        .col-ausencia { color: var(--warning); font-weight: 500; width: 110px; text-align: center; font-size: 0.75rem; }
 
         .row-weekend { background-color: var(--row-weekend); }
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; color: white; display: inline-block; min-width: 60px; text-align: center; }
+        .badge { padding: 2px 6px; border-radius: 12px; font-size: 0.65rem; font-weight: 700; color: white; display: inline-block; min-width: 40px; text-align: center; }
         .bg-sim { background: var(--success); }
         .bg-nao { background: var(--danger); }
         .bg-none { background: #e2e8f0; color: #94a3b8; }
@@ -111,10 +114,27 @@
     <div class="welcome-header">
         <div class="welcome-title">
             <h1 id="welcome-msg">Olá, Assistente</h1>
-            <p>Faça sua conferência diária entre Sistema e seu Controle.</p>
+            <p>Conferência de dados e metas.</p>
         </div>
-        <div class="date-control">
-            <input type="month" id="month-selector" onchange="carregarMeusDados()">
+    </div>
+
+    <div class="top-controls">
+        <div class="control-group">
+            <label>Tipo de Período</label>
+            <select id="period-type" onchange="atualizarOpcoesPeriodo()">
+                <option value="mes">Mensal</option>
+                <option value="trimestre">Trimestral</option>
+                <option value="semestre">Semestral</option>
+                <option value="ano">Anual</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label>Ano</label>
+            <select id="year-selector" onchange="atualizarOpcoesPeriodo()"></select>
+        </div>
+        <div class="control-group" style="flex: 1.5;">
+            <label>Período Específico</label>
+            <select id="period-value" onchange="carregarMeusDados()"></select>
         </div>
     </div>
 
@@ -127,7 +147,7 @@
         <div class="stat-card" style="border-top: 4px solid var(--accent);">
             <div class="stat-label">Sua Contagem</div>
             <div class="stat-value" id="kpi-manual">0</div>
-            <div class="stat-sub">Total digitado por você</div>
+            <div class="stat-sub">Soma do Diário</div>
         </div>
         <div class="stat-card" style="border-top: 4px solid var(--success);">
             <div class="stat-label">Melhor Dia</div>
@@ -142,8 +162,8 @@
     </div>
 
     <div class="chart-section">
-        <div class="chart-title">📈 Evolução (Sistema vs Meta)</div>
-        <div style="height: 230px; position: relative;">
+        <div class="chart-title" id="chart-title-text">📈 Evolução no Período Selecionado</div>
+        <div style="height: 250px; position: relative;">
             <canvas id="evolutionChart"></canvas>
         </div>
     </div>
@@ -151,7 +171,7 @@
     <div class="log-section">
         <div class="log-header">
             <h3>Diário de Conferência</h3>
-            <span style="font-size:0.8rem; color:var(--text-muted)">Atenção aos números em vermelho (Divergência)</span>
+            <span style="font-size:0.75rem; color:var(--text-muted)">Valores em branco = 0</span>
         </div>
         <table>
             <thead>
@@ -159,8 +179,8 @@
                     <th>Data</th>
                     <th style="text-align:center">Qtd. Sistema</th>
                     <th style="text-align:center">Minha Contagem</th>
-                    <th style="text-align:center">Meta Atingida</th>
-                    <th style="text-align:center">Status/Feriado</th>
+                    <th style="text-align:center">Meta</th>
+                    <th style="text-align:center">Status</th>
                     <th>Anotações</th>
                 </tr>
             </thead>
@@ -181,24 +201,77 @@
     document.getElementById('user-display').innerText = sessao.nome;
     document.getElementById('welcome-msg').innerText = `Olá, ${sessao.nome.split(' ')[0]}`;
     
-    const hoje = new Date();
-    document.getElementById('month-selector').value = hoje.toISOString().substring(0, 7);
-
     let myChart = null;
 
     function logout() { localStorage.removeItem('usuario'); window.location.href = 'index.html'; }
 
+    // --- DATAS E FILTROS ---
+    function init() {
+        const yearSel = document.getElementById('year-selector');
+        const currentYear = new Date().getFullYear();
+        for(let y = currentYear; y >= 2024; y--) yearSel.innerHTML += `<option value="${y}">${y}</option>`;
+        atualizarOpcoesPeriodo();
+    }
+
+    function atualizarOpcoesPeriodo() {
+        const type = document.getElementById('period-type').value;
+        const valSel = document.getElementById('period-value');
+        valSel.innerHTML = '';
+        const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+        
+        if(type === 'mes') {
+            meses.forEach((m, i) => valSel.innerHTML += `<option value="${i+1}" ${i === new Date().getMonth() ? 'selected' : ''}>${m}</option>`);
+        } else if(type === 'trimestre') {
+            valSel.innerHTML = `<option value="1">1º Trimestre (Jan-Mar)</option><option value="2">2º Trimestre (Abr-Jun)</option><option value="3">3º Trimestre (Jul-Set)</option><option value="4">4º Trimestre (Out-Dez)</option>`;
+        } else if(type === 'semestre') {
+            valSel.innerHTML = `<option value="1">1º Semestre (Jan-Jun)</option><option value="2">2º Semestre (Jul-Dez)</option>`;
+        } else {
+            valSel.innerHTML = `<option value="1">Ano Completo</option>`;
+        }
+        carregarMeusDados();
+    }
+
+    function getRangeDates() {
+        const type = document.getElementById('period-type').value;
+        const val = parseInt(document.getElementById('period-value').value);
+        const year = document.getElementById('year-selector').value;
+        let start = '', end = '';
+        let label = '';
+        
+        if(type === 'mes') {
+            const m = val.toString().padStart(2, '0');
+            start = `${year}-${m}-01`;
+            end = `${year}-${m}-${new Date(year, val, 0).getDate()}`;
+            label = `Mês: ${val}/${year}`;
+        } else if(type === 'trimestre') {
+            const mStart = ((val-1)*3) + 1;
+            const mEnd = mStart + 2;
+            start = `${year}-${mStart.toString().padStart(2,'0')}-01`;
+            end = `${year}-${mEnd.toString().padStart(2,'0')}-${new Date(year, mEnd, 0).getDate()}`;
+            label = `Trimestre: ${val}º/${year}`;
+        } else if(type === 'semestre') {
+            start = val === 1 ? `${year}-01-01` : `${year}-07-01`;
+            end = val === 1 ? `${year}-06-30` : `${year}-12-31`;
+            label = `Semestre: ${val}º/${year}`;
+        } else {
+            start = `${year}-01-01`;
+            end = `${year}-12-31`;
+            label = `Ano: ${year}`;
+        }
+        document.getElementById('chart-title-text').innerText = `📈 Evolução - ${label}`;
+        return { start, end };
+    }
+
     // --- CARREGAMENTO ---
     async function carregarMeusDados() {
-        const mesStr = document.getElementById('month-selector').value;
-        const [ano, mes] = mesStr.split('-');
+        const { start, end } = getRangeDates();
         
-        // Busca Dados
+        // Busca Produção do Usuário
         const { data: producao } = await _supabase.from('producao')
             .select('*')
             .eq('usuario_id', sessao.id)
-            .gte('data_referencia', `${mesStr}-01`)
-            .lte('data_referencia', `${mesStr}-31`)
+            .gte('data_referencia', start)
+            .lte('data_referencia', end)
             .order('data_referencia');
 
         // Busca Meta
@@ -207,42 +280,35 @@
             .eq('usuario_id', sessao.id)
             .order('data_inicio', { ascending: false });
         
-        const metaAtual = metas.find(m => m.data_inicio <= `${mesStr}-31`)?.valor_meta || 650;
+        const metaAtual = metas.find(m => m.data_inicio <= end)?.valor_meta || 650;
         document.getElementById('kpi-meta-detail').innerText = `Meta base: ${metaAtual}`;
 
         renderizarKPIs(producao || [], metaAtual);
-        renderizarLog(producao || [], metaAtual, parseInt(ano), parseInt(mes));
+        renderizarLog(producao || [], metaAtual, start, end);
     }
 
     // --- SALVAMENTO (AUTO-SAVE) ---
     async function atualizarDiario(input, dataRef, campo) {
         let valor = input.value;
         
-        // Se for quantidade manual e estiver vazio, assume 0
+        // Se for quantidade manual e estiver vazio, assume 0 para o banco
         if(campo === 'quantidade_manual' && valor === '') valor = 0;
         
         input.style.borderColor = '#fbbf24'; // Processando
 
-        // Verifica se já existe registro
-        const { data: existente } = await _supabase.from('producao')
-            .select('id')
-            .eq('usuario_id', sessao.id)
-            .eq('data_referencia', dataRef)
-            .maybeSingle();
+        const { data: existente } = await _supabase.from('producao').select('id').eq('usuario_id', sessao.id).eq('data_referencia', dataRef).maybeSingle();
 
         let erro = null;
 
         if (existente) {
-            // Update
             const { error } = await _supabase.from('producao').update({ [campo]: valor }).eq('id', existente.id);
             erro = error;
         } else {
-            // Insert (Cria linha nova caso o admin ainda não tenha subido o excel, mas a assistente já quer anotar)
             const novoDado = {
                 usuario_id: sessao.id,
                 data_referencia: dataRef,
                 [campo]: valor,
-                quantidade: 0, // Sistema começa zerado se não houve importação
+                quantidade: 0,
                 quantidade_manual: campo === 'quantidade_manual' ? valor : 0,
                 fifo: 0, gradual_total: 0, gradual_parcial: 0, perfil_fc: 0
             };
@@ -251,13 +317,12 @@
         }
 
         if(erro) {
-            alert('Erro ao salvar!');
             input.style.borderColor = 'red';
         } else {
-            input.style.borderColor = '#00d09e'; // Sucesso
+            input.style.borderColor = '#00d09e';
             setTimeout(() => { 
                 input.style.borderColor = ''; 
-                if(campo === 'quantidade_manual') carregarMeusDados(); // Atualiza KPIs e visual
+                if(campo === 'quantidade_manual') carregarMeusDados();
             }, 800);
         }
     }
@@ -271,11 +336,8 @@
             return;
         }
 
-        // Soma Total Sistema (Excel)
         const totalSys = dados.reduce((a,b) => a + (b.quantidade||0), 0);
-        // Soma Total Manual (Digitado)
         const totalMan = dados.reduce((a,b) => a + (b.quantidade_manual||0), 0);
-        
         const diasAtivos = dados.filter(d => d.quantidade > 0).length;
         const best = dados.reduce((p,c) => (p.quantidade||0) > (c.quantidade||0) ? p : c, {quantidade:0});
         const diasMeta = dados.filter(d => d.quantidade >= meta).length;
@@ -284,7 +346,6 @@
         document.getElementById('kpi-total').innerText = totalSys.toLocaleString();
         document.getElementById('kpi-manual').innerText = totalMan.toLocaleString();
         
-        // Pinta de vermelho se houver divergência no total
         if(totalSys !== totalMan) {
             document.getElementById('kpi-manual').style.color = 'var(--danger)';
         } else {
@@ -299,8 +360,7 @@
         elHit.style.color = hitRate >= 100 ? 'var(--success)' : 'var(--danger)';
     }
 
-    function renderizarLog(dados, meta, ano, mes) {
-        const daysInMonth = new Date(ano, mes, 0).getDate();
+    function renderizarLog(dados, meta, startDateStr, endDateStr) {
         const tbody = document.getElementById('log-body');
         let html = '';
         
@@ -308,59 +368,61 @@
         const dataMap = {};
         dados.forEach(d => dataMap[d.data_referencia] = d);
 
-        for(let d = 1; d <= daysInMonth; d++) {
-            const dateObj = new Date(ano, mes - 1, d);
-            const dateStr = dateObj.toISOString().split('T')[0];
-            const diaSemana = dateObj.getDay(); 
+        const start = new Date(startDateStr);
+        const end = new Date(endDateStr);
+        // Ajuste fuso horário simples
+        start.setHours(12,0,0,0);
+        end.setHours(12,0,0,0);
+
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+            const dateStr = d.toISOString().split('T')[0];
+            const diaSemana = d.getDay(); 
             const diaFormatado = dateStr.split('-').reverse().join('/');
             const isWeekend = diaSemana === 0 || diaSemana === 6;
             
             const registro = dataMap[dateStr] || {};
             const qtdSys = registro.quantidade || 0;
-            const qtdMan = registro.quantidade_manual; // Pode ser null ou undefined
+            const qtdMan = registro.quantidade_manual;
             const obs = registro.observacao || '';
 
-            // Dados para o Gráfico (Usamos o Sistema como verdade)
+            // Dados Gráfico
             if(!isWeekend || qtdSys > 0) {
-                chartLabels.push(d);
+                chartLabels.push(diaFormatado.substring(0,5)); // DD/MM
                 chartData.push(qtdSys);
                 chartMeta.push(meta);
             }
 
-            // Lógica Visual
+            // Visual
             let statusBadge = '<span class="badge bg-none">-</span>';
             let ausenciaText = '-';
             let rowClass = isWeekend ? 'row-weekend' : '';
-            
-            // Estilo para destacar divergência (Se manual existe e for diferente do sistema)
             let manualStyle = '';
-            const manualValue = (qtdMan !== null && qtdMan !== undefined) ? qtdMan : '';
             
-            if(manualValue !== '' && parseInt(manualValue) !== qtdSys) {
-                manualStyle = 'input-divergent'; // Classe CSS vermelha
+            // Valor no input (Vazio se 0) - REGRA PEDIDA
+            const displayManual = (qtdMan !== null && qtdMan !== undefined && qtdMan !== 0) ? qtdMan : '';
+
+            // Divergencia visual
+            if(qtdMan !== null && qtdMan !== undefined && qtdMan !== 0 && qtdMan !== qtdSys) {
+                manualStyle = 'input-divergent';
             }
 
-            // Badge de Meta (Baseado no Sistema)
             if (qtdSys > 0) {
                 const atingiu = qtdSys >= meta;
                 statusBadge = atingiu ? `<span class="badge bg-sim">Sim</span>` : `<span class="badge bg-nao">Não</span>`;
                 ausenciaText = '';
             } else if(isWeekend) {
-                ausenciaText = diaSemana === 0 ? 'Domingo' : 'Sábado';
+                ausenciaText = diaSemana === 0 ? 'Dom' : 'Sáb';
             }
 
             html += `
                 <tr class="${rowClass}">
                     <td class="col-date">${diaFormatado}</td>
-                    
                     <td class="col-sys">${qtdSys > 0 ? qtdSys.toLocaleString() : '-'}</td>
-                    
                     <td class="col-manual">
-                        <input type="number" class="input-qty ${manualStyle}" value="${manualValue}" 
-                            placeholder="0"
+                        <input type="number" class="input-qty ${manualStyle}" value="${displayManual}" 
+                            placeholder=""
                             onchange="atualizarDiario(this, '${dateStr}', 'quantidade_manual')">
                     </td>
-                    
                     <td class="col-meta">${statusBadge}</td>
                     <td class="col-ausencia">${ausenciaText}</td>
                     <td class="col-obs">
@@ -385,15 +447,20 @@
             data: {
                 labels: labels,
                 datasets: [
-                    { label: 'Qtd. Sistema', data: data, borderColor: '#2662ea', backgroundColor: 'rgba(38, 98, 234, 0.1)', tension: 0.3, fill: true, pointRadius: 4 },
-                    { label: 'Meta', data: metas, borderColor: '#ef4444', borderDash: [5, 5], pointRadius: 0, borderWidth: 1.5 }
+                    { label: 'Qtd. Sistema', data: data, borderColor: '#2662ea', backgroundColor: 'rgba(38, 98, 234, 0.1)', tension: 0.3, fill: true, pointRadius: 3 },
+                    { label: 'Meta', data: metas, borderColor: '#ef4444', borderDash: [5, 5], pointRadius: 0, borderWidth: 1 }
                 ]
             },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                scales: { y: { beginAtZero: true } },
+                plugins: { legend: { position: 'top' } }
+            }
         });
     }
 
-    carregarMeusDados();
+    init();
 </script>
 </body>
 </html>
