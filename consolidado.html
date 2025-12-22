@@ -3,70 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relatório Consolidado</title>
+    <title>Consolidado</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* --- PALETA PASTEL SOFISTICADA --- */
         :root { 
-            --primary: #f87171; --clt: #60a5fa; --pj: #34d399; 
-            --fifo: #fbbf24; --gt: #a8a29e; --gp: #fb923c; --fc: #c084fc;
-            --bg: #f3f4f6; --nav: #1e293b; --header-dark: #334155; 
-            --card: #ffffff; --border: #e5e7eb; --text-main: #374151; --text-muted: #9ca3af;
-            --zebra-even: #e2e8f0; --zebra-hover: #cbd5e1;
+            --primary: #0045d0; --accent: #2662ea; --nav: #0d1b2a;
+            --success: #00d09e; --danger: #ef4444;
+            --clt: #0077b6; --pj: #00b4d8; --fifo: #f59e0b;
+            --bg: #f3f5f8; --card: #ffffff; --border: #e2e8f0;
+            --text-main: #1f2937; --text-muted: #64748b;
+            --zebra-even: #f8fafc; --zebra-hover: #eff6ff;
         }
-        
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding-top: 85px; color: var(--text-main); }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding-top: 80px; color: var(--text-main); }
 
-        /* NAVBAR */
-        .navbar { position: fixed; top: 0; left: 0; right: 0; height: 75px; background: var(--nav); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .nav-left { display: flex; align-items: center; gap: 20px; }
-        .brand { cursor: pointer; line-height: 1.1; }
-        .brand .small { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: #cbd5e1; display: block; }
-        .brand .big { font-size: 1.1rem; font-weight: 700; color: white; }
-        
-        .nav-links { display: flex; gap: 25px; margin-left: 30px; }
-        .nav-item { color: #94a3b8; text-decoration: none; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: 0.2s; }
-        .nav-item:hover, .nav-item.active { color: white; font-weight: 600; }
-        .nav-item.active { border-bottom: 2px solid var(--primary); padding-bottom: 2px; }
-
+        .navbar { position: fixed; top: 0; left: 0; right: 0; height: 70px; background: var(--nav); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+        .nav-left { display: flex; align-items: center; gap: 40px; }
+        .brand .big { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.5px; color: white; }
+        .brand .big span { color: var(--accent); }
+        .nav-links { display: flex; gap: 30px; }
+        .nav-item { color: #94a3b8; text-decoration: none; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: 0.3s; padding-bottom: 23px; border-bottom: 3px solid transparent; }
+        .nav-item:hover, .nav-item.active { color: white; border-bottom-color: var(--accent); }
         .user-area { text-align: right; border-left: 1px solid rgba(255,255,255,0.2); padding-left: 20px; }
-        .user-name { font-weight: 600; font-size: 0.85rem; color: white; display: block; }
-        .logout-btn { color: #fca5a5; font-size: 0.7rem; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .user-name { font-weight: 600; font-size: 0.85rem; color: white; }
+        .logout-btn { color: #fca5a5; font-size: 0.7rem; cursor: pointer; font-weight: 600; }
 
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 30px; }
 
         /* CONTROLES */
-        .top-controls { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px; background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .top-controls { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px; background: var(--card); padding: 20px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         .control-group { display: flex; flex-direction: column; gap: 5px; }
         .control-group label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-        input { padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Inter'; font-size: 0.9rem; color: var(--text-main); outline: none; background: #fff; }
+        input { padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-family: 'Inter'; font-size: 0.9rem; color: var(--text-main); outline: none; background: #fff; }
 
-        /* MINI PAINEL (Resumo no Topo) */
-        .dynamic-panel { background: var(--card); border-radius: 12px; padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid var(--border); border-top: 4px solid var(--nav); }
+        /* MINI PAINEL */
+        .dynamic-panel { background: var(--card); border-radius: 8px; padding: 25px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); border: 1px solid var(--border); border-top: 4px solid var(--primary); }
         .panel-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
-        .panel-column { display: flex; flex-direction: column; gap: 15px; padding: 0 20px; border-right: 1px solid var(--border); }
+        .panel-column { display: flex; flex-direction: column; gap: 20px; padding: 0 25px; border-right: 1px solid var(--border); }
         .panel-column:last-child { border-right: none; }
         .stat-item { display: flex; flex-direction: column; }
-        .label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
-        .value { font-size: 1.2rem; font-weight: 700; color: var(--nav); }
+        .label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 5px; }
+        .value { font-size: 1.4rem; font-weight: 700; color: var(--nav); }
         
-        /* TABELA LISTA */
-        .table-wrap { background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        /* TABELA */
+        .table-wrap { background: var(--card); border-radius: 8px; border: 1px solid var(--border); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 1100px; }
-        
-        th { background: #f8fafc; padding: 12px 15px; text-align: left; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.7rem; border-bottom: 2px solid var(--border); }
-        td { padding: 10px 15px; border-bottom: 1px solid var(--border); color: var(--text-main); }
-        
-        /* ZEBRADO FORTE */
+        th { background: #f8fafc; padding: 15px 20px; text-align: left; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.7rem; border-bottom: 1px solid var(--border); }
+        td { padding: 12px 20px; border-bottom: 1px solid var(--border); color: var(--text-main); }
         tbody tr:nth-child(even) { background-color: var(--zebra-even); }
         tbody tr:hover { background-color: var(--zebra-hover); }
         
-        .badge-contract { padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; color: white; text-transform: uppercase; }
+        .badge-contract { padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; color: white; text-transform: uppercase; }
         .bg-clt { background: var(--clt); }
         .bg-pj { background: var(--pj); }
-
     </style>
 </head>
 <body>
@@ -74,14 +63,13 @@
 <nav class="navbar">
     <div class="nav-left">
         <div class="brand" onclick="window.location.href='produtividade.html'">
-            <span class="small">controle de</span>
-            <div class="big">PRODUTIVIDADE</div>
+            <div class="big">PRODUTIVIDADE<span>.</span></div>
         </div>
         <div class="nav-links">
-            <a href="produtividade.html" class="nav-item">Dashboard</a>
+            <a href="gestao.html" class="nav-item">Gestão</a>
+            <a href="produtividade.html" class="nav-item">Produtividade</a>
             <a href="performance.html" class="nav-item">Performance</a>
             <a href="consolidado.html" class="nav-item active">Consolidado</a>
-            <a href="gestao.html" class="nav-item">Gestão</a>
         </div>
     </div>
     <div class="user-area">
@@ -91,7 +79,6 @@
 </nav>
 
 <div class="container">
-    
     <div class="top-controls">
         <div class="control-group">
             <label>Selecione o Mês de Referência</label>
@@ -107,19 +94,19 @@
         <div class="panel-grid">
             <div class="panel-column">
                 <div class="stat-item"><span class="label">Total Geral</span><span class="value" id="res-total">0</span></div>
-                <div class="stat-item" style="margin-top:10px"><span class="label">Média do Time (Dia)</span><span class="value" id="res-media-time">0</span></div>
+                <div class="stat-item"><span class="label">Média do Time (Dia)</span><span class="value" id="res-media-time">0</span></div>
             </div>
             <div class="panel-column">
                 <div class="stat-item"><span class="label">Assistentes</span><span class="value" id="res-head">0</span></div>
-                <div class="stat-item" style="margin-top:10px"><span class="label">Média por Assistente</span><span class="value" id="res-media-asst">0</span></div>
+                <div class="stat-item"><span class="label">Média por Assistente</span><span class="value" id="res-media-asst">0</span></div>
             </div>
             <div class="panel-column">
                 <div class="stat-item"><span class="label">Total CLT</span><span class="value" style="color:var(--clt)" id="res-clt">0</span></div>
-                <div class="stat-item" style="margin-top:10px"><span class="label">Média Diária CLT</span><span class="value" style="color:var(--clt); font-size:1rem;" id="res-clt-media">0</span></div>
+                <div class="stat-item"><span class="label">Média Diária CLT</span><span class="value" style="color:var(--clt); font-size:1.1rem;" id="res-clt-media">0</span></div>
             </div>
             <div class="panel-column">
                 <div class="stat-item"><span class="label">Total PJ</span><span class="value" style="color:var(--pj)" id="res-pj">0</span></div>
-                <div class="stat-item" style="margin-top:10px"><span class="label">Média Diária PJ</span><span class="value" style="color:var(--pj); font-size:1rem;" id="res-pj-media">0</span></div>
+                <div class="stat-item"><span class="label">Média Diária PJ</span><span class="value" style="color:var(--pj); font-size:1.1rem;" id="res-pj-media">0</span></div>
             </div>
         </div>
     </div>
@@ -141,7 +128,6 @@
             <tbody id="tabela-corpo"></tbody>
         </table>
     </div>
-
 </div>
 
 <script>
@@ -154,7 +140,6 @@
     document.getElementById('user-display').innerText = sessao.nome;
     function logout() { localStorage.removeItem('usuario'); window.location.href = 'index.html'; }
 
-    // Inicializa com o mês atual
     const hoje = new Date();
     document.getElementById('month-selector').value = hoje.toISOString().substring(0, 7);
     document.getElementById('last-update').innerText = new Date().toLocaleString('pt-BR');
@@ -163,42 +148,24 @@
         const mesStr = document.getElementById('month-selector').value;
         if(!mesStr) return;
 
-        // Busca dados do mês selecionado
-        const { data: dados } = await _supabase.from('producao')
-            .select('*, usuarios(*)')
-            .gte('data_referencia', `${mesStr}-01`)
-            .lte('data_referencia', `${mesStr}-31`);
+        const { data: dados } = await _supabase.from('producao').select('*, usuarios(*)').gte('data_referencia', `${mesStr}-01`).lte('data_referencia', `${mesStr}-31`);
 
         if(!dados || dados.length === 0) {
             document.getElementById('tabela-corpo').innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px;">Sem dados no período.</td></tr>';
             zerarPainel();
             return;
         }
-
         processarDados(dados);
     }
 
     function processarDados(dados) {
-        // Objeto para agrupar por assistente
         let resumo = {};
-        
         dados.forEach(d => {
             if(!d.usuario_id || !d.usuarios) return;
             const uid = d.usuario_id;
-            
             if(!resumo[uid]) {
-                resumo[uid] = {
-                    nome: d.usuarios.nome,
-                    contrato: d.usuarios.contrato || 'PJ',
-                    total: 0,
-                    fifo: 0,
-                    gt: 0,
-                    gp: 0,
-                    fc: 0,
-                    dias: new Set() // Usamos Set para contar dias únicos trabalhados
-                };
+                resumo[uid] = { nome: d.usuarios.nome, contrato: d.usuarios.contrato || 'PJ', total: 0, fifo: 0, gt: 0, gp: 0, fc: 0, dias: new Set() };
             }
-            
             resumo[uid].total += d.quantidade;
             resumo[uid].fifo += d.fifo;
             resumo[uid].gt += d.gradual_total;
@@ -207,86 +174,40 @@
             resumo[uid].dias.add(d.data_referencia);
         });
 
-        // Transforma objeto em array e ordena por produção total
         const lista = Object.values(resumo).sort((a,b) => b.total - a.total);
-
-        // Renderiza Tabela
-        let html = '';
-        let somaTotal = 0;
-        let somaDiasGlobais = new Set();
-        let headCount = lista.length;
-        
-        // Variaveis para calculo do Painel Superior
-        let totalCLT = 0, totalPJ = 0;
-        let diasCLT = 0, diasPJ = 0; // Soma de médias diárias
-        let countCLT = 0, countPJ = 0;
+        let html = '', somaTotal = 0, somaDiasGlobais = new Set(), headCount = lista.length;
+        let totalCLT = 0, totalPJ = 0, diasCLT = 0, diasPJ = 0, countCLT = 0, countPJ = 0;
 
         lista.forEach(r => {
             const numDias = r.dias.size || 1;
             const mediaDia = (r.total / numDias).toFixed(0);
-            
-            // Acumulando para o Painel
             somaTotal += r.total;
             r.dias.forEach(d => somaDiasGlobais.add(d));
 
-            if(r.contrato.includes('CLT')) {
-                totalCLT += r.total;
-                countCLT++;
-                diasCLT += parseInt(mediaDia); // Soma das médias para média geral depois
-            } else {
-                totalPJ += r.total;
-                countPJ++;
-                diasPJ += parseInt(mediaDia);
-            }
+            if(r.contrato.includes('CLT')) { totalCLT += r.total; countCLT++; diasCLT += parseInt(mediaDia); } 
+            else { totalPJ += r.total; countPJ++; diasPJ += parseInt(mediaDia); }
 
-            const badge = r.contrato.includes('CLT') 
-                ? `<span class="badge-contract bg-clt">CLT</span>` 
-                : `<span class="badge-contract bg-pj">PJ</span>`;
-
-            html += `
-                <tr>
-                    <td><b>${r.nome}</b> ${badge}</td>
-                    <td style="text-align:center;">${numDias}</td>
-                    <td style="text-align:center; font-weight:700; color:var(--primary); font-size:1rem;">${r.total.toLocaleString()}</td>
-                    <td style="text-align:center; font-weight:700; color:var(--nav);">${mediaDia}</td>
-                    <td>${r.fifo.toLocaleString()}</td>
-                    <td>${r.gt.toLocaleString()}</td>
-                    <td>${r.gp.toLocaleString()}</td>
-                    <td>${r.fc.toLocaleString()}</td>
-                </tr>
-            `;
+            const badge = r.contrato.includes('CLT') ? `<span class="badge-contract bg-clt">CLT</span>` : `<span class="badge-contract bg-pj">PJ</span>`;
+            html += `<tr><td><b>${r.nome}</b> ${badge}</td><td style="text-align:center;">${numDias}</td><td style="text-align:center; font-weight:700; color:var(--primary); font-size:1rem;">${r.total.toLocaleString()}</td><td style="text-align:center; font-weight:700; color:var(--nav);">${mediaDia}</td><td>${r.fifo.toLocaleString()}</td><td>${r.gt.toLocaleString()}</td><td>${r.gp.toLocaleString()}</td><td>${r.fc.toLocaleString()}</td></tr>`;
         });
 
         document.getElementById('tabela-corpo').innerHTML = html;
-
-        // Atualiza Mini Painel
-        const diasUteisGlobal = somaDiasGlobais.size || 1;
         
+        const diasUteisGlobal = somaDiasGlobais.size || 1;
         document.getElementById('res-total').innerText = somaTotal.toLocaleString();
         document.getElementById('res-head').innerText = headCount;
-        
-        // Média do Time (Dia): Total Geral / Dias Úteis do Mês
         document.getElementById('res-media-time').innerText = (somaTotal / diasUteisGlobal).toFixed(0);
-        
-        // Média por Assistente: Total Geral / Headcount
         document.getElementById('res-media-asst').innerText = (somaTotal / headCount).toFixed(0);
-
         document.getElementById('res-clt').innerText = totalCLT.toLocaleString();
-        // Média Diária CLT: Total CLT / (Dias Úteis * Headcount CLT) ... Aproximação
-        const mediaGeralCLT = countCLT > 0 ? (totalCLT / diasUteisGlobal / countCLT).toFixed(0) : 0;
-        document.getElementById('res-clt-media').innerText = mediaGeralCLT;
-
+        document.getElementById('res-clt-media').innerText = countCLT > 0 ? (totalCLT / diasUteisGlobal / countCLT).toFixed(0) : 0;
         document.getElementById('res-pj').innerText = totalPJ.toLocaleString();
-        const mediaGeralPJ = countPJ > 0 ? (totalPJ / diasUteisGlobal / countPJ).toFixed(0) : 0;
-        document.getElementById('res-pj-media').innerText = mediaGeralPJ;
+        document.getElementById('res-pj-media').innerText = countPJ > 0 ? (totalPJ / diasUteisGlobal / countPJ).toFixed(0) : 0;
     }
 
     function zerarPainel() {
-        ['res-total','res-media-time','res-head','res-media-asst','res-clt','res-clt-media','res-pj','res-pj-media']
-        .forEach(id => document.getElementById(id).innerText = '0');
+        ['res-total','res-media-time','res-head','res-media-asst','res-clt','res-clt-media','res-pj','res-pj-media'].forEach(id => document.getElementById(id).innerText = '0');
     }
 
-    // Carrega ao abrir
     carregarConsolidado();
 </script>
 </body>
