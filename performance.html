@@ -3,92 +3,346 @@
 <head>
     <meta charset="UTF-8">
     <title>Performance</title>
+    
     <link rel="icon" href="assets/img/logo.png" type="image/png">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="assets/css/style.css">
-    <style>.selected-row td {background:#eff6ff !important; color:var(--primary); font-weight:700;} .hidden{display:none !important}</style>
+    
+    <style>
+        .selected-row td { background:#eff6ff !important; color:var(--primary); font-weight:700; border-left: 4px solid var(--accent); }
+        .hidden { display:none !important; }
+        .badge { min-width: 50px; } /* Ajuste para caber a % */
+    </style>
 </head>
 <body>
+
 <div class="container">
-    <div class="top-controls">
-        <div class="control-group" style="flex:1.5"><label>Assistente</label><select id="user-selector" onchange="carregarPerformance()"></select></div>
-        <div class="control-group"><label>Tipo</label><select id="period-type" onchange="atualizarOpcoes()"><option value="mes">Mensal</option><option value="trimestre">Trimestral</option><option value="semestre">Semestral</option><option value="ano">Anual</option></select></div>
-        <div class="control-group"><label>Ano</label><select id="year-selector" onchange="atualizarOpcoes()"></select></div>
-        <div class="control-group" style="flex:1.2"><label>Período</label><select id="period-value" onchange="carregarPerformance()"></select></div>
+    
+    <div class="mode-tabs">
+        <button class="tab-btn active" onclick="switchMode('individual')" id="btn-individual" style="background:var(--nav); color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer;">📊 Análise & Comparativo</button>
+        <button class="tab-btn" onclick="switchMode('matrix')" id="btn-matrix" style="background:#e2e8f0; color:#64748b; border:none; padding:10px 20px; border-radius:6px; cursor:pointer;">🏆 Matriz Anual</button>
     </div>
-    <div class="stats-grid">
-        <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value" id="kpi-total">0</div></div>
-        <div class="stat-card"><div class="stat-label">Média</div><div class="stat-value" id="kpi-media">0</div></div>
-        <div class="stat-card"><div class="stat-label">Meta</div><div class="stat-value" id="kpi-meta">0</div></div>
-        <div class="stat-card"><div class="stat-label">Ranking</div><div class="stat-value" id="kpi-rank">-</div></div>
+
+    <div id="individual-view">
+        <div class="top-controls" style="margin-top:20px;">
+            <div class="control-group" style="flex:1.5">
+                <label>Assistente em Foco</label>
+                <select id="user-selector" onchange="carregarPerformance()"></select>
+            </div>
+            
+            <div class="control-group">
+                <label>Tipo</label>
+                <select id="period-type" onchange="atualizarOpcoes()">
+                    <option value="mes">Mensal</option>
+                    <option value="trimestre">Trimestral</option>
+                    <option value="semestre">Semestral</option>
+                    <option value="ano">Anual</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Ano</label>
+                <select id="year-selector" onchange="atualizarOpcoes()"></select>
+            </div>
+
+            <div class="control-group" style="flex:1.2">
+                <label>Período</label>
+                <select id="period-value" onchange="carregarPerformance()"></select>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card" style="border-left: 4px solid var(--clt);">
+                <div class="stat-label">Produção Total</div>
+                <div class="stat-value" id="kpi-total">0</div>
+            </div>
+            <div class="stat-card" style="border-left: 4px solid var(--pj);">
+                <div class="stat-label">Média Diária</div>
+                <div class="stat-value" id="kpi-media">0</div>
+            </div>
+            <div class="stat-card" style="border-left: 4px solid var(--fifo);">
+                <div class="stat-label">Meta do Período</div>
+                <div class="stat-value" id="kpi-meta">0</div>
+            </div>
+            <div class="stat-card" style="border-left: 4px solid var(--success);">
+                <div class="stat-label">Ranking</div>
+                <div class="stat-value" id="kpi-rank">-</div>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-header">
+                <div class="table-title">Comparativo do Time</div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Assistente</th>
+                        <th>Total Produzido</th>
+                        <th>Dias Trab.</th>
+                        <th>Média Diária</th>
+                        <th>Meta Total</th>
+                        <th>% Atingido</th> <th>Diferença</th>
+                    </tr>
+                </thead>
+                <tbody id="comparative-body"></tbody>
+            </table>
+        </div>
     </div>
-    <div class="table-card">
-        <table><thead><tr><th>#</th><th>Nome</th><th>Total</th><th>Dias</th><th>Média</th><th>Meta</th><th>Status</th></tr></thead><tbody id="comparative-body"></tbody></table>
+
+    <div id="matrix-view" class="hidden">
+        <div class="top-controls" style="margin-top:20px;">
+            <div class="control-group">
+                <label>Ano de Referência</label>
+                <select id="matrix-year" onchange="carregarMatriz()"></select>
+            </div>
+        </div>
+        <div class="table-card" style="overflow-x:auto;">
+            <table id="matrix-table" style="min-width:1500px">
+                <thead>
+                    <tr><th>NOME</th><th>JAN</th><th>FEV</th><th>MAR</th><th>ABR</th><th>MAI</th><th>JUN</th><th>JUL</th><th>AGO</th><th>SET</th><th>OUT</th><th>NOV</th><th>DEZ</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>H1</th><th>H2</th><th>ANUAL</th></tr>
+                </thead>
+                <tbody id="matrix-body"></tbody>
+            </table>
+        </div>
     </div>
+
 </div>
+
 <script src="assets/js/config.js"></script>
 <script src="assets/js/auth.js"></script>
 <script src="assets/js/layout.js"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', init);
+
     async function init() {
-        const ys = document.getElementById('year-selector'); const cy = new Date().getFullYear();
-        ys.innerHTML=''; for(let y=cy; y>=2024; y--) ys.innerHTML+=`<option value="${y}">${y}</option>`;
-        await loadUsers(); atualizarOpcoes();
+        const yearSel = document.getElementById('year-selector');
+        const matrixYear = document.getElementById('matrix-year');
+        const currentYear = new Date().getFullYear();
+        
+        yearSel.innerHTML = ''; 
+        matrixYear.innerHTML = '';
+        
+        for(let y = currentYear; y >= 2024; y--) {
+            yearSel.innerHTML += `<option value="${y}">${y}</option>`;
+            matrixYear.innerHTML += `<option value="${y}">${y}</option>`;
+        }
+        
+        await loadUsers();
+        atualizarOpcoes();
     }
+
     async function loadUsers() {
-        const { data } = await _supabase.from('usuarios').select('*').order('nome');
-        const sel = document.getElementById('user-selector'); sel.innerHTML='';
-        data.filter(u=>u.funcao!=='Gestora').forEach(u=>sel.innerHTML+=`<option value="${u.id}">${u.nome}</option>`);
+        const { data: users } = await _supabase.from('usuarios').select('*').order('nome');
+        const sel = document.getElementById('user-selector');
+        sel.innerHTML = '';
+        
+        const assistentes = users.filter(u => u.funcao !== 'Gestora' && u.funcao !== 'Auditora');
+        assistentes.forEach(u => sel.innerHTML += `<option value="${u.id}">${u.nome}</option>`);
     }
+
+    function switchMode(mode) {
+        document.getElementById('individual-view').classList.toggle('hidden', mode !== 'individual');
+        document.getElementById('matrix-view').classList.toggle('hidden', mode !== 'matrix');
+        
+        const btnInd = document.getElementById('btn-individual');
+        const btnMat = document.getElementById('btn-matrix');
+        
+        if(mode === 'individual') {
+            btnInd.style.background = 'var(--nav)'; btnInd.style.color = 'white';
+            btnMat.style.background = '#e2e8f0'; btnMat.style.color = '#64748b';
+            carregarPerformance();
+        } else {
+            btnMat.style.background = 'var(--nav)'; btnMat.style.color = 'white';
+            btnInd.style.background = '#e2e8f0'; btnInd.style.color = '#64748b';
+            carregarMatriz();
+        }
+    }
+
     function atualizarOpcoes() {
         const type = document.getElementById('period-type').value;
-        const sel = document.getElementById('period-value'); sel.innerHTML='';
-        if(type==='mes') ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'].forEach((m,i)=>sel.innerHTML+=`<option value="${i+1}" ${i===new Date().getMonth()?'selected':''}>${m}</option>`);
-        else if(type==='trimestre') sel.innerHTML='<option value="1">1º Tri</option><option value="2">2º Tri</option><option value="3">3º Tri</option><option value="4">4º Tri</option>';
-        else if(type==='semestre') sel.innerHTML='<option value="1">1º Sem</option><option value="2">2º Sem</option>';
-        else sel.innerHTML='<option value="1">Ano Completo</option>';
+        const valSel = document.getElementById('period-value');
+        valSel.innerHTML = '';
+        
+        const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+        const mesAtual = new Date().getMonth();
+
+        if(type === 'mes') {
+            meses.forEach((m, i) => valSel.innerHTML += `<option value="${i+1}" ${i === mesAtual ? 'selected' : ''}>${m}</option>`);
+        } 
+        else if(type === 'trimestre') valSel.innerHTML = `<option value="1">1º Trimestre</option><option value="2">2º Trimestre</option><option value="3">3º Trimestre</option><option value="4">4º Trimestre</option>`;
+        else if(type === 'semestre') valSel.innerHTML = `<option value="1">1º Semestre</option><option value="2">2º Semestre</option>`;
+        else valSel.innerHTML = `<option value="1">Ano Completo</option>`;
+        
         carregarPerformance();
     }
-    async function carregarPerformance() {
-        const uid = document.getElementById('user-selector').value; if(!uid) return;
-        const year = document.getElementById('year-selector').value; const val = parseInt(document.getElementById('period-value').value); const type = document.getElementById('period-type').value;
-        let s='', e='';
-        if(type==='mes'){ s=`${year}-${val.toString().padStart(2,'0')}-01`; e=`${year}-${val.toString().padStart(2,'0')}-${new Date(year,val,0).getDate()}`; }
-        else if(type==='trimestre'){ const m1=((val-1)*3)+1; s=`${year}-${m1.toString().padStart(2,'0')}-01`; e=`${year}-${(m1+2).toString().padStart(2,'0')}-${new Date(year,m1+2,0).getDate()}`; }
-        else if(type==='semestre'){ s=val===1?`${year}-01-01`:`${year}-07-01`; e=val===1?`${year}-06-30`:`${year}-12-31`; }
-        else { s=`${year}-01-01`; e=`${year}-12-31`; }
 
-        const { data:dt } = await _supabase.from('producao').select('*, usuarios(nome)').gte('data_referencia', s).lte('data_referencia', e);
-        const { data:mts } = await _supabase.from('metas').select('*');
+    function getRangeDates() {
+        const type = document.getElementById('period-type').value;
+        const val = parseInt(document.getElementById('period-value').value);
+        const year = document.getElementById('year-selector').value;
+        let start = '', end = '';
         
-        let stats={};
-        (dt||[]).forEach(d=>{ if(!stats[d.usuario_id]) stats[d.usuario_id]={id:d.usuario_id, nome:d.usuarios.nome, total:0, dias:new Set()}; stats[d.usuario_id].total+=d.quantidade; stats[d.usuario_id].dias.add(d.data_referencia); });
-        
-        let list = Object.values(stats).map(i=>{
-            const dc = i.dias.size||1;
-            const mt = mts.find(m=>m.usuario_id==i.id && m.data_inicio<=e)?.valor_meta||650;
-            return {...i, media:(i.total/dc).toFixed(0), diasCount:dc, metaTotal: mt*dc};
-        }).sort((a,b)=>b.total-a.total);
-
-        render(list, uid);
+        if(type === 'mes') { start = `${year}-${val.toString().padStart(2,'0')}-01`; end = `${year}-${val.toString().padStart(2,'0')}-${new Date(year, val, 0).getDate()}`; }
+        else if(type === 'trimestre') { const mStart = ((val-1)*3)+1; const mEnd = mStart+2; start = `${year}-${mStart.toString().padStart(2,'0')}-01`; end = `${year}-${mEnd.toString().padStart(2,'0')}-${new Date(year, mEnd, 0).getDate()}`; }
+        else if(type === 'semestre') { start = val===1?`${year}-01-01`:`${year}-07-01`; end = val===1?`${year}-06-30`:`${year}-12-31`; }
+        else { start = `${year}-01-01`; end = `${year}-12-31`; }
+        return { start, end };
     }
-    function render(list, uid) {
-        const me = list.find(i=>i.id==uid);
-        if(me) {
-            document.getElementById('kpi-total').innerText=me.total.toLocaleString();
-            document.getElementById('kpi-media').innerText=me.media;
-            document.getElementById('kpi-meta').innerText=me.metaTotal.toLocaleString();
-            document.getElementById('kpi-rank').innerText='#'+(list.findIndex(i=>i.id==uid)+1);
-        } else { ['kpi-total','kpi-media','kpi-meta','kpi-rank'].forEach(i=>document.getElementById(i).innerText='-'); }
+
+    async function carregarPerformance() {
+        const selectedUid = document.getElementById('user-selector').value;
+        if(!selectedUid) return;
+
+        const { start, end } = getRangeDates();
         
-        let h='';
-        list.forEach((i,idx)=>{
-            const ok = i.total>=i.metaTotal;
-            h+=`<tr class="${i.id==uid?'selected-row':''}"><td>${idx+1}</td><td>${i.nome}</td><td>${i.total}</td><td>${i.diasCount}</td><td>${i.media}</td><td>${i.metaTotal}</td><td><span class="badge" style="background:${ok?'var(--success)':'var(--danger)'}">${ok?'Sim':'Não'}</span></td></tr>`;
+        const { data: allData } = await _supabase.from('producao')
+            .select('*, usuarios(nome, funcao)')
+            .gte('data_referencia', start)
+            .lte('data_referencia', end);
+
+        if(!allData || allData.length === 0) {
+            renderizarTela([], selectedUid);
+            document.getElementById('comparative-body').innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px;">Sem dados para o período.</td></tr>';
+            return;
+        }
+
+        const { data: metas } = await _supabase.from('metas').select('*').order('data_inicio', { ascending: false });
+
+        let stats = {};
+        allData.forEach(d => {
+            if(!d.usuarios || d.usuarios.funcao !== 'Assistente') return;
+            const uid = d.usuario_id;
+            
+            if(!stats[uid]) {
+                stats[uid] = { id: uid, nome: d.usuarios.nome, total: 0, dias: new Set() };
+            }
+            stats[uid].total += d.quantidade;
+            stats[uid].dias.add(d.data_referencia);
         });
-        document.getElementById('comparative-body').innerHTML=h||'<tr><td colspan="7" style="text-align:center">Sem dados</td></tr>';
+
+        let lista = Object.values(stats).map(s => {
+            const diasCount = s.dias.size || 1;
+            // Busca a meta válida para o período (aproximação pela meta mais recente no período)
+            const userMeta = metas.find(m => m.usuario_id == s.id && m.data_inicio <= end)?.valor_meta || 650;
+            const metaTotal = userMeta * diasCount;
+            
+            return {
+                ...s,
+                diasCount,
+                media: (s.total / diasCount).toFixed(0),
+                metaTotal: metaTotal
+            };
+        });
+
+        lista.sort((a, b) => b.total - a.total);
+        renderizarTela(lista, selectedUid);
+    }
+
+    function renderizarTela(lista, selectedUid) {
+        const me = lista.find(i => i.id == selectedUid);
+        
+        if(me) {
+            document.getElementById('kpi-total').innerText = me.total.toLocaleString();
+            document.getElementById('kpi-media').innerText = me.media;
+            document.getElementById('kpi-meta').innerText = me.metaTotal.toLocaleString();
+            document.getElementById('kpi-rank').innerText = '#' + (lista.findIndex(i => i.id == selectedUid) + 1);
+        } else {
+            ['kpi-total','kpi-media','kpi-meta','kpi-rank'].forEach(i => document.getElementById(i).innerText = '-');
+        }
+
+        const tbody = document.getElementById('comparative-body');
+        let html = '';
+        
+        lista.forEach((item, index) => {
+            const isSelected = item.id == selectedUid;
+            
+            // CÁLCULO DA PORCENTAGEM
+            const percent = item.metaTotal > 0 ? ((item.total / item.metaTotal) * 100).toFixed(0) : 0;
+            
+            // Definição da cor do Badge
+            const color = percent >= 100 ? 'var(--success)' : 'var(--danger)';
+            
+            // Diferença simples
+            const diff = item.total - item.metaTotal;
+            const diffColor = diff >= 0 ? 'var(--success)' : 'var(--danger)';
+
+            html += `
+                <tr class="${isSelected ? 'selected-row' : ''}">
+                    <td>${index + 1}</td>
+                    <td>${item.nome}</td>
+                    <td style="font-weight:700">${item.total.toLocaleString()}</td>
+                    <td>${item.diasCount}</td>
+                    <td>${item.media}</td>
+                    <td>${item.metaTotal.toLocaleString()}</td>
+                    <td><span class="badge" style="background:${color}">${percent}%</span></td>
+                    <td style="color:${diffColor}; font-weight:600;">${diff > 0 ? '+' : ''}${diff.toLocaleString()}</td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
+
+    async function carregarMatriz() {
+        const ano = document.getElementById('matrix-year').value;
+        const { data: allData } = await _supabase.from('producao')
+            .select('*, usuarios(nome, funcao)')
+            .gte('data_referencia', `${ano}-01-01`)
+            .lte('data_referencia', `${ano}-12-31`);
+
+        if(!allData || allData.length === 0) {
+             document.getElementById('matrix-body').innerHTML = '<tr><td colspan="20" style="text-align:center; padding:20px;">Sem dados para o ano selecionado.</td></tr>';
+             return;
+        }
+
+        let stats = {};
+        allData.forEach(d => {
+            if(!d.usuarios || d.usuarios.funcao !== 'Assistente') return;
+            const uid = d.usuario_id;
+            
+            if(!stats[uid]) {
+                stats[uid] = { 
+                    nome: d.usuarios.nome, 
+                    months: Array(12).fill(0),
+                    q: [0,0,0,0], h: [0,0], total: 0
+                };
+            }
+            const monthIdx = new Date(d.data_referencia + 'T12:00:00').getMonth();
+            stats[uid].months[monthIdx] += d.quantidade;
+            stats[uid].total += d.quantidade;
+        });
+
+        Object.values(stats).forEach(s => {
+            s.q[0] = s.months[0]+s.months[1]+s.months[2];
+            s.q[1] = s.months[3]+s.months[4]+s.months[5];
+            s.q[2] = s.months[6]+s.months[7]+s.months[8];
+            s.q[3] = s.months[9]+s.months[10]+s.months[11];
+            s.h[0] = s.q[0]+s.q[1];
+            s.h[1] = s.q[2]+s.q[3];
+        });
+
+        const sorted = Object.values(stats).sort((a,b) => b.total - a.total);
+        const tbody = document.getElementById('matrix-body');
+        let html = '';
+
+        sorted.forEach(s => {
+            html += `<tr>
+                <td>${s.nome}</td>
+                ${s.months.map(v => `<td>${v ? v.toLocaleString() : '-'}</td>`).join('')}
+                <td style="background:#f0f9ff; font-weight:700; color:#0369a1">${s.q[0].toLocaleString()}</td>
+                <td style="background:#f0f9ff; font-weight:700; color:#0369a1">${s.q[1].toLocaleString()}</td>
+                <td style="background:#f0f9ff; font-weight:700; color:#0369a1">${s.q[2].toLocaleString()}</td>
+                <td style="background:#f0f9ff; font-weight:700; color:#0369a1">${s.q[3].toLocaleString()}</td>
+                <td style="background:#fff7ed; font-weight:700; color:#c2410c">${s.h[0].toLocaleString()}</td>
+                <td style="background:#fff7ed; font-weight:700; color:#c2410c">${s.h[1].toLocaleString()}</td>
+                <td style="background:#f3f4f6; font-weight:800">${s.total.toLocaleString()}</td>
+            </tr>`;
+        });
+        tbody.innerHTML = html;
     }
 </script>
 </body>
