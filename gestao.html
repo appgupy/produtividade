@@ -123,24 +123,18 @@
         </div>
         
         <div class="form-group" style="margin-bottom:15px;">
-            <label>ID do Sistema (Login)</label>
-            <input type="text" id="user-id-display" placeholder="Gerado automaticamente" disabled style="background:#f1f5f9; font-weight:700; color:var(--nav);">
-            <input type="hidden" id="user-id"> </div>
+            <label>ID (Login)</label>
+            <input type="number" id="user-id" placeholder="Digite o ID do funcionário" style="font-weight:700; color:var(--nav);">
+        </div>
 
         <div class="form-group" style="margin-bottom:15px;">
             <label>Nome Completo</label>
             <input type="text" id="user-name" placeholder="Ex: Maria Silva">
         </div>
 
-        <div class="form-row">
-            <div class="form-group">
-                <label>Senha de Acesso</label>
-                <input type="text" id="user-pass" placeholder="Defina uma senha">
-            </div>
-            <div class="form-group">
-                <label>E-mail (Opcional)</label>
-                <input type="email" id="user-email" placeholder="Contato">
-            </div>
+        <div class="form-group" style="margin-bottom:15px;">
+            <label>Senha de Acesso</label>
+            <input type="text" id="user-pass" placeholder="Defina uma senha">
         </div>
 
         <div class="form-row">
@@ -175,7 +169,7 @@
 <script>
     // Segurança: Apenas Gestora
     if (SESSAO_ATUAL.funcao !== 'Gestora') {
-        alert('Acesso restrito.');
+        alert('Acesso restrito à gestão.');
         window.location.href = 'produtividade.html';
     }
 
@@ -204,7 +198,7 @@
         
         lista.forEach(u => {
             const contratoClass = (u.contrato && u.contrato.includes('CLT')) ? 'role-clt' : 'role-pj';
-            // Prepara objeto para edição
+            // Prepara objeto para edição (escapando aspas)
             const userJson = JSON.stringify(u).replace(/"/g, '&quot;');
             
             html += `
@@ -228,31 +222,34 @@
         container.innerHTML = html;
     }
 
-    // Abertura do Modal (Criação ou Edição)
+    // Abertura do Modal
     function abrirModalUsuario(user = null) {
         const modal = document.getElementById('modal-user');
         const btnDel = document.getElementById('btn-delete');
         const title = document.getElementById('modal-label');
+        const idInput = document.getElementById('user-id');
         
         if (user) {
             // MODO EDIÇÃO
             title.innerText = "Editar Colaborador";
-            document.getElementById('user-id').value = user.id;
-            document.getElementById('user-id-display').value = user.id; // Mostra o ID
+            idInput.value = user.id;
+            idInput.disabled = true; // Não permite mudar ID na edição
+            idInput.style.backgroundColor = "#e2e8f0"; // Visual de bloqueado
+            
             document.getElementById('user-name').value = user.nome;
             document.getElementById('user-pass').value = user.senha;
-            document.getElementById('user-email').value = user.email || '';
             document.getElementById('user-role').value = user.funcao;
             document.getElementById('user-contract').value = user.contrato || 'PJ';
             btnDel.style.display = 'block';
         } else {
             // MODO CRIAÇÃO
             title.innerText = "Novo Colaborador";
-            document.getElementById('user-id').value = "";
-            document.getElementById('user-id-display').value = "Será gerado ao salvar";
+            idInput.value = "";
+            idInput.disabled = false; // Permite digitar ID
+            idInput.style.backgroundColor = "#fff";
+            
             document.getElementById('user-name').value = "";
             document.getElementById('user-pass').value = "";
-            document.getElementById('user-email').value = "";
             document.getElementById('user-role').value = "Assistente";
             document.getElementById('user-contract').value = "PJ";
             btnDel.style.display = 'none';
@@ -270,28 +267,28 @@
         const id = document.getElementById('user-id').value;
         const nome = document.getElementById('user-name').value;
         const senha = document.getElementById('user-pass').value;
-        const email = document.getElementById('user-email').value; // Opcional
         const funcao = document.getElementById('user-role').value;
         const contrato = document.getElementById('user-contract').value;
 
-        if(!nome || !senha) {
-            alert("Nome e Senha são obrigatórios.");
+        if(!id || !nome || !senha) {
+            alert("Preencha ID, Nome e Senha.");
             return;
         }
 
-        const payload = { nome, senha, email, funcao, contrato };
+        const payload = { id: parseInt(id), nome, senha, funcao, contrato };
         let error = null;
 
         const btn = document.querySelector('#modal-user .btn-save');
         btn.innerText = "Salvando...";
         btn.disabled = true;
 
-        if(id) {
-            // Update
+        // Se o campo ID estiver desabilitado, é Edição. Se estiver habilitado, é Criação.
+        if(document.getElementById('user-id').disabled) {
+            // UPDATE
             const res = await _supabase.from('usuarios').update(payload).eq('id', id);
             error = res.error;
         } else {
-            // Create (O Banco gera o ID)
+            // CREATE (Insert)
             const res = await _supabase.from('usuarios').insert(payload);
             error = res.error;
         }
@@ -300,10 +297,11 @@
         btn.disabled = false;
 
         if(error) {
-            alert("Erro ao salvar: " + error.message);
+            if(error.code === '23505') alert("Erro: Já existe um usuário com este ID.");
+            else alert("Erro ao salvar: " + error.message);
         } else {
             fecharModal();
-            loadUsers(); // Recarrega para mostrar o novo ID
+            loadUsers(); // Recarrega lista
         }
     }
 
