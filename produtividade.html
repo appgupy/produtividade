@@ -4,168 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Produtividade</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="assets/css/style.css">
+    
     <style>
-        /* --- ESTILO GUPY (Identidade Visual) --- */
-        :root { 
-            --primary: #0045d0;    /* Azul Institucional */
-            --accent: #2662ea;     /* Azul Vibrante */
-            --nav: #0d1b2a;        /* Azul Noite */
-            
-            --success: #00d09e; 
-            --danger: #ef4444;
-            --warning: #f59e0b;
-
-            /* Categorias */
-            --clt: #0077b6; --pj: #00b4d8; 
-            --fifo: #f59e0b; --gt: #6b7280; 
-            --gp: #8b5cf6; --fc: #ec4899;
-
-            --bg: #f3f5f8;         
-            --card: #ffffff; 
-            --border: #e2e8f0;
-            --text-main: #1f2937;
-            --text-muted: #64748b;
-            
-            --zebra-even: #f8fafc;
-            --zebra-hover: #eff6ff;
-        }
-        
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding-top: 80px; color: var(--text-main); }
-
-        /* NAVBAR */
-        .navbar { position: fixed; top: 0; left: 0; right: 0; height: 70px; background: var(--nav); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
-        .nav-left { display: flex; align-items: center; gap: 40px; }
-        .brand { cursor: pointer; line-height: 1.1; }
-        .brand .big { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.5px; color: white; }
-        .brand .big span { color: var(--accent); }
-        
-        .nav-links { display: flex; gap: 30px; }
-        .nav-item { color: #94a3b8; text-decoration: none; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: 0.3s; padding-bottom: 23px; border-bottom: 3px solid transparent; }
-        .nav-item:hover, .nav-item.active { color: white; border-bottom-color: var(--accent); }
-
-        .nav-tools { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); padding: 6px 15px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); }
-        .nav-tools select, .nav-tools input { background: transparent; border: none; color: white; font-size: 0.85rem; font-weight: 500; outline: none; cursor: pointer; }
-        .nav-tools option { background: var(--nav); }
-
-        /* AREA DO USUARIO */
-        .user-area { text-align: right; border-left: 1px solid rgba(255,255,255,0.2); padding-left: 20px; display: flex; flex-direction: column; justify-content: center; }
-        .user-name { font-weight: 600; font-size: 0.85rem; color: white; }
-        .logout-btn { color: #fca5a5; font-size: 0.7rem; cursor: pointer; font-weight: 600; transition: 0.2s; }
-        
-        .btn-import { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(38, 98, 234, 0.2); }
-        .btn-import:hover { background: #1d4ed8; transform: translateY(-1px); }
-
-        .container { max-width: 1400px; margin: 0 auto; padding: 30px; }
-
-        /* MINI PAINEL */
-        .dynamic-panel { background: var(--card); border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); border: 1px solid var(--border); border-top: 4px solid var(--primary); }
-        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
-        .panel-header h2 { color: var(--nav); font-size: 1.1rem; margin: 0; font-weight: 700; }
-        
-        .panel-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
-        .panel-column { display: flex; flex-direction: column; gap: 20px; padding: 0 25px; border-right: 1px solid var(--border); }
-        .panel-column:last-child { border-right: none; }
-        
-        .stat-row { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; }
-        .stat-item { display: flex; flex-direction: column; }
-        .stat-item.right { text-align: right; }
-
-        .label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 5px; letter-spacing: 0.5px; }
-        .value { font-size: 1.4rem; font-weight: 700; color: var(--nav); line-height: 1; }
-        .value.small-val { font-size: 1.1rem; opacity: 0.9; }
-
+        /* Estilos específicos desta página */
         .txt-clt { color: var(--clt); } .txt-pj { color: var(--pj); }
         .txt-fifo { color: var(--fifo); } .txt-gt { color: var(--gt); }
         .txt-gp { color: var(--gp); } .txt-fc { color: var(--fc); }
-
-        /* TABELA */
-        .table-wrap { background: var(--card); border-radius: 8px; border: 1px solid var(--border); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 1100px; }
-        th { background: #f8fafc; padding: 15px 20px; text-align: left; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.7rem; border-bottom: 1px solid var(--border); }
-        td { padding: 12px 20px; border-bottom: 1px solid var(--border); color: var(--text-main); }
-        
-        tbody tr.data-row:nth-child(even) { background-color: var(--zebra-even); }
-        tbody tr.data-row:hover { background-color: var(--zebra-hover); }
-        
+        .header-repeated th { background: #e2e8f0; color: #475569; padding: 8px 20px; font-size: 0.65rem; border-bottom: 1px solid #cbd5e1; }
         .divider-row { background: var(--nav) !important; }
         .divider-row td { color: white !important; font-weight: 700; font-size: 0.85rem; padding: 10px 20px; }
-        
-        .header-repeated th { background: #e2e8f0; color: #475569; padding: 8px 20px; font-size: 0.65rem; border-bottom: 1px solid #cbd5e1; }
-        
-        .badge { padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 0.7rem; color: white; display: inline-block; }
-        .hidden { display: none !important; }
-        
         #import-log { position: fixed; bottom: 20px; right: 20px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 2000; border-left: 5px solid var(--success); display: none; min-width: 300px; }
     </style>
 </head>
 <body>
 
-<nav class="navbar">
-    <div class="nav-left">
-        <div class="brand" onclick="location.reload()">
-            <div class="big">PRODUTIVIDADE<span>.</span></div>
-        </div>
-        <div class="nav-links">
-            <a href="gestao.html" class="nav-item">Gestão</a>
-            <a href="produtividade.html" class="nav-item active">Produtividade</a>
-            <a href="performance.html" class="nav-item">Performance</a>
-            <a href="consolidado.html" class="nav-item">Consolidado</a>
-            <a href="minha_area.html" class="nav-item">Minha Área</a>
-        </div>
+<div style="position: fixed; top: 15px; right: 250px; z-index: 1100; display:flex; gap:10px;">
+    <div class="nav-tools" style="background: rgba(255,255,255,0.1); padding: 6px 15px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); display:flex; gap:10px;">
+        <select id="view-selector" onchange="ajustarSeletores()" style="background:transparent; border:none; color:white; font-weight:600;">
+            <option value="dia" style="color:#333">🔍 Dia</option>
+            <option value="semana" style="color:#333">📅 Semana</option>
+            <option value="mes" style="color:#333">📊 Mês</option>
+        </select>
+        <div style="width:1px; height:15px; background:rgba(255,255,255,0.3); margin-top:4px;"></div>
+        <input type="month" id="select-mes" class="hidden" onchange="sincronizarMes()" style="background:transparent; border:none; color:white;">
+        <input type="date" id="select-dia" onchange="carregarDados()" style="background:transparent; border:none; color:white;">
+        <select id="select-semana" class="hidden" onchange="alternarVisao()" style="background:transparent; border:none; color:white;">
+            <option value="1" style="color:#333">Sem 1</option><option value="2" style="color:#333">Sem 2</option><option value="3" style="color:#333">Sem 3</option><option value="4" style="color:#333">Sem 4</option><option value="5" style="color:#333">Sem 5</option>
+        </select>
     </div>
-    <div style="display:flex; align-items:center; gap:20px;">
-        <div class="nav-tools">
-            <select id="view-selector" onchange="ajustarSeletores()">
-                <option value="dia">🔍 Dia</option>
-                <option value="semana">📅 Semana</option>
-                <option value="mes">📊 Mês</option>
-            </select>
-            <div style="width:1px; height:15px; background:rgba(255,255,255,0.3);"></div>
-            <input type="month" id="select-mes" class="hidden" onchange="sincronizarMes()">
-            <input type="date" id="select-dia" onchange="carregarDados()">
-            <select id="select-semana" class="hidden" onchange="alternarVisao()">
-                <option value="1">Sem 1</option><option value="2">Sem 2</option><option value="3">Sem 3</option><option value="4">Sem 4</option><option value="5">Sem 5</option>
-            </select>
-        </div>
-        <button class="btn-import" onclick="document.getElementById('excel-files').click()">Importar</button>
-        <input type="file" id="excel-files" accept=".xlsx" multiple class="hidden" onchange="importarArquivos()">
-        <div class="user-area">
-            <span id="user-display" class="user-name">Carregando...</span>
-            <span class="logout-btn" onclick="logout()">Sair</span>
-        </div>
-    </div>
-</nav>
+    <button onclick="document.getElementById('excel-files').click()" style="background: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: 600; cursor: pointer;">Importar</button>
+    <input type="file" id="excel-files" accept=".xlsx" multiple class="hidden" onchange="importarArquivos()">
+</div>
 
 <div class="container">
-    <div id="panel-contexto" class="dynamic-panel">
-        <div class="panel-header">
-            <h2 id="panel-titulo">Visão Geral</h2>
+    <div id="panel-contexto" class="dynamic-panel" style="background: var(--card); border-radius: 8px; padding: 25px; margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); border: 1px solid var(--border); border-top: 4px solid var(--primary);">
+        <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 15px;">
+            <h2 id="panel-titulo" style="color: var(--nav); font-size: 1.1rem; margin: 0; font-weight: 700;">Visão Geral</h2>
             <span id="panel-info-extra" style="font-size:0.75rem; color: var(--text-muted); font-weight:600;">-</span>
         </div>
-        <div class="panel-grid">
-            <div class="panel-column">
-                <div class="stat-row"><div class="stat-item"><span class="label">Total Geral</span><span class="value" id="p-total">0</span></div><div class="stat-item right"><span class="label">Média Time</span><span class="value small-val" id="p-media">0</span></div></div>
-                <div class="stat-row"><div class="stat-item"><span class="label">Assistentes</span><span class="value" id="p-headcount">0</span></div><div class="stat-item right"><span class="label">Dias Trab.</span><span class="value small-val" id="p-dias">0</span></div></div>
-            </div>
-            <div class="panel-column">
-                <div class="stat-row"><div class="stat-item"><span class="label">Total CLT</span><span class="value txt-clt" id="p-clt">0</span></div><div class="stat-item right"><span class="label">Média CLT</span><span class="value small-val txt-clt" id="p-clt-media">0</span></div></div>
-                <div class="stat-row"><div class="stat-item"><span class="label">Total PJ</span><span class="value txt-pj" id="p-pj">0</span></div><div class="stat-item right"><span class="label">Média PJ</span><span class="value small-val txt-pj" id="p-pj-media">0</span></div></div>
-            </div>
-            <div class="panel-column">
-                <div class="stat-row"><div class="stat-item"><span class="label">Total FIFO</span><span class="value txt-fifo" id="p-fifo">0</span></div><div class="stat-item right"><span class="label">Méd. FIFO</span><span class="value small-val txt-fifo" id="p-fifo-media">0</span></div></div>
-                <div class="stat-row"><div class="stat-item"><span class="label">Total GT</span><span class="value txt-gt" id="p-gt">0</span></div><div class="stat-item right"><span class="label">Méd. GT</span><span class="value small-val txt-gt" id="p-gt-media">0</span></div></div>
-            </div>
-            <div class="panel-column">
-                <div class="stat-row"><div class="stat-item"><span class="label">Total GP</span><span class="value txt-gp" id="p-gp">0</span></div><div class="stat-item right"><span class="label">Méd. GP</span><span class="value small-val txt-gp" id="p-gp-media">0</span></div></div>
-                <div class="stat-row"><div class="stat-item"><span class="label">Total FC</span><span class="value txt-fc" id="p-fc">0</span></div><div class="stat-item right"><span class="label">Méd. FC</span><span class="value small-val txt-fc" id="p-fc-media">0</span></div></div>
-            </div>
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-label">Total Geral</div><div class="stat-value" id="p-total">0</div><div class="stat-sub">Média Time: <span id="p-media">0</span></div></div>
+            <div class="stat-card"><div class="stat-label">Total CLT</div><div class="stat-value txt-clt" id="p-clt">0</div><div class="stat-sub">Média: <span id="p-clt-media">0</span></div></div>
+            <div class="stat-card"><div class="stat-label">Total PJ</div><div class="stat-value txt-pj" id="p-pj">0</div><div class="stat-sub">Média: <span id="p-pj-media">0</span></div></div>
+            <div class="stat-card"><div class="stat-label">Assistentes</div><div class="stat-value" id="p-headcount">0</div><div class="stat-sub">Dias Trab: <span id="p-dias">0</span></div></div>
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
+             <div><span class="stat-label">FIFO</span> <b class="txt-fifo" id="p-fifo">0</b></div>
+             <div><span class="stat-label">GT</span> <b class="txt-gt" id="p-gt">0</b></div>
+             <div><span class="stat-label">GP</span> <b class="txt-gp" id="p-gp">0</b></div>
+             <div><span class="stat-label">FC</span> <b class="txt-fc" id="p-fc">0</b></div>
         </div>
     </div>
 
-    <div class="table-wrap">
+    <div class="table-wrap" style="background: var(--card); border-radius: 8px; border: 1px solid var(--border); overflow-x: auto;">
         <table>
             <thead id="main-thead">
                 <tr>
@@ -186,26 +83,19 @@
     <button onclick="this.parentElement.style.display='none'" style="margin-top:15px; width:100%; padding:10px; border:none; background:var(--nav); color:white; cursor:pointer; border-radius:6px; font-weight:600;">Fechar</button>
 </div>
 
+<script src="assets/js/config.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/layout.js"></script>
+
 <script>
-    const SB_URL = "https://glqrpsyjwozvislyxapj.supabase.co";
-    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdscXJwc3lqd296dmlzbHl4YXBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyNTQyOTgsImV4cCI6MjA4MTgzMDI5OH0.etzcmIHgPcGC12HwZPTU2u0DLtJdF3XTBSYW38O7S-w";
-    const _supabase = supabase.createClient(SB_URL, SB_KEY);
     let dadosGlobais = [], metasGlobais = [];
 
-    const sessao = JSON.parse(localStorage.getItem('usuario'));
-    if(!sessao) window.location.href = 'index.html';
-    document.getElementById('user-display').innerText = sessao.nome;
-
-    // --- INICIALIZAÇÃO COM DATA DE ONTEM ---
+    // Inicialização D-1
     const hoje = new Date();
     const ontem = new Date(hoje);
-    ontem.setDate(ontem.getDate() - 1); // Subtrai 1 dia
-
-    // Ajusta formato para o input (YYYY-MM-DD)
+    ontem.setDate(ontem.getDate() - 1);
     document.getElementById('select-dia').value = ontem.toISOString().substring(0,10);
     document.getElementById('select-mes').value = ontem.toISOString().substring(0,7);
-
-    function logout() { localStorage.removeItem('usuario'); window.location.href = 'index.html'; }
 
     function sincronizarMes() {
         const mesSelected = document.getElementById('select-mes').value;
@@ -215,21 +105,15 @@
 
     function ajustarSeletores() {
         const v = document.getElementById('view-selector').value;
-        if (v === 'dia') {
-            document.getElementById('select-dia').classList.remove('hidden');
-            document.getElementById('select-semana').classList.add('hidden');
-            document.getElementById('select-mes').classList.add('hidden');
-        } else if (v === 'semana') {
-            document.getElementById('select-dia').classList.add('hidden');
-            document.getElementById('select-semana').classList.remove('hidden');
-            document.getElementById('select-mes').classList.remove('hidden');
-        } else {
-            document.getElementById('select-dia').classList.add('hidden');
-            document.getElementById('select-semana').classList.add('hidden');
-            document.getElementById('select-mes').classList.remove('hidden');
-        }
-        const mainThead = document.getElementById('main-thead');
-        if(v === 'dia') mainThead.style.display = 'table-header-group'; else mainThead.style.display = 'none';
+        const els = { dia: document.getElementById('select-dia'), sem: document.getElementById('select-semana'), mes: document.getElementById('select-mes') };
+        
+        els.dia.classList.add('hidden'); els.sem.classList.add('hidden'); els.mes.classList.add('hidden');
+        
+        if (v === 'dia') els.dia.classList.remove('hidden');
+        else if (v === 'semana') { els.sem.classList.remove('hidden'); els.mes.classList.remove('hidden'); }
+        else els.mes.classList.remove('hidden');
+        
+        document.getElementById('main-thead').style.display = (v === 'dia') ? 'table-header-group' : 'none';
         carregarDados();
     }
 
@@ -248,21 +132,23 @@
         alternarVisao();
     }
 
+    // ... (Copiar as funções processarEstatisticas, getWeekOfMonth, alternarVisao, zerarPainel, atualizarPainel) ...
+    // ... (Para economizar espaço na resposta, mantenha a lógica interna dessas funções igual ao código anterior) ...
+    
+    // ATENÇÃO: Cole aqui o restante das funções JS do arquivo anterior, 
+    // mas REMOVA as variáveis SB_URL, SB_KEY e a função logout(), pois já vêm dos scripts importados.
+
     function processarEstatisticas(todosDados) {
         let stats = {};
         const dadosOrdenados = [...todosDados].sort((a,b) => a.data_referencia.localeCompare(b.data_referencia));
-        
         dadosOrdenados.forEach(p => {
             if(!p.usuario_id) return;
             const uid = p.usuario_id;
             const wk = getWeekOfMonth(p.data_referencia);
-            
             if(!stats[uid]) stats[uid] = { m: 0, d: 0, s: {} };
             if(!stats[uid].s[wk]) stats[uid].s[wk] = { t: 0, d: 0 };
-            
             stats[uid].m += (p.quantidade || 0); stats[uid].d++;
             stats[uid].s[wk].t += (p.quantidade || 0); stats[uid].s[wk].d++;
-            
             p.stats_acum_sem = stats[uid].s[wk].t;
             p.stats_media_sem = (stats[uid].s[wk].t / stats[uid].s[wk].d).toFixed(0);
             p.stats_acum_mes = stats[uid].m;
@@ -270,7 +156,7 @@
         });
         return dadosOrdenados.reverse();
     }
-
+    
     function getWeekOfMonth(dateStr) {
         if(!dateStr) return 1;
         const date = new Date(dateStr + 'T12:00:00');
@@ -295,39 +181,20 @@
             filtrados = dadosCalculados;
             titulo = `Relatório Mensal`;
         }
-        
         filtrados.sort((a, b) => b.data_referencia.localeCompare(a.data_referencia) || (a.usuarios?.nome || "").localeCompare(b.usuarios?.nome || ""));
-        
         atualizarPainel(filtrados, titulo);
         renderizarTabela(filtrados, visao === 'dia');
     }
 
     function zerarPainel() {
-        document.getElementById('p-total').innerText = '0';
-        document.getElementById('p-media').innerText = '0';
-        document.getElementById('p-headcount').innerText = '0';
-        document.getElementById('p-dias').innerText = '0';
-        document.getElementById('p-clt').innerText = '0';
-        document.getElementById('p-clt-media').innerText = '0';
-        document.getElementById('p-pj').innerText = '0';
-        document.getElementById('p-pj-media').innerText = '0';
-        document.getElementById('p-fifo').innerText = '0';
-        document.getElementById('p-fifo-media').innerText = '0';
-        document.getElementById('p-gt').innerText = '0';
-        document.getElementById('p-gt-media').innerText = '0';
-        document.getElementById('p-gp').innerText = '0';
-        document.getElementById('p-gp-media').innerText = '0';
-        document.getElementById('p-fc').innerText = '0';
-        document.getElementById('p-fc-media').innerText = '0';
+        ['p-total','p-media','p-headcount','p-dias','p-clt','p-clt-media','p-pj','p-pj-media','p-fifo','p-gt','p-gp','p-fc'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.innerText = '0';
+        });
     }
 
     function atualizarPainel(dados, titulo) {
-        if(!dados || dados.length === 0) {
-            zerarPainel();
-            document.getElementById('panel-titulo').innerText = titulo;
-            return;
-        }
-
+        if(!dados || dados.length === 0) { zerarPainel(); document.getElementById('panel-titulo').innerText = titulo; return; }
         const todosValidos = dados.filter(p => p.usuario_id != null);
         const apenasAs = todosValidos.filter(p => p.usuarios?.funcao === 'Assistente');
         const total = todosValidos.reduce((a,b) => a + b.quantidade, 0);
@@ -335,8 +202,7 @@
         const head = new Set(apenasAs.map(p => p.usuario_id)).size || 1;
 
         document.getElementById('panel-titulo').innerText = titulo;
-        document.getElementById('panel-info-extra').innerText = `${head} Assistentes Ativos`;
-        
+        document.getElementById('panel-info-extra').innerText = `${head} Assistentes`;
         document.getElementById('p-total').innerText = total.toLocaleString();
         document.getElementById('p-media').innerText = (total / (numDias||1) / head).toFixed(0);
         document.getElementById('p-headcount').innerText = head;
@@ -355,13 +221,9 @@
         document.getElementById('p-pj-media').innerText = (tPj / (numDias||1) / headPj).toFixed(0);
 
         document.getElementById('p-fifo').innerText = todosValidos.reduce((a,b) => a + b.fifo, 0).toLocaleString();
-        document.getElementById('p-fifo-media').innerText = (todosValidos.reduce((a,b) => a + b.fifo, 0) / (numDias||1) / head).toFixed(0);
         document.getElementById('p-gt').innerText = todosValidos.reduce((a,b) => a + b.gradual_total, 0).toLocaleString();
-        document.getElementById('p-gt-media').innerText = (todosValidos.reduce((a,b) => a + b.gradual_total, 0) / (numDias||1) / head).toFixed(0);
         document.getElementById('p-gp').innerText = todosValidos.reduce((a,b) => a + b.gradual_parcial, 0).toLocaleString();
-        document.getElementById('p-gp-media').innerText = (todosValidos.reduce((a,b) => a + b.gradual_parcial, 0) / (numDias||1) / head).toFixed(0);
         document.getElementById('p-fc').innerText = todosValidos.reduce((a,b) => a + b.perfil_fc, 0).toLocaleString();
-        document.getElementById('p-fc-media').innerText = (todosValidos.reduce((a,b) => a + b.perfil_fc, 0) / (numDias||1) / head).toFixed(0);
     }
 
     function renderizarTabela(dados, isDia) {
@@ -371,25 +233,13 @@
                 <th style="text-align:center; color:var(--primary)">Produção</th>
                 <th>FIFO</th><th>G.T.</th><th>G.P.</th><th>P.FC</th>
                 <th>Acum. Sem.</th><th>Acum. Mês</th><th>Média Sem.</th><th>Média Mês</th><th>Status</th>
-            </tr>
-        `;
-
+            </tr>`;
         let html = '', lastD = '';
-        
-        if(!dados || dados.length === 0) {
-            document.getElementById('tabela-corpo').innerHTML = '<tr><td colspan="11" style="text-align:center; padding:30px; color:#64748b;">Nenhum dado encontrado para o período selecionado.</td></tr>';
-            return;
-        }
+        if(!dados || dados.length === 0) { document.getElementById('tabela-corpo').innerHTML = '<tr><td colspan="11" style="text-align:center; padding:30px;">Sem dados.</td></tr>'; return; }
 
         dados.forEach(p => {
             const dt = p.data_referencia.split('-').reverse().join('/');
-            
-            if(!isDia && dt !== lastD) { 
-                html += `<tr class="divider-row"><td colspan="11">📅 DATA: ${dt}</td></tr>`; 
-                html += headerHTML; 
-                lastD = dt; 
-            }
-
+            if(!isDia && dt !== lastD) { html += `<tr class="divider-row"><td colspan="11">📅 DATA: ${dt}</td></tr>`; html += headerHTML; lastD = dt; }
             const meta = metasGlobais.filter(m => m.usuario_id == p.usuario_id && m.data_inicio <= p.data_referencia).sort((a,b)=>b.id-a.id)[0];
             const metaV = meta ? meta.valor_meta : 0;
             const ating = metaV > 0 ? ((p.quantidade / metaV)*100).toFixed(0) : 0;
@@ -399,10 +249,7 @@
                 <td><b>${p.usuarios?.nome || p.usuario_id}</b></td>
                 <td style="text-align:center; color:var(--primary); font-weight:700">${p.quantidade}</td>
                 <td>${p.fifo}</td><td>${p.gradual_total}</td><td>${p.gradual_parcial}</td><td>${p.perfil_fc}</td>
-                <td>${p.stats_acum_sem || '-'}</td>
-                <td>${p.stats_acum_mes || '-'}</td>
-                <td>${p.stats_media_sem || '-'}</td>
-                <td>${p.stats_media_mes || '-'}</td>
+                <td>${p.stats_acum_sem || '-'}</td><td>${p.stats_acum_mes || '-'}</td><td>${p.stats_media_sem || '-'}</td><td>${p.stats_media_mes || '-'}</td>
                 <td><span class="badge" style="background:${corB}">${ating}%</span></td>
             </tr>`;
         });
