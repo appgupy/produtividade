@@ -13,7 +13,8 @@
     <style>
         .selected-row td { background:#eff6ff !important; color:var(--primary); font-weight:700; border-left: 4px solid var(--accent); }
         .hidden { display:none !important; }
-        .badge { min-width: 50px; } /* Ajuste para caber a % */
+        /* Ajuste para o badge de porcentagem caber melhor */
+        .badge { min-width: 55px; font-size: 0.75rem; }
     </style>
 </head>
 <body>
@@ -85,7 +86,7 @@
                         <th>Dias Trab.</th>
                         <th>Média Diária</th>
                         <th>Meta Total</th>
-                        <th>% Atingido</th> <th>Diferença</th>
+                        <th style="text-align:center">% Atingida</th> <th style="text-align:center">Diferença</th>
                     </tr>
                 </thead>
                 <tbody id="comparative-body"></tbody>
@@ -261,7 +262,7 @@
         lista.forEach((item, index) => {
             const isSelected = item.id == selectedUid;
             
-            // CÁLCULO DA PORCENTAGEM
+            // CÁLCULO DA PORCENTAGEM (CORRIGIDO AQUI)
             const percent = item.metaTotal > 0 ? ((item.total / item.metaTotal) * 100).toFixed(0) : 0;
             
             // Definição da cor do Badge
@@ -275,12 +276,12 @@
                 <tr class="${isSelected ? 'selected-row' : ''}">
                     <td>${index + 1}</td>
                     <td>${item.nome}</td>
-                    <td style="font-weight:700">${item.total.toLocaleString()}</td>
+                    <td>${item.total.toLocaleString()}</td>
                     <td>${item.diasCount}</td>
                     <td>${item.media}</td>
                     <td>${item.metaTotal.toLocaleString()}</td>
-                    <td><span class="badge" style="background:${color}">${percent}%</span></td>
-                    <td style="color:${diffColor}; font-weight:600;">${diff > 0 ? '+' : ''}${diff.toLocaleString()}</td>
+                    <td style="text-align:center"><span class="badge" style="background:${color}">${percent}%</span></td>
+                    <td style="text-align:center; color:${diffColor}; font-weight:600;">${diff > 0 ? '+' : ''}${diff.toLocaleString()}</td>
                 </tr>
             `;
         });
