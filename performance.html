@@ -13,7 +13,6 @@
     <style>
         .selected-row td { background:#eff6ff !important; color:var(--primary); font-weight:700; border-left: 4px solid var(--accent); }
         .hidden { display:none !important; }
-        /* Ajuste para o badge de porcentagem caber melhor */
         .badge { min-width: 55px; font-size: 0.75rem; }
     </style>
 </head>
@@ -86,7 +85,8 @@
                         <th>Dias Trab.</th>
                         <th>Média Diária</th>
                         <th>Meta Total</th>
-                        <th style="text-align:center">% Atingida</th> <th style="text-align:center">Diferença</th>
+                        <th style="text-align:center">% Atingida</th>
+                        <th style="text-align:center">Diferença</th>
                     </tr>
                 </thead>
                 <tbody id="comparative-body"></tbody>
@@ -101,7 +101,8 @@
                 <select id="matrix-year" onchange="carregarMatriz()"></select>
             </div>
         </div>
-        <div class="table-card" style="overflow-x:auto;">
+        
+        <div class="table-card scroll-top" style="overflow-x:auto;">
             <table id="matrix-table" style="min-width:1500px">
                 <thead>
                     <tr><th>NOME</th><th>JAN</th><th>FEV</th><th>MAR</th><th>ABR</th><th>MAI</th><th>JUN</th><th>JUL</th><th>AGO</th><th>SET</th><th>OUT</th><th>NOV</th><th>DEZ</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>H1</th><th>H2</th><th>ANUAL</th></tr>
@@ -228,7 +229,6 @@
 
         let lista = Object.values(stats).map(s => {
             const diasCount = s.dias.size || 1;
-            // Busca a meta válida para o período (aproximação pela meta mais recente no período)
             const userMeta = metas.find(m => m.usuario_id == s.id && m.data_inicio <= end)?.valor_meta || 650;
             const metaTotal = userMeta * diasCount;
             
@@ -262,13 +262,11 @@
         lista.forEach((item, index) => {
             const isSelected = item.id == selectedUid;
             
-            // CÁLCULO DA PORCENTAGEM (CORRIGIDO AQUI)
+            // CÁLCULO DA PORCENTAGEM
             const percent = item.metaTotal > 0 ? ((item.total / item.metaTotal) * 100).toFixed(0) : 0;
-            
-            // Definição da cor do Badge
             const color = percent >= 100 ? 'var(--success)' : 'var(--danger)';
             
-            // Diferença simples
+            // Diferença
             const diff = item.total - item.metaTotal;
             const diffColor = diff >= 0 ? 'var(--success)' : 'var(--danger)';
 
@@ -276,7 +274,7 @@
                 <tr class="${isSelected ? 'selected-row' : ''}">
                     <td>${index + 1}</td>
                     <td>${item.nome}</td>
-                    <td>${item.total.toLocaleString()}</td>
+                    <td style="font-weight:700">${item.total.toLocaleString()}</td>
                     <td>${item.diasCount}</td>
                     <td>${item.media}</td>
                     <td>${item.metaTotal.toLocaleString()}</td>
