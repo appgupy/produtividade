@@ -2,17 +2,26 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consolidado</title>
+    
     <link rel="icon" href="assets/img/logo.png" type="image/png">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="assets/css/style.css">
+    
     <style>
-        th:first-child { position: sticky; left: 0; background: var(--nav); color: white; z-index: 10; width: 250px; }
-        td:first-child { position: sticky; left: 0; background: #f8fafc; z-index: 5; border-right: 2px solid var(--border); font-weight: 600; text-align: left; }
+        /* Ajustes específicos de tabela larga */
+        th:first-child { position: sticky; left: 0; background: var(--nav); color: white; z-index: 10; width: 280px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
+        td:first-child { position: sticky; left: 0; background: #f8fafc; z-index: 5; border-right: 2px solid var(--border); font-weight: 700; text-align: left; color: var(--nav); box-shadow: 2px 0 5px rgba(0,0,0,0.05); }
+        
         .row-highlight td { background-color: #dcfce7 !important; color: #166534; font-weight: 700; }
-        .row-total-main td { font-weight: 800; color: var(--primary); border-top: 2px solid var(--border); }
-        .row-sub-header td { background-color: #eff6ff !important; font-weight: 700; color: var(--primary); text-align: left; }
+        .row-total-main td { font-weight: 800; color: var(--primary); border-top: 2px solid var(--border); background-color: #eff6ff !important; }
+        .row-sub-header td { background-color: #e2e8f0 !important; font-weight: 800; color: var(--text-muted); text-align: left; letter-spacing: 1px; font-size: 0.7rem; padding-top: 15px; }
+        
+        /* Loading */
+        .loading-overlay { position: absolute; top:0; left:0; right:0; bottom:0; background:rgba(255,255,255,0.8); display:none; justify-content:center; align-items:center; z-index:50; font-weight:600; color:var(--primary); }
     </style>
 </head>
 <body>
@@ -20,14 +29,14 @@
 <div class="container">
     <div class="top-controls">
         <div class="control-group">
-            <label>Tipo de Visão</label>
+            <label>Visão</label>
             <select id="period-type" onchange="atualizarOpcoes()">
                 <option value="dia">Dia Específico</option>
                 <option value="mes" selected>Mensal (Semanas)</option>
                 <option value="trimestre">Trimestral</option>
                 <option value="semestre">Semestral</option>
-                <option value="ano_mes">Anual (Por Mês)</option>
-                <option value="ano_tri">Anual (Por Trimestre)</option>
+                <option value="ano_mes">Anual (Meses)</option>
+                <option value="ano_tri">Anual (Trimestres)</option>
             </select>
         </div>
         <div class="control-group" id="group-year">
@@ -35,30 +44,49 @@
             <select id="year-selector" onchange="atualizarOpcoes()"></select>
         </div>
         <div class="control-group" style="flex:1.5">
-            <label id="dynamic-label">Selecione o Período</label>
+            <label id="dynamic-label">Período</label>
             <select id="period-value" onchange="carregarRelatorio()"></select>
             <input type="date" id="date-picker" class="hidden" onchange="carregarRelatorio()">
         </div>
     </div>
 
-    <div class="dynamic-panel" style="background:var(--card); padding:20px; border-radius:8px; margin-bottom:20px; border-top:4px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+    <div class="dynamic-panel" style="background:var(--card); padding:20px; border-radius:8px; margin-bottom:20px; border-top:4px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); position:relative;">
+        <div class="loading-overlay" id="loading">Carregando dados...</div>
+        
         <div class="panel-header" style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
             <h2 id="panel-title" style="margin:0; font-size:1.1rem; color:var(--nav);">Resumo Geral</h2>
         </div>
+        
         <div class="stats-grid">
-            <div class="stat-card"><div class="stat-label">Total Produzido</div><div class="stat-value" id="p-total">0</div></div>
-            <div class="stat-card"><div class="stat-label">Média do Time</div><div class="stat-value" id="p-media-time">0</div></div>
-            <div class="stat-card"><div class="stat-label">Média/Assistente (Base 17)</div><div class="stat-value" id="p-media-ind">0</div></div>
-            <div class="stat-card"><div class="stat-label">Assistentes Ativos</div><div class="stat-value" id="p-headcount">0</div></div>
+            <div class="stat-card">
+                <div class="stat-label">Total Produzido</div>
+                <div class="stat-value" id="p-total">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Média do Time</div>
+                <div class="stat-value" id="p-media-time">0</div>
+            </div>
+            <div class="stat-card" style="border-left: 4px solid var(--warning);">
+                <div class="stat-label">Média/Assistente (Base 17)</div>
+                <div class="stat-value" id="p-media-ind">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Assistentes Ativos</div>
+                <div class="stat-value" id="p-headcount">0</div>
+            </div>
         </div>
     </div>
 
-    <div class="table-card" style="overflow-x:auto;">
+    <div class="table-card" style="overflow-x:auto; position:relative; min-height:200px;">
+        <div class="loading-overlay" id="loading-table">Calculando...</div>
         <table id="main-table">
             <thead>
-                <tr id="table-header"><th>Indicadores</th></tr>
+                <tr id="table-header">
+                    <th>Indicadores</th>
+                    </tr>
             </thead>
-            <tbody id="table-body"></tbody>
+            <tbody id="table-body">
+                </tbody>
         </table>
     </div>
 </div>
@@ -68,20 +96,28 @@
 <script src="assets/js/layout.js"></script>
 
 <script>
-    const FIXED_HEADCOUNT = 17;
+    // --- CONSTANTES ---
+    const FIXED_HEADCOUNT = 17; // Regra de negócio fixa
 
-    document.addEventListener('DOMContentLoaded', init);
+    // --- INICIALIZAÇÃO ---
+    document.addEventListener('DOMContentLoaded', () => {
+        init();
+    });
 
     function init() {
         const yearSel = document.getElementById('year-selector');
         const currentYear = new Date().getFullYear();
+        
+        // Preenche Anos
         yearSel.innerHTML = '';
         for(let y = currentYear; y >= 2024; y--) {
             yearSel.innerHTML += `<option value="${y}">${y}</option>`;
         }
-        atualizarOpcoes();
+        
+        atualizarOpcoes(); // Dispara a configuração inicial
     }
 
+    // --- CONTROLE DE UI ---
     function atualizarOpcoes() {
         const type = document.getElementById('period-type').value;
         const valSel = document.getElementById('period-value');
@@ -89,6 +125,7 @@
         const groupYear = document.getElementById('group-year');
         const label = document.getElementById('dynamic-label');
 
+        // Reset visual
         valSel.innerHTML = '';
         valSel.classList.remove('hidden');
         datePicker.classList.add('hidden');
@@ -101,25 +138,39 @@
             valSel.classList.add('hidden');
             datePicker.classList.remove('hidden');
             groupYear.style.visibility = 'hidden';
-            label.innerText = 'Dia';
+            label.innerText = 'Selecione o Dia';
             if(!datePicker.value) datePicker.value = new Date().toISOString().substring(0, 10);
         } 
         else if(type === 'mes') {
-            label.innerText = 'Mês';
-            meses.forEach((m, i) => valSel.innerHTML += `<option value="${i+1}" ${i===mesAtual?'selected':''}>${m}</option>`);
+            label.innerText = 'Selecione o Mês';
+            meses.forEach((m, i) => {
+                // Seleciona o mês atual por padrão
+                const isSelected = i === mesAtual ? 'selected' : '';
+                valSel.innerHTML += `<option value="${i+1}" ${isSelected}>${m}</option>`;
+            });
         } 
         else if(type === 'trimestre') {
-            label.innerText = 'Trimestre';
-            valSel.innerHTML = '<option value="1">1º Tri</option><option value="2">2º Tri</option><option value="3">3º Tri</option><option value="4">4º Tri</option>';
-        }
+            label.innerText = 'Selecione o Trimestre';
+            valSel.innerHTML = `
+                <option value="1">1º Tri (Jan-Mar)</option>
+                <option value="2">2º Tri (Abr-Jun)</option>
+                <option value="3">3º Tri (Jul-Set)</option>
+                <option value="4">4º Tri (Out-Dez)</option>`;
+        } 
         else if(type === 'semestre') {
-            label.innerText = 'Semestre';
-            valSel.innerHTML = '<option value="1">1º Sem</option><option value="2">2º Sem</option>';
-        }
-        else {
+            label.innerText = 'Selecione o Semestre';
+            valSel.innerHTML = `
+                <option value="1">1º Sem (Jan-Jun)</option>
+                <option value="2">2º Sem (Jul-Dez)</option>`;
+        } 
+        else if(type === 'ano_mes') {
             label.innerText = 'Visualização';
-            valSel.innerHTML = '<option value="1">Ano Completo</option>';
+            valSel.innerHTML = `<option value="1">Ano Completo (Mensal)</option>`;
+        } else {
+            label.innerText = 'Visualização';
+            valSel.innerHTML = `<option value="1">Ano Completo (Trimestral)</option>`;
         }
+        
         carregarRelatorio();
     }
 
@@ -132,6 +183,7 @@
             start = end = document.getElementById('date-picker').value;
         } else if(type === 'mes') {
             const m = document.getElementById('period-value').value;
+            // Pega o último dia do mês corretamente
             start = `${year}-${m.toString().padStart(2,'0')}-01`;
             end = `${year}-${m.toString().padStart(2,'0')}-${new Date(year, m, 0).getDate()}`;
         } else if(type === 'trimestre') {
@@ -145,27 +197,46 @@
             start = s===1 ? `${year}-01-01` : `${year}-07-01`;
             end = s===1 ? `${year}-06-30` : `${year}-12-31`;
         } else {
-            start = `${year}-01-01`; end = `${year}-12-31`;
+            start = `${year}-01-01`; 
+            end = `${year}-12-31`;
         }
         return { start, end, type };
     }
 
+    // --- CARREGAMENTO DE DADOS ---
     async function carregarRelatorio() {
         const { start, end, type } = getRange();
         if(!start) return;
 
+        // Feedback Visual
+        document.getElementById('loading').style.display = 'flex';
+        document.getElementById('loading-table').style.display = 'flex';
+
         // Atualiza Título
-        const titulo = type === 'dia' ? `Resumo de ${start.split('-').reverse().join('/')}` : `Consolidado ${document.getElementById('year-selector').value}`;
+        let titulo = '';
+        if(type === 'dia') titulo = `Resumo do dia ${start.split('-').reverse().join('/')}`;
+        else titulo = `Consolidado ${document.getElementById('year-selector').value}`;
         document.getElementById('panel-title').innerText = titulo;
 
-        const { data: dados } = await _supabase.from('producao')
-            .select('*, usuarios(*)')
+        // Busca no Supabase
+        const { data: dados, error } = await _supabase
+            .from('producao')
+            .select('*, usuarios(funcao, contrato)')
             .gte('data_referencia', start)
             .lte('data_referencia', end);
 
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('loading-table').style.display = 'none';
+
+        if(error) {
+            console.error(error);
+            alert('Erro ao buscar dados.');
+            return;
+        }
+
         if(!dados || dados.length === 0) {
             zerarPainel();
-            document.getElementById('table-body').innerHTML = '<tr><td colspan="100" style="text-align:center; padding:30px">Sem dados no período.</td></tr>';
+            document.getElementById('table-body').innerHTML = '<tr><td colspan="100%" style="text-align:center; padding:30px; color:#64748b;">Nenhum dado encontrado para o período selecionado.</td></tr>';
             document.getElementById('table-header').innerHTML = '<th>Indicadores</th><th>-</th>';
             return;
         }
@@ -173,25 +244,35 @@
         processarTabela(dados, type);
     }
 
+    // --- MOTOR DE CÁLCULO ---
     function getBucket(dateStr, type) {
+        // Converte string YYYY-MM-DD para data segura
         const date = new Date(dateStr + 'T12:00:00');
+        
         if(type === 'dia') return 1;
+        
         if(type === 'mes') { 
-            // Calcula semana do mês (1 a 5)
+            // Calcula a semana do mês
             const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-            return Math.ceil((date.getDate() + firstDay.getDay()) / 7);
+            const week = Math.ceil((date.getDate() + firstDay.getDay()) / 7);
+            return week; // Retorna 1, 2, 3, 4, 5 ou 6
         }
-        if(type === 'trimestre') return (date.getMonth() % 3) + 1; 
-        if(type === 'semestre') return (date.getMonth() % 6) + 1; 
-        if(type === 'ano_tri') return Math.floor(date.getMonth() / 3) + 1; 
-        if(type === 'ano_mes') return date.getMonth() + 1; 
+        
+        if(type === 'trimestre') return (date.getMonth() % 3) + 1; // 1 a 3
+        if(type === 'semestre') return (date.getMonth() % 6) + 1; // 1 a 6
+        if(type === 'ano_tri') return Math.floor(date.getMonth() / 3) + 1; // 1 a 4
+        if(type === 'ano_mes') return date.getMonth() + 1; // 1 a 12
+        
         return 1;
     }
 
     function getColumnNames(type) {
         if(type === 'dia') return ['Dia Selecionado'];
+        // Garantimos 5 colunas para o mês. Se houver semana 6, somamos na 5.
         if(type === 'mes') return ['Semana 1','Semana 2','Semana 3','Semana 4','Semana 5'];
+        
         const mNames = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+        
         if(type === 'trimestre') {
             const t = parseInt(document.getElementById('period-value').value);
             const start = (t-1)*3;
@@ -203,67 +284,82 @@
         }
         if(type === 'ano_tri') return ['1º Tri','2º Tri','3º Tri','4º Tri'];
         if(type === 'ano_mes') return mNames;
-        return [];
+        
+        return ['Total'];
     }
 
     function createEmptyStat() {
-        return { assistentes: new Set(), assistentesCLT: new Set(), assistentesPJ: new Set(), dias: new Set(), fifo:0, gt:0, gp:0, fc:0, total:0, totalCLT:0, totalPJ:0 };
+        return { 
+            assistentes: new Set(), 
+            assistentesCLT: new Set(), 
+            assistentesPJ: new Set(), 
+            dias: new Set(), 
+            fifo:0, gt:0, gp:0, fc:0, total:0, totalCLT:0, totalPJ:0 
+        };
     }
 
     function processarTabela(dados, type) {
         const cols = getColumnNames(type);
-        const numCols = cols.length;
+        const numCols = cols.length; // Ex: Mês = 5
         let stats = {};
+        
+        // Inicializa buckets para cada coluna + totalizador (99)
         for(let i=1; i<=numCols; i++) stats[i] = createEmptyStat();
-        stats[99] = createEmptyStat(); // Totalizador
+        stats[99] = createEmptyStat(); 
 
         dados.forEach(d => {
+            // Filtra: Tem que ter usuário e ser Assistente
             if(!d.usuario_id || !d.usuarios) return;
             if(d.usuarios.funcao !== 'Assistente') return;
             
-            const b = getBucket(d.data_referencia, type);
-            // Se o bucket calculado for maior que o numero de colunas (ex: semana 6), ignora ou joga na ultima
-            const bucketIndex = b > numCols ? numCols : b;
+            let b = getBucket(d.data_referencia, type);
             
-            const buckets = [bucketIndex, 99];
+            // PROTEÇÃO CONTRA ESTOURO DE COLUNAS
+            // Se for semana 6, joga na semana 5
+            if(b > numCols) b = numCols;
             
-            buckets.forEach(idx => {
+            // Adiciona ao bucket específico (b) e ao totalizador (99)
+            [b, 99].forEach(idx => {
                 const s = stats[idx];
                 s.assistentes.add(d.usuario_id);
                 s.dias.add(d.data_referencia);
-                s.fifo += d.fifo || 0; 
-                s.gt += d.gradual_total || 0; 
-                s.gp += d.gradual_parcial || 0; 
-                s.fc += d.perfil_fc || 0; 
-                s.total += d.quantidade || 0;
+                s.fifo += (d.fifo || 0); 
+                s.gt += (d.gradual_total || 0); 
+                s.gp += (d.gradual_parcial || 0); 
+                s.fc += (d.perfil_fc || 0); 
+                s.total += (d.quantidade || 0);
                 
                 if(d.usuarios.contrato && d.usuarios.contrato.includes('CLT')) { 
-                    s.assistentesCLT.add(d.usuario_id); s.totalCLT += d.quantidade || 0; 
+                    s.assistentesCLT.add(d.usuario_id); s.totalCLT += (d.quantidade || 0); 
                 } else { 
-                    s.assistentesPJ.add(d.usuario_id); s.totalPJ += d.quantidade || 0; 
+                    s.assistentesPJ.add(d.usuario_id); s.totalPJ += (d.quantidade || 0); 
                 }
             });
         });
 
-        // Monta Cabeçalho
+        // --- RENDERIZAÇÃO DA TABELA ---
         const hRow = document.getElementById('table-header');
         hRow.innerHTML = '<th>Indicadores</th>' + cols.map(c => `<th>${c}</th>`).join('') + '<th>Total Período</th>';
         
         const colIndices = []; 
         for(let i=1; i<=numCols; i++) colIndices.push(i); 
-        colIndices.push(99);
+        colIndices.push(99); // Índice do total
 
-        // Helper para criar linha HTML
+        // Função auxiliar para criar linhas
         const createRow = (label, key, isCalc = false, highlight = false, isMainTotal = false) => {
             let tr = `<tr class="${highlight ? 'row-highlight' : ''} ${isMainTotal ? 'row-total-main' : ''}"><td>${label}</td>`;
+            
             colIndices.forEach(idx => {
                 const s = stats[idx];
                 let val = 0;
+                
                 if(!isCalc) {
+                    // Valores diretos (Somas ou Contagens)
                     if(key === 'assistentes') val = s.assistentes.size;
                     else if(key === 'dias') val = s.dias.size;
                     else val = s[key];
                 } else {
+                    // Valores Calculados (Médias)
                     const dias = s.dias.size || 1;
                     const headReal = s.assistentes.size || 1;
                     const headFixed = FIXED_HEADCOUNT;
@@ -274,6 +370,8 @@
                     else if(key === 'clt_media') val = s.totalCLT / dias / (s.assistentesCLT.size || 1);
                     else if(key === 'pj_media') val = s.totalPJ / dias / (s.assistentesPJ.size || 1);
                 }
+                
+                // Formata número (sem decimais e com separador de milhar)
                 tr += `<td>${Math.round(val || 0).toLocaleString()}</td>`;
             });
             tr += '</tr>';
@@ -283,31 +381,35 @@
         let html = '';
         html += createRow('Total de assistentes ativos', 'assistentes');
         html += createRow('Dias trabalhados', 'dias');
-        html += createRow('FIFO', 'fifo');
-        html += createRow('Gradual Parcial', 'gp');
-        html += createRow('Gradual Total', 'gt');
-        html += createRow('Perfil FC', 'fc');
+        html += createRow('Total FIFO', 'fifo');
+        html += createRow('Total Gradual Parcial', 'gp');
+        html += createRow('Total Gradual Total', 'gt');
+        html += createRow('Total Perfil FC', 'fc');
+        
         html += createRow('Total de documentos validados', 'total', false, false, true); 
-        html += createRow('Média Diária (Time)', 'validacao_diaria', true);
+        html += createRow('Total validação diária (Dias úteis)', 'validacao_diaria', true);
+        
         html += createRow(`Média por Assistente (Base ${FIXED_HEADCOUNT})`, 'media_assistente', true);
         html += createRow(`Média Diária por Assistente (Base ${FIXED_HEADCOUNT})`, 'media_validacao_assistente', true, true); 
         
+        // Seção CLT
         html += `<tr class="row-sub-header"><td colspan="${numCols + 2}">ANÁLISE CLT</td></tr>`;
         html += createRow('CLT - Total Produção', 'totalCLT');
         html += createRow('CLT - Média Diária por Pessoa', 'clt_media', true);
         
+        // Seção PJ
         html += `<tr class="row-sub-header"><td colspan="${numCols + 2}">ANÁLISE PJ</td></tr>`;
         html += createRow('PJ - Total Produção', 'totalPJ');
         html += createRow('PJ - Média Diária por Pessoa', 'pj_media', true);
 
         document.getElementById('table-body').innerHTML = html;
 
-        // Atualiza Cards do Topo
+        // --- ATUALIZA CARDS DO TOPO ---
         const t = stats[99];
-        const dias = t.dias.size || 1;
+        const diasTotal = t.dias.size || 1;
         document.getElementById('p-total').innerText = t.total.toLocaleString();
-        document.getElementById('p-media-time').innerText = Math.round(t.total / dias).toLocaleString();
-        document.getElementById('p-media-ind').innerText = Math.round(t.total / dias / FIXED_HEADCOUNT).toLocaleString();
+        document.getElementById('p-media-time').innerText = Math.round(t.total / diasTotal).toLocaleString();
+        document.getElementById('p-media-ind').innerText = Math.round(t.total / diasTotal / FIXED_HEADCOUNT).toLocaleString();
         document.getElementById('p-headcount').innerText = t.assistentes.size;
     }
 
