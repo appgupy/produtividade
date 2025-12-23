@@ -11,38 +11,35 @@
     <link rel="stylesheet" href="assets/css/style.css">
     
     <style>
-        /* GRID LAYOUT */
+        /* ESTILOS ESPECÍFICOS DA GESTÃO */
         .management-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
         
-        /* CARDS */
-        .card-form { background: var(--card); padding: 25px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 5px rgba(0,0,0,0.02); height: 100%; }
+        .card-form { background: var(--card); padding: 25px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 5px rgba(0,0,0,0.02); height: 100%; display: flex; flex-direction: column; }
         .card-header { font-size: 1rem; font-weight: 700; color: var(--nav); margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         
-        /* FORM ELEMENTS */
         .form-row { display: flex; gap: 15px; margin-bottom: 15px; }
         .form-group { flex: 1; display: flex; flex-direction: column; gap: 5px; }
         .form-group label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
         
-        /* BUTTONS */
         .btn-save { background: var(--success); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.2s; font-size: 0.9rem; }
         .btn-save:hover { background: #059669; }
         
-        .btn-add { background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: 600; }
+        .btn-add { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: 600; }
         .btn-add:hover { background: var(--accent); }
 
-        .btn-action { background: transparent; border: 1px solid var(--border); border-radius: 4px; padding: 4px 8px; cursor: pointer; color: var(--text-muted); transition: 0.2s; font-size: 0.8rem; }
+        .btn-action { background: white; border: 1px solid var(--border); border-radius: 4px; padding: 6px 12px; cursor: pointer; color: var(--nav); transition: 0.2s; font-size: 0.8rem; font-weight: 600; }
         .btn-action:hover { border-color: var(--primary); color: var(--primary); background: #eff6ff; }
 
-        /* LISTS */
-        .list-container { max-height: 500px; overflow-y: auto; padding-right: 5px; }
-        .list-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.85rem; align-items: center; transition: 0.2s; }
-        .list-item:hover { background: var(--zebra-hover); }
+        .list-container { flex: 1; overflow-y: auto; padding-right: 5px; min-height: 300px; max-height: 500px; }
+        .list-item { display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid var(--border); font-size: 0.85rem; align-items: center; transition: 0.2s; }
+        .list-item:hover { background: #f8fafc; }
         
         .role-tag { font-size: 0.65rem; padding: 2px 8px; border-radius: 4px; background: #e2e8f0; color: #475569; font-weight: 600; margin-left: 5px; }
-        .role-clt { background: #dbeafe; color: var(--clt); }
-        .role-pj { background: #cffafe; color: var(--pj); }
+        .role-clt { background: #dbeafe; color: #1e40af; }
+        .role-pj { background: #cffafe; color: #0e7490; }
+        .id-badge { background: var(--nav); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; margin-right: 8px; }
 
-        /* MODAL STYLES */
+        /* MODAL */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
         .modal { background: white; width: 100%; max-width: 500px; border-radius: 12px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); animation: slideUp 0.3s ease; }
         .modal-title { font-size: 1.2rem; font-weight: 800; color: var(--nav); margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; display:flex; justify-content:space-between; }
@@ -59,7 +56,7 @@
     <div class="top-controls" style="justify-content: space-between; align-items: center;">
         <div>
             <h1 style="font-size:1.5rem; margin:0; color:var(--nav);">Painel de Gestão</h1>
-            <p style="margin:5px 0 0 0; color:var(--text-muted); font-size:0.9rem;">Configuração de Metas e Colaboradores</p>
+            <p style="margin:5px 0 0 0; color:var(--text-muted); font-size:0.9rem;">Gerencie Colaboradores e Metas</p>
         </div>
     </div>
 
@@ -67,7 +64,7 @@
         
         <div class="column">
             <div class="card-form">
-                <div class="card-header">🎯 Nova Meta / Alteração</div>
+                <div class="card-header">🎯 Configuração de Metas</div>
                 
                 <div class="form-row">
                     <div class="form-group">
@@ -77,7 +74,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Vigência (Início)</label>
+                        <label>Início Vigência</label>
                         <input type="date" id="meta-date">
                     </div>
                 </div>
@@ -91,9 +88,9 @@
 
                 <button class="btn-save" onclick="salvarMeta()">Gravar Meta</button>
 
-                <div style="margin-top: 30px;">
-                    <div class="card-header" style="font-size:0.9rem;">Histórico Recente</div>
-                    <div class="list-container" id="meta-list" style="max-height: 250px;">
+                <div style="margin-top: 30px; flex: 1; display: flex; flex-direction: column;">
+                    <div class="card-header" style="font-size:0.9rem; margin-bottom: 10px;">Histórico Recente</div>
+                    <div class="list-container" id="meta-list" style="max-height: 300px;">
                         </div>
                 </div>
             </div>
@@ -102,12 +99,12 @@
         <div class="column">
             <div class="card-form">
                 <div class="card-header">
-                    <span>👥 Quadro de Colaboradores <span class="badge bg-none" id="total-users">0</span></span>
-                    <button class="btn-add" onclick="abrirModalUsuario()">+ Novo</button>
+                    <span>👥 Equipe (<span id="total-users">0</span>)</span>
+                    <button class="btn-add" onclick="abrirModalUsuario()">+ Adicionar</button>
                 </div>
                 
                 <div style="margin-bottom:15px;">
-                    <input type="text" id="search-user" placeholder="Buscar por nome..." onkeyup="filtrarUsuarios()" style="padding:10px; font-size:0.85rem;">
+                    <input type="text" id="search-user" placeholder="Buscar por nome ou ID..." onkeyup="filtrarUsuarios()" style="padding:10px; font-size:0.85rem;">
                 </div>
 
                 <div class="list-container" id="user-list">
@@ -125,19 +122,24 @@
             <span class="close-modal" onclick="fecharModal()">&times;</span>
         </div>
         
-        <input type="hidden" id="user-id"> <div class="form-group" style="margin-bottom:15px;">
+        <div class="form-group" style="margin-bottom:15px;">
+            <label>ID do Sistema (Login)</label>
+            <input type="text" id="user-id-display" placeholder="Gerado automaticamente" disabled style="background:#f1f5f9; font-weight:700; color:var(--nav);">
+            <input type="hidden" id="user-id"> </div>
+
+        <div class="form-group" style="margin-bottom:15px;">
             <label>Nome Completo</label>
             <input type="text" id="user-name" placeholder="Ex: Maria Silva">
         </div>
 
         <div class="form-row">
             <div class="form-group">
-                <label>E-mail (Login)</label>
-                <input type="email" id="user-email" placeholder="maria@empresa.com">
+                <label>Senha de Acesso</label>
+                <input type="text" id="user-pass" placeholder="Defina uma senha">
             </div>
             <div class="form-group">
-                <label>Senha</label>
-                <input type="text" id="user-pass" placeholder="••••••">
+                <label>E-mail (Opcional)</label>
+                <input type="email" id="user-email" placeholder="Contato">
             </div>
         </div>
 
@@ -171,8 +173,9 @@
 <script src="assets/js/layout.js"></script>
 
 <script>
+    // Segurança: Apenas Gestora
     if (SESSAO_ATUAL.funcao !== 'Gestora') {
-        alert('Acesso restrito à gestão.');
+        alert('Acesso restrito.');
         window.location.href = 'produtividade.html';
     }
 
@@ -184,7 +187,7 @@
         document.getElementById('meta-date').value = new Date().toISOString().substring(0, 10);
     }
 
-    // --- GERENCIAMENTO DE USUÁRIOS ---
+    // --- CRUD USUÁRIOS ---
 
     async function loadUsers() {
         const { data: users, error } = await _supabase.from('usuarios').select('*').order('nome');
@@ -201,16 +204,19 @@
         
         lista.forEach(u => {
             const contratoClass = (u.contrato && u.contrato.includes('CLT')) ? 'role-clt' : 'role-pj';
-            // Escapar aspas para passar o objeto no onclick
+            // Prepara objeto para edição
             const userJson = JSON.stringify(u).replace(/"/g, '&quot;');
             
             html += `
                 <div class="list-item">
-                    <div style="display:flex; flex-direction:column;">
-                        <span style="font-weight:700; color:var(--nav);">${u.nome}</span>
-                        <div style="margin-top:2px;">
-                            <span class="role-tag" style="background:#f1f5f9; margin:0;">${u.funcao}</span>
-                            <span class="role-tag ${contratoClass}">${u.contrato || 'PJ'}</span>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span class="id-badge" title="ID de Login">#${u.id}</span>
+                        <div style="display:flex; flex-direction:column;">
+                            <span style="font-weight:700; color:var(--nav);">${u.nome}</span>
+                            <div style="margin-top:2px;">
+                                <span class="role-tag" style="background:#f1f5f9; margin:0;">${u.funcao}</span>
+                                <span class="role-tag ${contratoClass}">${u.contrato || 'PJ'}</span>
+                            </div>
                         </div>
                     </div>
                     <div>
@@ -222,30 +228,34 @@
         container.innerHTML = html;
     }
 
+    // Abertura do Modal (Criação ou Edição)
     function abrirModalUsuario(user = null) {
         const modal = document.getElementById('modal-user');
         const btnDel = document.getElementById('btn-delete');
+        const title = document.getElementById('modal-label');
         
         if (user) {
-            // Modo Edição
-            document.getElementById('modal-label').innerText = "Editar Colaborador";
+            // MODO EDIÇÃO
+            title.innerText = "Editar Colaborador";
             document.getElementById('user-id').value = user.id;
+            document.getElementById('user-id-display').value = user.id; // Mostra o ID
             document.getElementById('user-name').value = user.nome;
-            document.getElementById('user-email').value = user.email;
-            document.getElementById('user-pass').value = user.senha; // Exibe senha atual (simples)
+            document.getElementById('user-pass').value = user.senha;
+            document.getElementById('user-email').value = user.email || '';
             document.getElementById('user-role').value = user.funcao;
             document.getElementById('user-contract').value = user.contrato || 'PJ';
-            btnDel.style.display = 'block'; // Mostra botão excluir
+            btnDel.style.display = 'block';
         } else {
-            // Modo Criação
-            document.getElementById('modal-label').innerText = "Novo Colaborador";
+            // MODO CRIAÇÃO
+            title.innerText = "Novo Colaborador";
             document.getElementById('user-id').value = "";
+            document.getElementById('user-id-display').value = "Será gerado ao salvar";
             document.getElementById('user-name').value = "";
-            document.getElementById('user-email').value = "";
             document.getElementById('user-pass').value = "";
+            document.getElementById('user-email').value = "";
             document.getElementById('user-role').value = "Assistente";
             document.getElementById('user-contract').value = "PJ";
-            btnDel.style.display = 'none'; // Esconde botão excluir
+            btnDel.style.display = 'none';
         }
         
         modal.style.display = 'flex';
@@ -255,45 +265,54 @@
         document.getElementById('modal-user').style.display = 'none';
     }
 
+    // CREATE / UPDATE
     async function salvarUsuario() {
         const id = document.getElementById('user-id').value;
         const nome = document.getElementById('user-name').value;
-        const email = document.getElementById('user-email').value;
         const senha = document.getElementById('user-pass').value;
+        const email = document.getElementById('user-email').value; // Opcional
         const funcao = document.getElementById('user-role').value;
         const contrato = document.getElementById('user-contract').value;
 
-        if(!nome || !email || !senha) {
-            alert("Preencha os campos obrigatórios.");
+        if(!nome || !senha) {
+            alert("Nome e Senha são obrigatórios.");
             return;
         }
 
-        const payload = { nome, email, senha, funcao, contrato };
+        const payload = { nome, senha, email, funcao, contrato };
         let error = null;
+
+        const btn = document.querySelector('#modal-user .btn-save');
+        btn.innerText = "Salvando...";
+        btn.disabled = true;
 
         if(id) {
             // Update
             const res = await _supabase.from('usuarios').update(payload).eq('id', id);
             error = res.error;
         } else {
-            // Create
+            // Create (O Banco gera o ID)
             const res = await _supabase.from('usuarios').insert(payload);
             error = res.error;
         }
+
+        btn.innerText = "Salvar Dados";
+        btn.disabled = false;
 
         if(error) {
             alert("Erro ao salvar: " + error.message);
         } else {
             fecharModal();
-            loadUsers();
+            loadUsers(); // Recarrega para mostrar o novo ID
         }
     }
 
+    // DELETE
     async function excluirUsuario() {
         const id = document.getElementById('user-id').value;
         if(!id) return;
         
-        if(confirm("Tem certeza que deseja excluir este usuário? Todos os dados de produção vinculados poderão ficar órfãos.")) {
+        if(confirm(`Tem certeza que deseja excluir o usuário #${id}?`)) {
             const { error } = await _supabase.from('usuarios').delete().eq('id', id);
             if(error) alert("Erro: " + error.message);
             else {
@@ -303,7 +322,7 @@
         }
     }
 
-    // --- AUXILIARES E METAS ---
+    // --- FILTROS E METAS ---
 
     function populateSelect(lista) {
         const sel = document.getElementById('meta-user');
@@ -314,7 +333,10 @@
 
     function filtrarUsuarios() {
         const term = document.getElementById('search-user').value.toLowerCase();
-        const filtered = allUsers.filter(u => u.nome.toLowerCase().includes(term));
+        const filtered = allUsers.filter(u => 
+            u.nome.toLowerCase().includes(term) || 
+            String(u.id).includes(term)
+        );
         renderUsers(filtered);
     }
 
@@ -327,7 +349,7 @@
 
         const container = document.getElementById('meta-list');
         let html = '';
-        if(!metas || metas.length === 0) html = '<div style="padding:15px; text-align:center; font-size:0.8rem;">Nenhuma meta configurada.</div>';
+        if(!metas || metas.length === 0) html = '<div style="padding:15px; text-align:center; font-size:0.8rem; color:#999;">Nenhuma meta configurada.</div>';
         else {
             metas.forEach(m => {
                 const dataF = m.data_inicio.split('-').reverse().join('/');
@@ -335,7 +357,7 @@
                     <div class="list-item">
                         <div>
                             <span style="display:block; font-weight:700; color:var(--primary);">${m.usuarios?.nome || 'Ex-Colaborador'}</span>
-                            <span style="font-size:0.75rem; color:var(--text-muted);">Início: ${dataF}</span>
+                            <span style="font-size:0.75rem; color:var(--text-muted);">Vigência: ${dataF}</span>
                         </div>
                         <div style="font-size:1rem; font-weight:800; color:var(--nav);">
                             ${m.valor_meta}
@@ -354,7 +376,8 @@
 
         if(!uid || !data || !valor) return alert("Preencha todos os campos da meta!");
 
-        const btn = document.querySelector('.btn-save'); // Pega o primeiro btn-save (da meta)
+        const btn = document.querySelector('.card-form .btn-save'); 
+        const txt = btn.innerText;
         btn.innerText = "Salvando...";
         btn.disabled = true;
 
@@ -364,8 +387,13 @@
         else {
             document.getElementById('meta-value').value = ''; 
             await loadMetas(); 
+            btn.style.background = 'var(--primary)';
             btn.innerText = "Salvo!";
-            setTimeout(() => { btn.innerText = "Gravar Meta"; btn.disabled = false; }, 2000);
+            setTimeout(() => { 
+                btn.innerText = txt; 
+                btn.style.background = '';
+                btn.disabled = false; 
+            }, 2000);
         }
     }
 
