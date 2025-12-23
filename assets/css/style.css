@@ -1,11 +1,28 @@
 :root { 
-    --primary: #0045d0; --accent: #2662ea; --nav: #0d1b2a;
-    --success: #00d09e; --danger: #ef4444; --warning: #f59e0b;
-    --clt: #0077b6; --pj: #00b4d8; --fifo: #f59e0b; 
-    --gt: #6b7280; --gp: #8b5cf6; --fc: #ec4899;
-    --bg: #f3f5f8; --card: #ffffff; --border: #e2e8f0;
-    --text-main: #1f2937; --text-muted: #64748b;
-    --zebra-even: #f8fafc; --zebra-hover: #eff6ff;
+    /* Paleta de Cores */
+    --primary: #0045d0;    /* Azul Institucional */
+    --accent: #2662ea;     /* Azul Vibrante */
+    --nav: #0d1b2a;        /* Azul Escuro (Navbar) */
+    
+    --success: #00d09e; 
+    --danger: #ef4444;
+    --warning: #f59e0b;
+
+    /* Categorias */
+    --clt: #0077b6; --pj: #00b4d8; 
+    --fifo: #f59e0b; --gt: #6b7280; 
+    --gp: #8b5cf6; --fc: #ec4899;
+
+    /* Estrutura */
+    --bg: #f3f5f8;         
+    --card: #ffffff; 
+    --border: #e2e8f0;
+    --text-main: #1f2937;
+    --text-muted: #64748b;
+    
+    /* Tabelas */
+    --zebra-even: #f8fafc;
+    --zebra-hover: #eff6ff;
     --row-weekend: #fefce8; 
     --locked-bg: #e2e8f0;
 }
@@ -15,6 +32,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; paddi
 /* NAVBAR & LOGO */
 .navbar { position: fixed; top: 0; left: 0; right: 0; height: 70px; background: var(--nav); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
 .nav-left { display: flex; align-items: center; gap: 40px; }
+
 .logo-nav { height: 45px; width: auto; transition: 0.2s; }
 .logo-nav:hover { opacity: 0.9; }
 .logo-login { max-width: 280px; height: auto; display: block; margin: 0 auto; }
@@ -44,7 +62,19 @@ select, input { padding: 8px 10px; border: 1px solid var(--border); border-radiu
 .stat-sub { font-size: 0.75rem; margin-top: 5px; color: var(--text-muted); }
 
 .table-wrap, .table-card, .log-section { background: var(--card); border-radius: 8px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+.log-header, .table-header { padding: 12px 20px; border-bottom: 1px solid var(--border); background: #f8fafc; display: flex; justify-content: space-between; align-items: center; }
+.log-header h3, .table-title { margin: 0; color: var(--nav); font-size: 0.95rem; font-weight: 700; }
+
 table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
 th { padding: 12px 15px; text-align: left; color: var(--text-muted); font-weight: 700; border-bottom: 1px solid var(--border); background: #f8fafc; text-transform: uppercase; font-size: 0.7rem; }
 td { padding: 8px 15px; border-bottom: 1px solid var(--border); color: var(--text-main); height: 40px; vertical-align: middle; }
 .badge { padding: 2px 8px; border-radius: 12px; font-size: 0.65rem; font-weight: 700; color: white; display: inline-block; min-width: 40px; text-align: center; }
+
+/* MODIFICADORES ESPECÍFICOS */
+.row-weekend { background-color: var(--row-weekend); }
+.input-divergent { border-color: var(--danger); color: var(--danger); background-color: #fee2e2; }
+.input-qty:disabled, .input-obs:disabled { background: var(--locked-bg); color: #94a3b8; border-color: #e2e8f0; cursor: not-allowed; }
+
+/* SCROLL SUPERIOR (Truque de Espelhamento) */
+.scroll-top { transform: rotateX(180deg); }
+.scroll-top table { transform: rotateX(180deg); }
