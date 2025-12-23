@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Controle de Produtividade</title>
-    <link rel="icon" href="assets/img/logo.png" type="image/png">
+    <link rel="icon" href="assets/img/favicon.png" type="image/png">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
@@ -22,9 +22,7 @@
 </head>
 <body>
 <div class="login-wrapper">
-    <div class="brand-login">
-        <img src="assets/img/logo.png" alt="Controle de Produtividade" class="logo-login">
-    </div>
+    <div class="brand-login"><img src="assets/img/logoindex.png" alt="Controle de Produtividade" class="logo-login"></div>
     <div class="login-card">
         <div class="input-group">
             <label>ID do Funcionário</label>
@@ -48,7 +46,6 @@
         const msg = document.getElementById('error-msg');
         msg.style.display = 'none';
         if(!idVal || !passVal) { msg.innerText = "Informe ID e Senha."; msg.style.display = 'block'; return; }
-        
         try {
             const { data, error } = await _supabase.from('usuarios').select('*').eq('id', idVal).eq('senha', passVal).maybeSingle();
             if (error) throw error;
@@ -56,9 +53,7 @@
                 localStorage.setItem('usuario', JSON.stringify(data));
                 window.location.href = 'produtividade.html';
             } else { throw new Error(); }
-        } catch (err) {
-            msg.innerText = "Credenciais inválidas."; msg.style.display = 'block';
-        }
+        } catch (err) { msg.innerText = "Credenciais inválidas."; msg.style.display = 'block'; }
     }
 </script>
 </body>
