@@ -1,21 +1,18 @@
-// assets/js/layout.js
-
 function renderNavbar() {
-    // Não renderiza navbar na tela de login
-    if(window.location.pathname.includes('index.html')) return;
+    if(window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/')) return;
 
     const navHTML = `
     <nav class="navbar">
         <div class="nav-left">
-            <div class="brand" onclick="window.location.href='produtividade.html'">
-                <div class="big">PRODUTIVIDADE<span>.</span></div>
+            <div class="brand" onclick="window.location.href='produtividade.html'" style="display:flex; align-items:center; cursor:pointer;">
+                <img src="assets/img/logo.png" alt="Logo" class="logo-nav">
             </div>
             <div class="nav-links">
-                <a href="gestao.html" class="nav-item ${isActive('gestao.html')}">Gestão</a>
-                <a href="produtividade.html" class="nav-item ${isActive('produtividade.html')}">Produtividade</a>
-                <a href="performance.html" class="nav-item ${isActive('performance.html')}">Performance</a>
-                <a href="consolidado.html" class="nav-item ${isActive('consolidado.html')}">Consolidado</a>
-                <a href="minha_area.html" class="nav-item ${isActive('minha_area.html')}">Minha Área</a>
+                <a href="gestao.html" class="nav-item">Gestão</a>
+                <a href="produtividade.html" class="nav-item">Produtividade</a>
+                <a href="performance.html" class="nav-item">Performance</a>
+                <a href="consolidado.html" class="nav-item">Consolidado</a>
+                <a href="minha_area.html" class="nav-item">Minha Área</a>
             </div>
         </div>
         <div class="user-area">
@@ -24,16 +21,16 @@ function renderNavbar() {
         </div>
     </nav>
     `;
-
-    // Insere no topo do body
     document.body.insertAdjacentHTML('afterbegin', navHTML);
+    
+    // Marca item ativo
+    const page = window.location.pathname.split('/').pop();
+    const links = document.querySelectorAll('.nav-item');
+    links.forEach(link => {
+        if(link.getAttribute('href') === page) link.classList.add('active');
+    });
 }
 
-function isActive(page) {
-    return window.location.pathname.includes(page) ? 'active' : '';
-}
-
-// Executa ao carregar
 document.addEventListener("DOMContentLoaded", () => {
     renderNavbar();
 });
