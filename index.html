@@ -4,216 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Controle de Produtividade</title>
-    
+    <link rel="icon" href="assets/img/logo.png" type="image/png">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="assets/css/style.css">
-
     <style>
-        /* ESTILOS EXCLUSIVOS DO LOGIN */
-        body {
-            padding-top: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            background: #f3f5f8;
-        }
-
-        .login-wrapper {
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-        }
-
-        /* NOVO LOGO */
-        .brand-login {
-            text-align: center;
-            margin-bottom: 35px;
-            color: var(--nav);
-            line-height: 1.1;
-        }
-        
-        .brand-small {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-muted);
-            margin-bottom: 2px;
-        }
-        
-        .brand-big {
-            font-size: 2rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-            color: var(--primary);
-            position: relative;
-            display: inline-block;
-        }
-
-        /* SÍMBOLO DO APP (Check de Produtividade) */
-        .brand-icon {
-            color: var(--success);
-            font-size: 1.8rem;
-            margin-left: 2px;
-            vertical-align: middle;
-            position: relative;
-            top: -2px;
-        }
-
-        .login-card {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            border: 1px solid var(--border);
-        }
-
+        body { padding-top: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .login-wrapper { width: 100%; max-width: 400px; padding: 20px; }
+        .brand-login { text-align: center; margin-bottom: 35px; }
+        .login-card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid var(--border); }
         .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.8rem; color: var(--text-main); text-transform: uppercase; }
-        
-        /* Input ajustado para ID numérico/texto */
-        .input-group input { 
-            width: 100%; 
-            padding: 14px; 
-            border: 1px solid #cbd5e1; 
-            border-radius: 8px; 
-            font-size: 1rem;
-            font-weight: 600;
-            outline: none;
-            transition: 0.2s;
-            font-family: 'Inter', sans-serif;
-            color: var(--nav);
-            letter-spacing: 0.5px;
-        }
-        .input-group input::placeholder { font-weight: 400; color: #94a3b8; letter-spacing: normal; }
-        .input-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(38, 98, 234, 0.1); }
-
-        .btn-login {
-            width: 100%;
-            padding: 14px;
-            background: var(--nav); /* Botão escuro para contraste */
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            margin-top: 10px;
-        }
-        .btn-login:hover { background: var(--primary); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 69, 208, 0.3); }
-        .btn-login:disabled { background: #94a3b8; cursor: wait; transform: none; box-shadow: none; }
-
-        .error-msg {
-            color: var(--danger);
-            font-size: 0.85rem;
-            text-align: center;
-            margin-top: 15px;
-            display: none;
-            font-weight: 600;
-            background: #fee2e2;
-            padding: 10px;
-            border-radius: 6px;
-        }
-        
-        .footer-text { text-align: center; margin-top: 30px; color: var(--text-muted); font-size: 0.75rem; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; }
+        .btn-login { width: 100%; padding: 14px; background: var(--nav); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+        .btn-login:hover { background: var(--primary); transform: translateY(-1px); }
+        .error-msg { color: var(--danger); font-size: 0.85rem; text-align: center; margin-top: 15px; display: none; background: #fee2e2; padding: 10px; border-radius: 6px; font-weight: 600; }
     </style>
 </head>
 <body>
-
 <div class="login-wrapper">
     <div class="brand-login">
-        <span class="brand-small">Controle de</span>
-        <span class="brand-big">Produtividade<span class="brand-icon">✓</span></span>
+        <img src="assets/img/logo.png" alt="Controle de Produtividade" class="logo-login">
     </div>
-    
     <div class="login-card">
         <div class="input-group">
             <label>ID do Funcionário</label>
-            <input type="text" id="login-id" placeholder="Digite seu ID" onkeypress="handleEnter(event)">
+            <input type="number" id="login-id" placeholder="Digite seu ID" onkeypress="handleEnter(event)">
         </div>
-
         <div class="input-group">
             <label>Senha de Acesso</label>
             <input type="password" id="senha" placeholder="••••••••" onkeypress="handleEnter(event)">
         </div>
-
         <button class="btn-login" onclick="fazerLogin()" id="btn-entrar">Acessar Sistema</button>
         <div class="error-msg" id="error-msg">ID ou senha incorretos.</div>
     </div>
-
-    <div class="footer-text">
-        &copy; 2024 Gestão Integrada
-    </div>
 </div>
-
 <script src="assets/js/config.js"></script>
-
 <script>
-    // Verifica sessão existente
-    const sessaoAtual = localStorage.getItem('usuario');
-    if(sessaoAtual) window.location.href = 'produtividade.html';
-
-    function handleEnter(e) {
-        if(e.key === 'Enter') fazerLogin();
-    }
-
+    if(localStorage.getItem('usuario')) window.location.href = 'produtividade.html';
+    function handleEnter(e) { if(e.key === 'Enter') fazerLogin(); }
     async function fazerLogin() {
-        const idInput = document.getElementById('login-id').value.trim();
-        const senhaInput = document.getElementById('senha').value.trim();
-        const btn = document.getElementById('btn-entrar');
+        const idVal = document.getElementById('login-id').value.trim();
+        const passVal = document.getElementById('senha').value.trim();
         const msg = document.getElementById('error-msg');
-
-        // Reset visual
         msg.style.display = 'none';
+        if(!idVal || !passVal) { msg.innerText = "Informe ID e Senha."; msg.style.display = 'block'; return; }
         
-        if(!idInput || !senhaInput) {
-            msg.innerText = "Por favor, informe seu ID e Senha.";
-            msg.style.display = 'block';
-            return;
-        }
-
-        // Feedback de carregamento
-        btn.disabled = true;
-        btn.innerText = "Validando...";
-
         try {
-            // BUSCA POR ID AGORA (não mais por email)
-            // Nota: Certifique-se que o ID digitado corresponde à coluna 'id' no banco (se for número inteiro).
-            // Se o ID no banco for UUID (letras e números longos), o usuário terá que digitar exatamente isso.
-            const { data, error } = await _supabase
-                .from('usuarios')
-                .select('*')
-                .eq('id', idInput) // Busca pela coluna ID
-                .eq('senha', senhaInput)
-                .maybeSingle();
-
+            const { data, error } = await _supabase.from('usuarios').select('*').eq('id', idVal).eq('senha', passVal).maybeSingle();
             if (error) throw error;
-
             if (data) {
-                // SUCESSO
                 localStorage.setItem('usuario', JSON.stringify(data));
-                setTimeout(() => {
-                    window.location.href = 'produtividade.html';
-                }, 500);
-            } else {
-                throw new Error("Credenciais inválidas");
-            }
-
+                window.location.href = 'produtividade.html';
+            } else { throw new Error(); }
         } catch (err) {
-            console.error(err);
-            // Mensagem genérica de erro para segurança ou específica se preferir
-            msg.innerText = "ID ou senha não encontrados.";
-            msg.style.display = 'block';
-            btn.disabled = false;
-            btn.innerText = "Acessar Sistema";
+            msg.innerText = "Credenciais inválidas."; msg.style.display = 'block';
         }
     }
 </script>
-
 </body>
 </html>
