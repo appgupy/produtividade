@@ -55,39 +55,6 @@ body {
     flex: 1;
 }
 
-/* --- NOVA LOGO DE TEXTO --- */
-.brand {
-    margin-right: 40px;
-    display: flex;
-    flex-direction: column; /* Empilha o texto verticalmente */
-    justify-content: center;
-    height: 100%;
-    white-space: nowrap; /* Impede quebra de linha no nome */
-}
-
-.logo-text-container {
-    margin-top: -2px; /* Ajuste fino de alinhamento vertical */
-}
-
-.logo-sub {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: #94a3b8; /* Cor cinza claro da paleta */
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    line-height: 1.1;
-    display: block;
-}
-
-.logo-main {
-    font-size: 1.4rem;
-    font-weight: 800; /* Extra negrito */
-    color: white;
-    letter-spacing: -0.5px; /* Letras mais juntas para visual moderno */
-    line-height: 1.1;
-    display: block;
-}
-
 /* --- LINKS DE NAVEGAÇÃO --- */
 .nav-links { 
     display: flex; 
@@ -251,7 +218,17 @@ body.login-page {
     background: linear-gradient(135deg, var(--nav) 0%, var(--primary) 100%);
 }
 .login-container { background: white; padding: 40px; border-radius: 16px; width: 100%; max-width: 400px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); text-align: center;}
-.logo-login { max-width: 200px; height: auto; display: block; margin: 0 auto 25px auto; }
+
+/* Container específico para a logo na tela de login */
+.login-logo-container {
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza o texto da logo */
+}
+/* Ajuste de cor para a logo no fundo branco do login */
+.login-logo-container .logo-main { color: var(--nav); }
+
 
 /* =========================================
    RESPONSIVIDADE (MEDIA QUERIES)
@@ -292,12 +269,6 @@ body.login-page {
         padding-right: 20px; /* Espaço extra no final do scroll */
         height: 60px; /* Altura fixa para os links no mobile */
     }
-
-    .brand { margin-right: 20px; height: 60px; }
-
-    /* Reduz um pouco o tamanho da logo de texto no celular */
-    .logo-sub { font-size: 0.65rem; }
-    .logo-main { font-size: 1.2rem; }
 
     /* Oculta a área do usuário no topo para economizar espaço */
     .user-area { display: none; } 
