@@ -1,25 +1,19 @@
 :root { 
-    /* --- PALETA DE CORES --- */
-    --primary: #0045d0;    /* Azul Institucional */
-    --accent: #2662ea;     /* Azul Vibrante (Hover) */
-    --nav: #0d1b2a;        /* Azul Escuro (Navbar/Textos Fortes) */
-    
-    --success: #00d09e;    /* Verde Sucesso */
-    --danger: #ef4444;     /* Vermelho Erro */
-    --warning: #f59e0b;    /* Laranja Alerta */
-
-    /* Estrutura & Fundo */
+    /* --- CORES --- */
+    --primary: #0045d0;
+    --accent: #2662ea;
+    --nav: #0d1b2a;
+    --success: #00d09e;
+    --danger: #ef4444;
+    --warning: #f59e0b;
     --bg: #f3f5f8;         
     --card: #ffffff;       
     --border: #e2e8f0;     
     --text-main: #1f2937;  
     --text-muted: #64748b; 
     
-    /* Tabelas */
-    --zebra-even: #f8fafc; 
-    --zebra-hover: #eff6ff;
-    --row-weekend: #fefce8;
-    --locked-bg: #e2e8f0;  
+    /* --- MEDIDAS --- */
+    --navbar-height: 70px; /* Reduzi de 90px para 70px */
 }
 
 /* --- GERAL --- */
@@ -27,73 +21,89 @@ body {
     font-family: 'Inter', sans-serif; 
     background: var(--bg); 
     margin: 0; 
-    /* AUMENTEI O ESPAÇO PARA 100px POR CAUSA DA NAVBAR MAIOR */
-    padding-top: 100px; 
+    padding-top: calc(var(--navbar-height) + 30px); /* Ajuste automático */
     color: var(--text-main); 
 }
 
-/* --- NAVBAR (Barra Azul Superior) --- */
+/* --- NAVBAR (Responsiva) --- */
 .navbar { 
     position: fixed; 
-    top: 0; 
-    left: 0; 
-    right: 0; 
-    /* AUMENTEI A ALTURA DA BARRA PARA 90px */
-    height: 90px; 
+    top: 0; left: 0; right: 0; 
+    height: var(--navbar-height); 
     background: var(--nav); 
     color: white; 
     display: flex; 
     align-items: center; 
     justify-content: space-between; 
-    padding: 0 40px; 
+    padding: 0 20px; 
     z-index: 1000; 
     box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
 }
 
-.nav-left { display: flex; align-items: center; gap: 40px; }
-
-/* LOGO: Tamanho Aumentado e Fundo Transparente */
-.brand {
-    background-color: transparent !important;
-    padding: 0;
-    margin: 0;
+.nav-container {
     display: flex;
     align-items: center;
-    margin-right: 25px; 
+    height: 100%;
+    flex: 1;
+}
+
+.brand {
+    cursor: pointer;
+    margin-right: 30px;
+    display: flex;
+    align-items: center;
+    height: 100%;
 }
 
 .logo-nav { 
-    /* AUMENTEI A LOGO PARA 75px */
-    height: 75px; 
+    height: 55px; /* Logo grande em relação à barra (55px em 70px total) */
     width: auto; 
-    transition: 0.2s; 
     display: block; 
 }
-.logo-nav:hover { opacity: 0.9; }
 
-/* Links do Menu */
-.nav-links { display: flex; gap: 30px; }
+.nav-links { 
+    display: flex; 
+    gap: 25px; 
+    height: 100%;
+    align-items: center;
+}
+
 .nav-item { 
     color: #94a3b8; 
     text-decoration: none; 
-    font-size: 0.95rem; /* Aumentei levemente a fonte */
+    font-size: 0.9rem; 
     font-weight: 500; 
-    cursor: pointer; 
     transition: 0.3s; 
-    padding-bottom: 32px; /* Ajuste para a barra maior */
+    height: 100%;
+    display: flex;
+    align-items: center;
     border-bottom: 4px solid transparent; 
+    white-space: nowrap;
 }
-.nav-item:hover, .nav-item.active { color: white; border-bottom-color: var(--accent); }
+.nav-item:hover, .nav-item.active { 
+    color: white; 
+    border-bottom-color: var(--accent); 
+}
 
-.user-area { text-align: right; border-left: 1px solid rgba(255,255,255,0.2); padding-left: 20px; }
-.user-name { font-weight: 600; font-size: 0.9rem; color: white; display: block; }
+.user-area { 
+    text-align: right; 
+    border-left: 1px solid rgba(255,255,255,0.2); 
+    padding-left: 15px; 
+    margin-left: 15px;
+    min-width: fit-content;
+}
+.user-name { font-weight: 600; font-size: 0.85rem; color: white; display: block; }
 .logout-btn { color: #fca5a5; font-size: 0.75rem; cursor: pointer; font-weight: 600; }
 
 /* --- LOGIN --- */
 .logo-login { max-width: 280px; height: auto; display: block; margin: 0 auto; }
 
-/* --- LAYOUT --- */
-.container { max-width: 1400px; margin: 0 auto; padding: 30px; }
+/* --- LAYOUT GERAL --- */
+.container { 
+    max-width: 1400px; 
+    margin: 0 auto; 
+    padding: 20px; /* Reduzi padding lateral */
+}
 .hidden { display: none !important; }
 
 /* --- BARRA DE AÇÕES / FILTROS --- */
@@ -111,70 +121,102 @@ body {
     gap: 15px; 
 }
 
-.action-title { font-size: 1.1rem; font-weight: 700; color: var(--nav); margin: 0; display: flex; align-items: center; gap: 10px; }
-.tools-group { display: flex; gap: 10px; align-items: center; }
-
-/* Inputs e Selects */
-.tools-group select, .tools-group input, 
-.control-group select, .control-group input, 
+.tools-group, .control-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 select, input { 
     background: #f8fafc; border: 1px solid var(--border); color: var(--text-main); 
-    padding: 8px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; width: auto; outline: none; box-sizing: border-box; font-family: 'Inter';
+    padding: 8px 12px; border-radius: 6px; font-weight: 600; outline: none; 
+    font-family: 'Inter'; max-width: 100%;
 }
-.control-group input, .control-group select { width: 100%; }
-
-/* Botões */
-.btn-import { background: var(--accent); color: white; border: none; padding: 9px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
-.btn-import:hover { background: var(--primary); }
-.btn-save { width: 100%; padding: 12px; border-radius: 6px; border:none; font-weight:600; cursor:pointer; background:var(--success); color:white; transition:0.2s; }
-.btn-add { background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: 600; }
-.btn-action { background: white; border: 1px solid var(--border); padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; color: var(--nav); }
-
-.control-group { display: flex; flex-direction: column; gap: 5px; flex: 1; }
-.control-group label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+.btn-import, .btn-save, .btn-add { cursor: pointer; border-radius: 6px; border:none; font-weight:600; transition:0.2s;}
+.btn-import { background: var(--accent); color: white; padding: 9px 20px; }
+.btn-save { width: 100%; padding: 12px; background:var(--success); color:white; }
+.btn-add { background: var(--primary); color: white; padding: 6px 12px; font-size: 0.75rem; }
 
 /* --- GRIDS E CARDS --- */
-.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
-.stat-card { background: var(--card); padding: 20px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; flex-direction: column; }
-.stat-label { font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
+.stats-grid { 
+    display: grid; 
+    grid-template-columns: repeat(4, 1fr); /* Padrão Desktop: 4 colunas */
+    gap: 15px; 
+    margin-bottom: 20px; 
+}
+.stat-card { 
+    background: var(--card); padding: 20px; border-radius: 8px; 
+    border: 1px solid var(--border); box-shadow: 0 2px 5px rgba(0,0,0,0.02); 
+}
+.stat-label { font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
 .stat-value { font-size: 1.6rem; font-weight: 700; color: var(--nav); }
 
-/* Grid da Gestão */
 .management-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; align-items: start; }
-@media (max-width: 900px) { .management-grid { grid-template-columns: 1fr; } }
-
-/* --- CONTAINERS GERAIS --- */
-.table-wrap, .table-card, .log-section, .card-form, .dynamic-panel { background: var(--card); border-radius: 8px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-.log-header, .table-header, .card-header { padding: 12px 20px; border-bottom: 1px solid var(--border); background: #f8fafc; display: flex; justify-content: space-between; align-items: center; color: var(--nav); font-size: 0.95rem; font-weight: 700; }
-
-.form-row { display: flex; gap: 15px; margin-bottom: 15px; }
-.form-group { flex: 1; display: flex; flex-direction: column; gap: 5px; }
-.list-container { max-height: 400px; overflow-y: auto; padding-right: 5px; }
-.list-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid var(--border); align-items: center; transition: 0.2s; }
-.list-item:hover { background: #f8fafc; }
-.role-tag { font-size: 0.65rem; padding: 2px 8px; border-radius: 4px; background: #e2e8f0; font-weight: 600; margin-left: 5px; color: var(--text-muted); }
-.id-badge { background: var(--nav); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; margin-right: 8px; }
 
 /* --- TABELAS --- */
-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
-th { padding: 10px 4px; text-align: center; color: var(--text-muted); font-weight: 700; border-bottom: 1px solid var(--border); background: #f8fafc; text-transform: uppercase; font-size: 0.7rem; white-space: nowrap; }
-td { padding: 8px 4px; border-bottom: 1px solid var(--border); color: var(--text-main); height: auto; vertical-align: middle; white-space: nowrap; text-align: center; }
-.badge { padding: 3px 6px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; color: white; display: inline-block; min-width: 50px; text-align: center; }
+.table-wrap { overflow-x: auto; background: var(--card); border-radius: 8px; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; min-width: 800px; /* Força scroll horizontal se necessário */ }
+th, td { padding: 10px 8px; text-align: center; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
+th { background: #f8fafc; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
 
-.row-weekend { background-color: var(--row-weekend); }
-.input-divergent { border-color: var(--danger); color: var(--danger); background-color: #fee2e2; }
-.input-qty:disabled, .input-obs:disabled { background: var(--locked-bg); color: #94a3b8; border-color: #e2e8f0; cursor: not-allowed; }
+/* Sticky Columns para primeira coluna (Nome) */
+table th:first-child, table td:first-child { 
+    position: sticky; left: 0; z-index: 10; 
+    background-color: var(--card); 
+    border-right: 2px solid var(--border);
+    width: 120px; min-width: 120px;
+}
+table th:first-child { background-color: var(--nav); color:white; z-index: 20; }
+tr:nth-child(even) td:first-child { background-color: #f8fafc; }
 
-.scroll-top { transform: rotateX(180deg); }
-.scroll-top table { transform: rotateX(180deg); }
+/* --- MODAL --- */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
+.modal { background: white; width: 100%; max-width: 500px; border-radius: 12px; padding: 25px; overflow-y: auto; max-height: 90vh; }
 
-table th:first-child { position: sticky; left: 0; z-index: 20; background-color: var(--nav); color: white; border-right: 2px solid rgba(0,0,0,0.1); width: 110px !important; min-width: 110px; max-width: 110px; text-align: left; padding-left: 10px; }
-table td:first-child { position: sticky; left: 0; z-index: 10; background-color: var(--card); font-weight: 700; color: var(--nav); border-right: 2px solid var(--border); width: 110px !important; min-width: 110px; max-width: 110px; white-space: normal !important; line-height: 1.2; text-align: left; padding-left: 10px; font-size: 0.7rem; }
-tr:nth-child(even) td:first-child { background-color: var(--zebra-even); }
-tr:hover td:first-child { background-color: var(--zebra-hover); color: var(--primary); }
+/* =========================================
+   RESPONSIVIDADE (MEDIA QUERIES)
+   ========================================= */
 
-.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
-.modal { background: white; width: 100%; max-width: 500px; border-radius: 12px; padding: 30px; animation: slideUp 0.3s ease; }
-@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+/* Tablets e Notebooks Pequenos (até 1024px) */
+@media (max-width: 1024px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; } /* 2 colunas */
+    .container { padding: 15px; }
+}
 
-#import-log { position: fixed; bottom: 20px; right: 20px; background: white; padding: 20px; border-left: 5px solid var(--success); box-shadow: 0 10px 40px rgba(0,0,0,0.15); display: none; z-index: 2000; border-radius: 4px; width: 300px; }
+/* Celulares (até 768px) */
+@media (max-width: 768px) {
+    /* Navbar ajustada para Mobile */
+    .navbar { 
+        padding: 0 15px; 
+        flex-wrap: wrap; /* Permite quebrar linha se precisar, mas vamos usar scroll */
+        height: auto;
+        min-height: 60px;
+        padding-bottom: 0;
+    }
+    
+    .nav-container {
+        width: 100%;
+        overflow-x: auto; /* Scroll horizontal nos links */
+        padding-bottom: 0;
+        -webkit-overflow-scrolling: touch; /* Scroll suave no iOS */
+    }
+    
+    .nav-links {
+        gap: 20px;
+        padding-right: 20px;
+    }
+
+    .brand { margin-right: 20px; }
+    .logo-nav { height: 40px; } /* Logo um pouco menor no mobile */
+
+    .user-area { display: none; } /* Ocultar usuário no topo do mobile para economizar espaço */
+
+    /* Layout do Corpo */
+    body { padding-top: 80px; } /* Ajuste do topo */
+    
+    .stats-grid { grid-template-columns: 1fr; } /* 1 coluna (pilha) */
+    
+    .management-grid { grid-template-columns: 1fr; gap: 20px; }
+    
+    .action-bar, .top-controls { flex-direction: column; align-items: stretch; }
+    .tools-group, .control-group { flex-direction: column; width: 100%; }
+    .tools-group select, .tools-group input, .btn-import { width: 100%; }
+    
+    .list-item { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .list-item > div { width: 100%; justify-content: space-between; display: flex; }
+}
