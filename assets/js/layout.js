@@ -1,23 +1,16 @@
 /**
  * assets/js/layout.js
- * Responsável por desenhar a barra de menu no topo de todas as páginas.
- * * CORREÇÕES DESTE ARQUIVO:
- * 1. Logo aumentada para 60px.
- * 2. Estilos inline forçados para garantir fundo transparente da imagem.
- * 3. EventListener no final para garantir que a barra apareça.
+ * ATUALIZADO: Logo aumentada para 75px e Navbar para 90px
  */
 
 function renderNavbar() {
-    // 1. Evita duplicidade
     if (document.querySelector('.navbar')) return;
 
-    // 2. Não mostra no Login
     const path = window.location.pathname;
     if (path.includes('index.html') || (path.endsWith('/') && path.length < 2) || path === '/') {
         return;
     }
 
-    // 3. Recupera nome do usuário
     let nomeUsuario = 'Colaborador';
     if (typeof SESSAO_ATUAL !== 'undefined' && SESSAO_ATUAL && SESSAO_ATUAL.nome) {
         nomeUsuario = SESSAO_ATUAL.nome;
@@ -25,19 +18,16 @@ function renderNavbar() {
         try {
             const u = JSON.parse(localStorage.getItem('usuario'));
             nomeUsuario = u.nome || 'Colaborador';
-        } catch (e) {
-            console.error(e);
-        }
+        } catch (e) { console.error(e); }
     }
 
-    // 4. Desenha a Navbar
     const navHTML = `
     <nav class="navbar">
         <div class="nav-left">
             <div class="brand" onclick="window.location.href='produtividade.html'" 
                  style="display:flex; align-items:center; cursor:pointer; background:transparent !important; border:none !important; padding:0; margin-right: 30px;">
                 <img src="assets/img/logo.png" alt="Logo" class="logo-nav" 
-                     style="height: 60px; width: auto; display: block; background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important;">
+                     style="height: 75px; width: auto; display: block; background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important;">
             </div>
             
             <div class="nav-links">
@@ -56,10 +46,8 @@ function renderNavbar() {
     </nav>
     `;
 
-    // 5. Injeta no HTML
     document.body.insertAdjacentHTML('afterbegin', navHTML);
 
-    // 6. Marca página ativa
     const page = path.split('/').pop();
     document.querySelectorAll('.nav-item').forEach(link => {
         const href = link.getAttribute('href');
@@ -69,5 +57,4 @@ function renderNavbar() {
     });
 }
 
-// --- COMANDO DE EXECUÇÃO ---
 document.addEventListener("DOMContentLoaded", renderNavbar);
