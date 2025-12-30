@@ -1,42 +1,43 @@
 /**
  * assets/js/layout.js
- * Responsável por renderizar a barra de navegação (Navbar) em todas as páginas,
- * exceto no login.
+ * Responsável por desenhar a barra de menu no topo de todas as páginas.
+ * * CORREÇÕES DESTE ARQUIVO:
+ * 1. Logo aumentada para 60px.
+ * 2. Estilos inline forçados para garantir fundo transparente da imagem.
+ * 3. EventListener no final para garantir que a barra apareça.
  */
 
 function renderNavbar() {
-    // 1. Verifica se é a página de login (index.html ou raiz). Se for, NÃO desenha a navbar.
+    // 1. Evita duplicidade
+    if (document.querySelector('.navbar')) return;
+
+    // 2. Não mostra no Login
     const path = window.location.pathname;
-    if (path.includes('index.html') || path === '/' || path.endsWith('/')) {
+    if (path.includes('index.html') || (path.endsWith('/') && path.length < 2) || path === '/') {
         return;
     }
 
-    // 2. Tenta recuperar o nome do usuário de forma segura
-    let nomeUsuario = 'Usuário';
-    
-    // Verifica se a variável global SESSAO_ATUAL (do auth.js) existe
-    if (typeof SESSAO_ATUAL !== 'undefined' && SESSAO_ATUAL) {
+    // 3. Recupera nome do usuário
+    let nomeUsuario = 'Colaborador';
+    if (typeof SESSAO_ATUAL !== 'undefined' && SESSAO_ATUAL && SESSAO_ATUAL.nome) {
         nomeUsuario = SESSAO_ATUAL.nome;
-    } 
-    // Se não, tenta pegar direto do LocalStorage (fallback de segurança)
-    else if (localStorage.getItem('usuario')) {
+    } else if (localStorage.getItem('usuario')) {
         try {
             const u = JSON.parse(localStorage.getItem('usuario'));
-            nomeUsuario = u.nome;
+            nomeUsuario = u.nome || 'Colaborador';
         } catch (e) {
-            console.error('Erro ao ler usuário', e);
+            console.error(e);
         }
     }
 
-    // 3. Monta o HTML da Navbar
-    // OBS: Adicionei estilos inline na imagem para garantir 100% que o fundo fique transparente
+    // 4. Desenha a Navbar
     const navHTML = `
     <nav class="navbar">
         <div class="nav-left">
             <div class="brand" onclick="window.location.href='produtividade.html'" 
                  style="display:flex; align-items:center; cursor:pointer; background:transparent !important; border:none !important; padding:0; margin-right: 30px;">
                 <img src="assets/img/logo.png" alt="Logo" class="logo-nav" 
-                     style="height: 45px; width: auto; display: block; background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important;">
+                     style="height: 60px; width: auto; display: block; background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important;">
             </div>
             
             <div class="nav-links">
@@ -50,26 +51,23 @@ function renderNavbar() {
         
         <div class="user-area">
             <span class="user-name">${nomeUsuario}</span>
-            <span class="logout-btn" onclick="logout()">Sair</span>
+            <span class="logout-btn" onclick="logout()" style="color: #fca5a5; font-size: 0.7rem; cursor: pointer; font-weight: 600;">Sair</span>
         </div>
     </nav>
     `;
 
-    // 4. Insere a Navbar no início do Body
+    // 5. Injeta no HTML
     document.body.insertAdjacentHTML('afterbegin', navHTML);
 
-    // 5. Marca o link da página atual como "Ativo" (ficando com a borda colorida embaixo)
+    // 6. Marca página ativa
     const page = path.split('/').pop();
-    const links = document.querySelectorAll('.nav-item');
-    
-    links.forEach(link => {
+    document.querySelectorAll('.nav-item').forEach(link => {
         const href = link.getAttribute('href');
-        // Se o nome do arquivo bater com o link, adiciona a classe .active
         if (href === page || (page === '' && href === 'produtividade.html')) {
             link.classList.add('active');
         }
     });
 }
 
-// --- IMPORTANTE: Executa a função assim que a página carregar ---
+// --- COMANDO DE EXECUÇÃO ---
 document.addEventListener("DOMContentLoaded", renderNavbar);
