@@ -1,118 +1,60 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Performance</title>
-    <link rel="icon" href="assets/img/favicon.png" type="image/png">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Individual</title>
     <link rel="stylesheet" href="assets/css/style.css">
-    <style>.selected-row td{background:#eff6ff!important;color:var(--primary);font-weight:700;border-left:4px solid var(--accent);}.hidden{display:none!important;}.badge{min-width:55px;font-size:0.75rem;}</style>
+    <link rel="stylesheet" href="assets/css/logo.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-<div class="container">
-    <div class="mode-tabs">
-        <button class="tab-btn active" onclick="switchMode('individual')" id="btn-individual" style="background:var(--nav);color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;">📊 Análise</button>
-        <button class="tab-btn" onclick="switchMode('matrix')" id="btn-matrix" style="background:#e2e8f0;color:#64748b;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;">🏆 Matriz</button>
-    </div>
-    <div id="individual-view">
-        <div class="top-controls" style="margin-top:20px;">
-            <div class="control-group" style="flex:1.5"><label>Assistente</label><select id="user-selector" onchange="carregarPerformance()"></select></div>
-            <div class="control-group"><label>Tipo</label><select id="period-type" onchange="atualizarOpcoes()"><option value="mes">Mensal</option><option value="trimestre">Trimestral</option><option value="semestre">Semestral</option><option value="ano">Anual</option></select></div>
-            <div class="control-group"><label>Ano</label><select id="year-selector" onchange="atualizarOpcoes()"></select></div>
-            <div class="control-group" style="flex:1.2"><label>Período</label><select id="period-value" onchange="carregarPerformance()"></select></div>
+    <div class="container">
+        <div class="top-controls">
+            <div class="control-group">
+                <select id="colaboradorSelect" onchange="atualizarPerformance()">
+                    <option value="">Selecione um colaborador...</option>
+                </select>
+                <select id="mesSelect" onchange="atualizarPerformance()">
+                    </select>
+            </div>
         </div>
-        <div class="stats-grid">
-            <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value" id="kpi-total">0</div></div>
-            <div class="stat-card"><div class="stat-label">Média</div><div class="stat-value" id="kpi-media">0</div></div>
-            <div class="stat-card"><div class="stat-label">Meta</div><div class="stat-value" id="kpi-meta">0</div></div>
-            <div class="stat-card"><div class="stat-label">Ranking</div><div class="stat-value" id="kpi-rank">-</div></div>
+
+        <div id="performanceContent" class="hidden">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">Total do Mês</span>
+                    <div class="stat-value" id="totalMes">0h</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Meta Mensal</span>
+                    <div class="stat-value" id="metaMensal">0h</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Atingimento</span>
+                    <div class="stat-value" id="atingimento">0%</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Status</span>
+                    <div class="stat-value" id="statusPerf">-</div>
+                </div>
+            </div>
+
+            <div class="chart-container" style="background: white; padding: 20px; border-radius: 10px; border: 1px solid var(--border);">
+                <canvas id="performanceChart"></canvas>
+            </div>
         </div>
-        <div class="table-card">
-            <div class="table-header"><div class="table-title">Comparativo</div></div>
-            <table><thead><tr><th>#</th><th>Assistente</th><th>Total</th><th>Dias</th><th>Média</th><th>Meta Total</th><th style="text-align:center">% Atingida</th><th style="text-align:center">Dif.</th></tr></thead><tbody id="comparative-body"></tbody></table>
+
+        <div id="emptyState" style="text-align: center; padding: 50px; color: var(--text-muted);">
+            <p>Selecione um colaborador e um mês para visualizar a performance.</p>
         </div>
     </div>
-    <div id="matrix-view" class="hidden">
-        <div class="top-controls" style="margin-top:20px;"><div class="control-group"><label>Ano</label><select id="matrix-year" onchange="carregarMatriz()"></select></div></div>
-        <div class="table-card scroll-top" style="overflow-x:auto;"><table id="matrix-table" style="min-width:1500px"><thead><tr><th>NOME</th><th>JAN</th><th>FEV</th><th>MAR</th><th>ABR</th><th>MAI</th><th>JUN</th><th>JUL</th><th>AGO</th><th>SET</th><th>OUT</th><th>NOV</th><th>DEZ</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>H1</th><th>H2</th><th>ANUAL</th></tr></thead><tbody id="matrix-body"></tbody></table></div>
-    </div>
-</div>
-<script src="assets/js/config.js"></script>
-<script src="assets/js/auth.js"></script>
-<script src="assets/js/layout.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', init);
-    async function init() {
-        const ys = document.getElementById('year-selector'), my = document.getElementById('matrix-year'), cy = new Date().getFullYear();
-        ys.innerHTML=''; my.innerHTML=''; for(let y=cy; y>=2024; y--){ ys.innerHTML+=`<option value="${y}">${y}</option>`; my.innerHTML+=`<option value="${y}">${y}</option>`; }
-        await loadUsers(); atualizarOpcoes();
-    }
-    async function loadUsers() {
-        const { data } = await _supabase.from('usuarios').select('*').order('nome');
-        const sel = document.getElementById('user-selector'); sel.innerHTML='';
-        data.filter(u=>u.funcao!=='Gestora').forEach(u=>sel.innerHTML+=`<option value="${u.id}">${u.nome}</option>`);
-    }
-    function switchMode(m) {
-        document.getElementById('individual-view').classList.toggle('hidden', m!=='individual');
-        document.getElementById('matrix-view').classList.toggle('hidden', m!=='matrix');
-        const b1=document.getElementById('btn-individual'), b2=document.getElementById('btn-matrix');
-        if(m==='individual'){ b1.style.background='var(--nav)';b1.style.color='white'; b2.style.background='#e2e8f0';b2.style.color='#64748b'; carregarPerformance(); }
-        else{ b2.style.background='var(--nav)';b2.style.color='white'; b1.style.background='#e2e8f0';b1.style.color='#64748b'; carregarMatriz(); }
-    }
-    function atualizarOpcoes() {
-        const t=document.getElementById('period-type').value, s=document.getElementById('period-value'); s.innerHTML='';
-        if(t==='mes') ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'].forEach((m,i)=>s.innerHTML+=`<option value="${i+1}" ${i===new Date().getMonth()?'selected':''}>${m}</option>`);
-        else if(t==='trimestre') s.innerHTML='<option value="1">1º Tri</option><option value="2">2º Tri</option><option value="3">3º Tri</option><option value="4">4º Tri</option>';
-        else if(t==='semestre') s.innerHTML='<option value="1">1º Sem</option><option value="2">2º Sem</option>';
-        else s.innerHTML='<option value="1">Ano Completo</option>';
-        carregarPerformance();
-    }
-    function getRange() {
-        const t=document.getElementById('period-type').value, v=parseInt(document.getElementById('period-value').value), y=document.getElementById('year-selector').value;
-        if(t==='mes') return {s:`${y}-${v.toString().padStart(2,'0')}-01`,e:`${y}-${v.toString().padStart(2,'0')}-${new Date(y,v,0).getDate()}`};
-        if(t==='trimestre'){const m=((v-1)*3)+1; return {s:`${y}-${m.toString().padStart(2,'0')}-01`,e:`${y}-${(m+2).toString().padStart(2,'0')}-${new Date(y,m+2,0).getDate()}`};}
-        if(t==='semestre') return {s:v===1?`${y}-01-01`:`${y}-07-01`,e:v===1?`${y}-06-30`:`${y}-12-31`};
-        return {s:`${y}-01-01`,e:`${y}-12-31`};
-    }
-    async function carregarPerformance() {
-        const uid=document.getElementById('user-selector').value; if(!uid)return;
-        const {s,e}=getRange();
-        const {data:d}=await _supabase.from('producao').select('*,usuarios(nome,funcao)').gte('data_referencia',s).lte('data_referencia',e);
-        const {data:mt}=await _supabase.from('metas').select('*').order('data_inicio',{ascending:false});
-        if(!d||!d.length){ render([],uid); document.getElementById('comparative-body').innerHTML='<tr><td colspan="8" style="text-align:center">Sem dados</td></tr>'; return; }
-        let st={}; d.forEach(x=>{ if(!x.usuarios||x.usuarios.funcao!=='Assistente')return; if(!st[x.usuario_id])st[x.usuario_id]={id:x.usuario_id,nome:x.usuarios.nome,total:0,dias:new Set()}; st[x.usuario_id].total+=x.quantidade; st[x.usuario_id].dias.add(x.data_referencia); });
-        let l=Object.values(st).map(i=>{
-            const dc=i.dias.size||1; const m=mt.find(k=>k.usuario_id==i.id && k.data_inicio<=e)?.valor_meta||650;
-            return {...i, diasCount:dc, media:(i.total/dc).toFixed(0), metaTotal:m*dc};
-        }).sort((a,b)=>b.total-a.total);
-        render(l,uid);
-    }
-    function render(l,uid) {
-        const me=l.find(i=>i.id==uid);
-        if(me){ document.getElementById('kpi-total').innerText=me.total.toLocaleString(); document.getElementById('kpi-media').innerText=me.media; document.getElementById('kpi-meta').innerText=me.metaTotal.toLocaleString(); document.getElementById('kpi-rank').innerText='#'+(l.findIndex(i=>i.id==uid)+1); }
-        else ['kpi-total','kpi-media','kpi-meta','kpi-rank'].forEach(i=>document.getElementById(i).innerText='-');
-        let h='';
-        l.forEach((i,idx)=>{
-            const pct=i.metaTotal>0?((i.total/i.metaTotal)*100).toFixed(0):0;
-            const dif=i.total-i.metaTotal;
-            h+=`<tr class="${i.id==uid?'selected-row':''}"><td>${idx+1}</td><td>${i.nome}</td><td>${i.total.toLocaleString()}</td><td>${i.diasCount}</td><td>${i.media}</td><td>${i.metaTotal.toLocaleString()}</td><td style="text-align:center"><span class="badge" style="background:${pct>=100?'var(--success)':'var(--danger)'}">${pct}%</span></td><td style="text-align:center;color:${dif>=0?'var(--success)':'var(--danger)'};font-weight:600">${dif>0?'+':''}${dif.toLocaleString()}</td></tr>`;
-        });
-        document.getElementById('comparative-body').innerHTML=h;
-    }
-    async function carregarMatriz() {
-        const y=document.getElementById('matrix-year').value;
-        const {data:d}=await _supabase.from('producao').select('*,usuarios(nome,funcao)').gte('data_referencia',`${y}-01-01`).lte('data_referencia',`${y}-12-31`);
-        if(!d||!d.length){ document.getElementById('matrix-body').innerHTML='<tr><td colspan="20">Sem dados</td></tr>'; return; }
-        let st={}; d.forEach(x=>{ if(!x.usuarios||x.usuarios.funcao!=='Assistente')return; if(!st[x.usuario_id])st[x.usuario_id]={nome:x.usuarios.nome,m:Array(12).fill(0),t:0}; const idx=new Date(x.data_referencia+'T12:00:00').getMonth(); st[x.usuario_id].m[idx]+=x.quantidade; st[x.usuario_id].t+=x.quantidade; });
-        const s=Object.values(st).sort((a,b)=>b.t-a.t);
-        let h='';
-        s.forEach(i=>{
-            const q1=i.m[0]+i.m[1]+i.m[2], q2=i.m[3]+i.m[4]+i.m[5], q3=i.m[6]+i.m[7]+i.m[8], q4=i.m[9]+i.m[10]+i.m[11];
-            h+=`<tr><td>${i.nome}</td>${i.m.map(v=>`<td>${v?v.toLocaleString():'-'}</td>`).join('')}<td style="background:#f0f9ff;font-weight:700">${q1.toLocaleString()}</td><td style="background:#f0f9ff;font-weight:700">${q2.toLocaleString()}</td><td style="background:#f0f9ff;font-weight:700">${q3.toLocaleString()}</td><td style="background:#f0f9ff;font-weight:700">${q4.toLocaleString()}</td><td style="background:#fff7ed;font-weight:700">${(q1+q2).toLocaleString()}</td><td style="background:#fff7ed;font-weight:700">${(q3+q4).toLocaleString()}</td><td style="background:#f3f4f6;font-weight:800">${i.t.toLocaleString()}</td></tr>`;
-        });
-        document.getElementById('matrix-body').innerHTML=h;
-    }
-</script>
+
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/dados.js"></script>
+    <script src="assets/js/logo.js"></script>
+    <script src="assets/js/layout.js"></script>
+    <script src="assets/js/performance.js"></script>
 </body>
 </html>
