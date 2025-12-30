@@ -1,19 +1,19 @@
 /**
  * assets/js/layout.js
- * ATUALIZADO: Navbar responsiva com nova logo textual moderna.
+ * ATUALIZADO: Usa a função externa getLogoHTML() para renderizar a marca.
  */
 
 function renderNavbar() {
-    // Evita renderizar duas vezes se já existir
+    // Evita renderizar duas vezes
     if (document.querySelector('.navbar')) return;
 
     const path = window.location.pathname;
-    // Não renderiza na tela de login (index.html ou raiz)
+    // Não renderiza na tela de login
     if (path.includes('index.html') || (path.endsWith('/') && path.length < 2) || path === '/') {
         return;
     }
 
-    // Tenta identificar o usuário logado para mostrar no canto
+    // Identifica usuário
     let nomeUsuario = 'Colaborador';
     if (typeof SESSAO_ATUAL !== 'undefined' && SESSAO_ATUAL && SESSAO_ATUAL.nome) {
         nomeUsuario = SESSAO_ATUAL.nome;
@@ -24,14 +24,12 @@ function renderNavbar() {
         } catch (e) { console.error(e); }
     }
 
-    // HTML da Navbar (Estrutura limpa para CSS controlar)
+    // HTML da Navbar
     const navHTML = `
     <nav class="navbar">
         <div class="nav-container">
-            <div class="brand logo-text-container" onclick="window.location.href='produtividade.html'" style="cursor: pointer;">
-                <span class="logo-sub">Controle de</span>
-                <span class="logo-main">Produtividade</span>
-            </div>
+            
+            ${getLogoHTML()}
             
             <div class="nav-links">
                 <a href="gestao.html" class="nav-item">Gestão</a>
@@ -49,19 +47,16 @@ function renderNavbar() {
     </nav>
     `;
 
-    // Insere a navbar no início do body
     document.body.insertAdjacentHTML('afterbegin', navHTML);
 
-    // Marca o link da página atual como ativo
+    // Marca link ativo
     const page = path.split('/').pop();
     document.querySelectorAll('.nav-item').forEach(link => {
         const href = link.getAttribute('href');
-        // Verifica se é a página atual OU se é a home (produtividade) quando o caminho está vazio
         if (href === page || (page === '' && href === 'produtividade.html')) {
             link.classList.add('active');
         }
     });
 }
 
-// Executa a função quando o HTML terminar de carregar
 document.addEventListener("DOMContentLoaded", renderNavbar);
