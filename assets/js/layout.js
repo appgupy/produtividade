@@ -1,11 +1,16 @@
 function renderNavbar() {
+    // Não exibe navbar na tela de login
     if(window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/')) return;
+
     const navHTML = `
     <nav class="navbar">
         <div class="nav-left">
-            <div class="brand" onclick="window.location.href='produtividade.html'" style="display:flex; align-items:center; cursor:pointer;">
-                <img src="assets/img/logo.png" alt="Logo" class="logo-nav">
+            <div class="brand" onclick="window.location.href='produtividade.html'" 
+                 style="display:flex; align-items:center; cursor:pointer; background:transparent !important; border:none !important; padding:0;">
+                <img src="assets/img/logo.png" alt="Logo" class="logo-nav" 
+                     style="height: 45px; width: auto; display: block; background: transparent;">
             </div>
+            
             <div class="nav-links">
                 <a href="gestao.html" class="nav-item">Gestão</a>
                 <a href="produtividade.html" class="nav-item">Produtividade</a>
@@ -14,15 +19,21 @@ function renderNavbar() {
                 <a href="minha_area.html" class="nav-item">Minha Área</a>
             </div>
         </div>
+        
         <div class="user-area">
             <span class="user-name">${SESSAO_ATUAL ? SESSAO_ATUAL.nome : 'Usuário'}</span>
             <span class="logout-btn" onclick="logout()">Sair</span>
         </div>
-    </nav>`;
+    </nav>
+    `;
+
     document.body.insertAdjacentHTML('afterbegin', navHTML);
+
+    // Marca o link ativo
     const page = window.location.pathname.split('/').pop();
     document.querySelectorAll('.nav-item').forEach(link => {
-        if(link.getAttribute('href') === page) link.classList.add('active');
+        if(link.getAttribute('href') === page) {
+            link.classList.add('active');
+        }
     });
 }
-document.addEventListener("DOMContentLoaded", renderNavbar);
