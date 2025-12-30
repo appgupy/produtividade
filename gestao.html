@@ -8,19 +8,20 @@
     <link rel="icon" href="assets/img/favicon.png" type="image/png">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="assets/css/style.css">
     
     <style>
-        /* LAYOUT CORRIGIDO */
+        /* ESTILOS ESPECÍFICOS DA GESTÃO */
         .management-grid { 
             display: grid; 
-            grid-template-columns: 1fr 1fr; /* Duas colunas iguais */
+            grid-template-columns: 1fr 1fr; 
             gap: 30px; 
             margin-bottom: 30px; 
             align-items: start;
         }
 
-        /* Responsividade: Vira 1 coluna em telas menores */
+        /* Responsividade */
         @media (max-width: 900px) {
             .management-grid { grid-template-columns: 1fr; }
         }
@@ -51,7 +52,6 @@
             color: var(--text-muted);
         }
         
-        /* Botões Específicos */
         .btn-add { background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: 600; }
         .btn-action { background: white; border: 1px solid var(--border); padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; color: var(--nav); }
         .btn-action:hover { border-color: var(--primary); color: var(--primary); background: #eff6ff; }
@@ -61,6 +61,9 @@
         .btn-save:disabled { background: #ccc; cursor: not-allowed; }
 
         .id-badge { background: var(--nav); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; margin-right: 8px; }
+        
+        /* Destaque no select */
+        option.opt-all { font-weight: 800; color: var(--primary); background-color: #f0f9ff; }
     </style>
 </head>
 <body>
@@ -76,14 +79,13 @@
     <div class="management-grid">
         
         <div class="card-form">
-            <div class="card-header">🎯 Nova Meta / Alteração</div>
+            <div class="card-header">🎯 Configuração de Metas</div>
             
             <div class="form-row">
                 <div class="form-group">
-                    <label>Colaborador</label>
-                    <select id="meta-user">
-                        <option value="">Selecione...</option>
-                    </select>
+                    <label>Aplicar Para</label>
+                    <select id="meta-user" style="font-weight:600;">
+                        </select>
                 </div>
                 <div class="form-group">
                     <label>Início Vigência</label>
@@ -221,7 +223,6 @@
         
         lista.forEach(u => {
             const contratoClass = (u.contrato && u.contrato.includes('CLT')) ? 'role-clt' : 'role-pj';
-            // Escapar aspas para passar o objeto no onclick
             const userJson = JSON.stringify(u).replace(/"/g, '&quot;');
             
             html += `
@@ -284,7 +285,6 @@
         document.getElementById('modal-user').style.display = 'none';
     }
 
-    // CREATE / UPDATE
     async function salvarUsuario() {
         const id = document.getElementById('user-id').value;
         const nome = document.getElementById('user-name').value;
@@ -293,10 +293,7 @@
         const funcao = document.getElementById('user-role').value;
         const contrato = document.getElementById('user-contract').value;
 
-        if(!id || !nome || !senha) {
-            alert("Preencha ID, Nome e Senha.");
-            return;
-        }
+        if(!id || !nome || !senha) return alert("Preencha ID, Nome e Senha.");
 
         const payload = { id: parseInt(id), nome, senha, email, funcao, contrato };
         let error = null;
@@ -316,9 +313,8 @@
         btn.innerText = "Salvar Dados";
         btn.disabled = false;
 
-        if(error) {
-            alert("Erro ao salvar: " + error.message);
-        } else {
+        if(error) alert("Erro ao salvar: " + error.message);
+        else {
             fecharModal();
             loadUsers();
             loadMetasAtuais();
@@ -338,11 +334,14 @@
         }
     }
 
-    // --- FILTROS E METAS ---
+    // --- FILTROS E METAS COM OPÇÃO "TODOS" ---
 
     function populateSelect(lista) {
         const sel = document.getElementById('meta-user');
+        // Opção especial para atualizar todos
         sel.innerHTML = '<option value="">Selecione...</option>';
+        sel.innerHTML += '<option value="all" class="opt-all">⭐ TODOS OS ASSISTENTES (Massa)</option>';
+        
         const assistentes = lista.filter(u => u.funcao === 'Assistente');
         assistentes.forEach(u => sel.innerHTML += `<option value="${u.id}">${u.nome}</option>`);
     }
@@ -399,10 +398,54 @@
 
         if(!uid || !data || !valor) return alert("Preencha todos os campos da meta!");
 
-        await _supabase.from('metas').insert({ usuario_id: uid, data_inicio: data, valor_meta: parseInt(valor) });
-        document.getElementById('meta-value').value = ''; 
-        await loadMetasAtuais(); 
-        alert("Meta Salva!");
+        const btn = document.querySelector('.card-form .btn-save'); 
+        const txt = btn.innerText;
+        btn.innerText = "Salvando...";
+        btn.disabled = true;
+
+        let error = null;
+
+        // LÓGICA DE SALVAMENTO EM MASSA
+        if (uid === 'all') {
+            if(!confirm(`ATENÇÃO:\nVocê está prestes a definir a meta de ${valor} para TODOS os assistentes a partir de ${data.split('-').reverse().join('/')}.\n\nDeseja continuar?`)) {
+                btn.innerText = txt; 
+                btn.disabled = false;
+                return;
+            }
+
+            // Filtra quem é assistente
+            const assistentes = allUsers.filter(u => u.funcao === 'Assistente');
+            const inserts = assistentes.map(u => ({
+                usuario_id: u.id,
+                data_inicio: data,
+                valor_meta: parseInt(valor)
+            }));
+
+            // Envia tudo de uma vez
+            const res = await _supabase.from('metas').insert(inserts);
+            error = res.error;
+
+        } else {
+            // Salvamento Individual
+            const res = await _supabase.from('metas').insert({ usuario_id: uid, data_inicio: data, valor_meta: parseInt(valor) });
+            error = res.error;
+        }
+
+        if(error) {
+            alert('Erro: ' + error.message);
+            btn.innerText = txt; 
+            btn.disabled = false;
+        } else {
+            document.getElementById('meta-value').value = ''; 
+            await loadMetasAtuais(); 
+            btn.style.background = 'var(--primary)';
+            btn.innerText = "Salvo!";
+            setTimeout(() => { 
+                btn.innerText = txt; 
+                btn.style.background = '';
+                btn.disabled = false; 
+            }, 2000);
+        }
     }
 
     init();
